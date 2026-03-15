@@ -1,9 +1,15 @@
 #pragma once
 
 #include <Windows.h>
+#include <ShObjIdl.h>
 
+#define ID_BTN_OK 1
 
-//Namespace holds data for making the window
+namespace KE
+{
+	enum class KReturn : int;
+}
+
 namespace KE::SYSTEM
 {
 
@@ -13,7 +19,6 @@ namespace KE::SYSTEM
 		const WCHAR* WindowTitle;
 		int WindowWidth;
 		int WindowHeight;
-
 	};
 	
 	//Class holds functions and private memebers for class
@@ -24,8 +29,8 @@ namespace KE::SYSTEM
 		void Create();
 		void SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle,
 			const int WindowWidth, const int WindowHeight);
-		void GetFrameBufferSize(HWND WindowHandle, int& Width, int& Height);
-		
+		KE::KReturn GetFrameBufferSize(HWND WindowHandle, int& Width, int& Height);
+		KE::KReturn OpenDialogBox();
 		KE::KReturn EventDispatcher();
 
 		const HWND GetWindowHandle() { return WindowHandle; }
@@ -33,7 +38,8 @@ namespace KE::SYSTEM
 
 	private:
 
-		KReturn CreateWin32Window(WindowDesc& desc);
+		KE::KReturn CreateWin32Window(WindowDesc& desc);
+		KE::KReturn CreateWin32Button();
 
 	private:
 
@@ -42,8 +48,10 @@ namespace KE::SYSTEM
 
 		//Handle to the window
 		HWND WindowHandle;
+		
 
 		WindowDesc _WindowDesc;
+
 	};
 
 };
