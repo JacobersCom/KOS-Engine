@@ -12,7 +12,7 @@ MReturns is the beginning of the logging system for the MAUS engine. HELD within
 
 namespace KE
 {
-	enum class KReturn
+	enum class KReturn : int
 	{
 		K_PROGRAM_CLOSED = 3,
 

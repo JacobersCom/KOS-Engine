@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Windows.h>
-#include "KReturn.h"
+
 
 //Namespace holds data for making the window
 namespace KE::SYSTEM
@@ -25,7 +25,8 @@ namespace KE::SYSTEM
 		void SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle,
 			const int WindowWidth, const int WindowHeight);
 		void GetFrameBufferSize(HWND WindowHandle, int& Width, int& Height);
-		KReturn EventDispatcher();
+		
+		KE::KReturn EventDispatcher();
 
 		const HWND GetWindowHandle() { return WindowHandle; }
 		const HINSTANCE GetWindowInstance() { return PtrLoader; }

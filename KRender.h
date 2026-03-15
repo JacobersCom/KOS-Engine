@@ -11,8 +11,16 @@
 #include <fstream>
 
 #include "vulkan/vulkan.h"
-#include "KWindow.h"
-#include "KReturn.h"
+
+
+namespace KE
+{
+	enum class KReturn : int;
+}
+namespace KE::SYSTEM
+{
+	class KWindow;
+}
 
 #ifdef NDEBUG
 static const bool enableValidationLayers = false;
@@ -25,8 +33,8 @@ namespace KE::RENDERER
 
 	struct QueueFamilyIndices {
 
-		std::optional<uint32_t>(GraphicsFamily);
-		std::optional<uint32_t>(PresentFamily);
+		std::optional<uint32_t>GraphicsFamily;
+		std::optional<uint32_t>PresentFamily;
 
 
 		bool isComplete()
@@ -59,6 +67,8 @@ namespace KE::RENDERER
 		void UpdateLoop();
 		void CleanUp();
 		
+		
+
 		KE::KReturn CreateVkInstance(VkInstance& _Instance);
 		KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
 		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
@@ -98,8 +108,6 @@ namespace KE::RENDERER
 		std::vector<const char*> GetRequiredInstanceExtensions();
 		std::vector<const char*> GetRequiredInstaceLayers();
 		std::vector<const char*> GetRequiredDeviceExtensions();
-		
-
 
 	private:
 
@@ -114,6 +122,8 @@ namespace KE::RENDERER
 		VkFormat _VkSwapChainFormat;
 		VkExtent2D _VkSwapChainExtent;
 		VkPipelineLayout _VkPipelineLayout;
+
+
 
 		std::vector<const char*> validationLayers;
 		std::vector<const char*> InstanceExtensions;

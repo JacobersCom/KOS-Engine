@@ -1,5 +1,6 @@
 #include "KRender.h"
-
+#include "KWindow.h"
+#include "KReturn.h"
 
 namespace KE::RENDERER
 {
@@ -230,9 +231,9 @@ namespace KE::RENDERER
 
 		VkPipelineViewportStateCreateInfo ViewPortInfo{};
 		ViewPortInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		ViewPortInfo.viewportCount = static_cast<uint32_t>(1);
+		ViewPortInfo.viewportCount = 1;
 		ViewPortInfo.pViewports = &viewport;
-		ViewPortInfo.scissorCount = static_cast<uint32_t>(1);
+		ViewPortInfo.scissorCount = 1;
 		ViewPortInfo.pScissors = &scissor;
 
 		return ViewPortInfo;
