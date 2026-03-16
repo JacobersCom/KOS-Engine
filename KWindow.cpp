@@ -61,9 +61,31 @@ namespace KE::SYSTEM
 		return KE::KReturn::K_SUCCESS;
 	}
 
+	//Whatever thread calls this function will own the COM model init in the function
 	KE::KReturn KWindow::OpenDialogBox()
 	{
-		
+		//Disable dynamic data exchange
+		HRESULT result = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+		if (SUCCEEDED(result))
+		{
+			IFileOpenDialog* pFileOpen;
+
+
+			result = CoCreateInstance( //Creates and fefault init a single object of the class associated with a specified CLSID
+				CLSID_FileOpenDialog, //Data and code associated with the object
+				NULL, // Wont be created as part of an aggreate
+				CLSCTX_ALL, //Context in which the newly create will run
+				IID_IFileOpenDialog, //Interface used to talk to the created object
+				reinterpret_cast<void**>(&pFileOpen)
+				);
+
+			if (SUCCEEDED(result))
+			{
+				result = pFileOpen->Show(NULL);
+			}
+
+			return KE::KReturn::K_SUCCESS;
+		}
 	}
 	
 	KReturn KWindow::CreateWin32Window(WindowDesc& Desc)
@@ -72,7 +94,7 @@ namespace KE::SYSTEM
 		WNDCLASS wc = {};
 		wc.hInstance = PtrLoader;
 		wc.lpszClassName = reinterpret_cast<LPCWSTR>(Desc.ClassName);
-		wc.lpfnWndProc = ::WindowProc;
+		wc.lpfnWndProc = KE::SYSTEM::KWindow::WindowProc;
 
 		RegisterClass(&wc);
 
@@ -86,12 +108,13 @@ namespace KE::SYSTEM
 		return KReturn::K_WINDOW_CREATION_SUCCESS;
 	}
 
+	//Add parameters to this to make it a helper
 	KE::KReturn KWindow::CreateWin32Button()
 	{
 		HWND hwnd = CreateWindowEx(
 			0,
 			L"BUTTON",  // Predefined class; Unicode assumed 
-			L"OK",      // Button text 
+			L"Import",      // Button text 
 			WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
 			10,         // x position 
 			10,         // y position 
@@ -118,13 +141,8 @@ namespace KE::SYSTEM
 		return KReturn::K_PROGRAM_CLOSED;
 	}
 
-
-}
-
-
-//Static Functions
-LRESULT CALLBACK WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam)
-{
+	LRESULT CALLBACK KWindow::WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam)
+	{
 	switch (message)
 	{
 		case WM_DESTROY:
@@ -148,13 +166,22 @@ LRESULT CALLBACK WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lPa
 
 			if (Notification == BN_CLICKED)
 			{
+
+				KE::SYSTEM::KWindow* pThis = reinterpret_cast<KE::SYSTEM::KWindow*>(GetWindowLongPtr(
+					Window, 
+					GWLP_USERDATA //retrieves the data use by the application to create the window
+				));
+				
 				switch (ControllerID)
 				{
 					case ID_BTN_OK:
-						
+						pThis->OpenDialogBox();
 						break;
 				}
+
+				delete pThis;
 			}
+			break;
 		}
 		case WM_SIZE:
 		{
@@ -175,6 +202,8 @@ LRESULT CALLBACK WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lPa
 			break;
 		}
 	}
-
-	return DefWindowProc(Window, message, wParam, lParam);
+		return DefWindowProc(Window, message, wParam, lParam);
+	}
 }
+
+

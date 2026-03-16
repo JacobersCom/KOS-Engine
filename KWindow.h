@@ -38,8 +38,11 @@ namespace KE::SYSTEM
 
 	private:
 
+		static LRESULT CALLBACK WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam);
+		
 		KE::KReturn CreateWin32Window(WindowDesc& desc);
 		KE::KReturn CreateWin32Button();
+		
 
 	private:
 
@@ -55,5 +58,3 @@ namespace KE::SYSTEM
 	};
 
 };
-
-LRESULT CALLBACK WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam);
