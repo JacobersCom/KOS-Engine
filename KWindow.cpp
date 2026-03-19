@@ -71,7 +71,7 @@ namespace KE
 				IFileOpenDialog* pFileOpen;
 
 
-				result = CoCreateInstance( //Creates and fefault init a single object of the class associated with a specified CLSID
+				result = CoCreateInstance( //Creates and defaults init a single object of the class associated with a specified CLSID
 					CLSID_FileOpenDialog, //Data and code associated with the object
 					NULL, // Wont be created as part of an aggreate
 					CLSCTX_ALL, //Context in which the newly create will run
@@ -89,13 +89,16 @@ namespace KE
 						//The file the user selected
 						IShellItem* pItem;
 
+						//The selected file
 						result = pFileOpen->GetResult(&pItem);
 
 						if (SUCCEEDED(result))
 						{
-
+							//Get the folder path to the users localAppData.
 							PWSTR LocalAppDataPath;
 							result = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &LocalAppDataPath);
+							//Create a folder for this program and store the selected file there.
+
 
 							if (FAILED(result))
 							{

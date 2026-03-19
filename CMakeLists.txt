@@ -1,0 +1,16 @@
+#Cmake make minium required 
+cmake_minimum_required(VERSION 3.0)
+
+#Project name version and language used
+project(KOS-Engine VERSION 1.0 LANGUAGE CXX)
+
+#Set the standard language version
+set(CMAKE_CXX_STANDARD 17)
+#Make it required
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+#Adding both subdirectorys
+add_subdirectory(src)
+add_subdirectory(Include)
+
+add_executable(KOS-Engine)

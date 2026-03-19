@@ -50,4 +50,9 @@
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

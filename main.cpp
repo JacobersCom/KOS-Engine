@@ -10,8 +10,8 @@ int main()
 {
 	KE::SYSTEM::KWindow _win;
 	KE::RENDERER::KRender _render(_win);
-	KE::RENDERER::QueueFamilyIndices fm;
-	KE::RENDERER::SwapChainSupportDetails sd;
+	KE::RENDERER::KRender::QueueFamilyIndices fm;
+	KE::RENDERER::KRender::SwapChainSupportDetails sd;
 
 
 	_win.SetWindowDesc(L"KOS", L"KOS Engine", 500, 500);
