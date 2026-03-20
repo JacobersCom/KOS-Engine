@@ -6,6 +6,11 @@ add_library(vulkan)
 target_sources(vulkan
 PRIVATE
     KRender.cpp
+PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS ${PROJECT_SOURCE_DIR}/include
+    FILES
+        ${PROJECT_SOURCE_DIR}/include/render/vulkan/KRender.h
 )
 
 #Links the src files to the renderer header files

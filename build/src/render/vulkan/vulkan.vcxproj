@@ -313,6 +313,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D:\WinSR\src\render\vulkan\KRender.cpp" />
+    <ClInclude Include="D:\WinSR\include\render\vulkan\KRender.h" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

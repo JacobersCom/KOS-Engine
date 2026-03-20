@@ -6,9 +6,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="D:\WinSR\include\render\vulkan\KRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <CustomBuild Include="D:\WinSR\src\render\vulkan\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{FA3BF6FD-E95B-34D4-88B2-183AB1B9E50D}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{55A422DB-7B4F-3FD4-9DA9-8709DDD2076F}</UniqueIdentifier>
     </Filter>
