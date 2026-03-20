@@ -1,0 +1,14 @@
+{
+	"InstallScripts" : 
+	[
+		"D:/WinSR/build/cmake_install.cmake",
+		"D:/WinSR/build/src/cmake_install.cmake",
+		"D:/WinSR/build/src/platform/cmake_install.cmake",
+		"D:/WinSR/build/src/platform/win32/cmake_install.cmake",
+		"D:/WinSR/build/src/render/cmake_install.cmake",
+		"D:/WinSR/build/src/render/vulkan/cmake_install.cmake",
+		"D:/WinSR/build/include/cmake_install.cmake",
+		"D:/WinSR/build/include/math/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

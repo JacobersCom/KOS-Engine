@@ -1,6 +1,6 @@
 
-#include "KWindow.h"
-#include "KRender.h"
+#include <platform/win32/KWindow.h>
+#include <render/vulkan/KRender.h>
 #include "KVector3.h"
 #include "KMat4.h"
 

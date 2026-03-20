@@ -1,0 +1,6 @@
+D:/WinSR/build/CMakeFiles/ALL_BUILD.dir
+D:/WinSR/build/CMakeFiles/ZERO_CHECK.dir
+D:/WinSR/build/src/CMakeFiles/KOS-Engine.dir
+D:/WinSR/build/src/platform/win32/CMakeFiles/win32.dir
+D:/WinSR/build/src/render/vulkan/CMakeFiles/vulkan.dir
+D:/WinSR/build/include/math/CMakeFiles/math.dir
