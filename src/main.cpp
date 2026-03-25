@@ -9,7 +9,7 @@
 int main()
 {
 	KE::SYSTEM::KWindow _win;
-	KE::RENDERER::KRender _render(_win);
+	KE::RENDERER::KRender _render(&_win);
 	KE::RENDERER::KRender::QueueFamilyIndices fm;
 	KE::RENDERER::KRender::SwapChainSupportDetails sd;
 

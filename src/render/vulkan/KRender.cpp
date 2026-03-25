@@ -13,16 +13,14 @@ namespace KE
 			CleanUp();
 		}
 
-		KReturn KRender::InitVulkan() 
+		void KRender::InitVulkan() 
 		{
-			KE::RENDERER::KRender::CreateVkInstance(_VkInstance);
-			KE::RENDERER::KRender::CreateWin32Surface(_win, _VkInstance, _VkSurface);
-			KE::RENDERER::KRender::PickPhysicalDevice(_VkPhysicalDevice, _VkInstance);
-			KE::RENDERER::KRender::CreateLogicalDevice(_VkPhysicalDevice, _VkDevice);
-			KE::RENDERER::KRender::CreateSwapChain(_VkPhysicalDevice, _VkDevice, _VkSwapChain);
+			KE::RENDERER::KRender::CreateVkInstance();
+			KE::RENDERER::KRender::CreateWin32Surface();
+			KE::RENDERER::KRender::PickPhysicalDevice();
+			KE::RENDERER::KRender::CreateLogicalDevice();
+			KE::RENDERER::KRender::CreateSwapChain();
 			KE::RENDERER::KRender::CreatePipeline();
-
-			return KE::KReturn::K_SUCCESS;
 		}
 
 		void KRender::UpdateLoop()
@@ -44,7 +42,7 @@ namespace KE
 		}
 
 
-		KReturn KRender::CreateVkInstance(VkInstance& _VkInstance)
+		void KRender::CreateVkInstance()
 		{
 			//Applcation information
 			VkApplicationInfo AppInfo{};
@@ -84,27 +82,24 @@ namespace KE
 				throw std::runtime_error("Failed to create VkInstance");
 			}
 
-			return KE::KReturn::K_SUCCESS;
 		}
 
-		KE::KReturn KRender::CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR)
+		void KRender::CreateWin32Surface()
 		{
 
 			VkWin32SurfaceCreateInfoKHR _WinSurfaceInfo{};
 
 			_WinSurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-			_WinSurfaceInfo.hwnd = _win.GetWindowHandle();
-			_WinSurfaceInfo.hinstance = _win.GetWindowInstance();
+			_WinSurfaceInfo.hwnd = _win->GetWindowHandle();
+			_WinSurfaceInfo.hinstance = _win->GetWindowInstance();
 
-			if (vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurfaceKHR) != VK_SUCCESS)
+			if (vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Win32 Surface creation failed");
 			}
-
-			return KE::KReturn::K_SUCCESS;
 		}
 
-		KE::KReturn KRender::PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance)
+		void KRender::PickPhysicalDevice()
 		{
 			//Get device count
 			uint32_t deviceCount = 0;
@@ -134,7 +129,6 @@ namespace KE
 				throw std::runtime_error("Failed to find Suitable GPU");
 			}
 
-			return KE::KReturn::K_SUCCESS;
 		}
 
 		KE::RENDERER::KRender::QueueFamilyIndices KRender::FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice)
@@ -339,7 +333,7 @@ namespace KE
 			else 
 			{
 				int width, height;
-				_win.GetFrameBufferSize(_win.GetWindowHandle(), width, height);
+				_win->GetFrameBufferSize(_win->GetWindowHandle(), width, height);
 
 				VkExtent2D actualExtent =
 				{
@@ -356,7 +350,7 @@ namespace KE
 			}
 		}
 
-		KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
+		void KE::RENDERER::KRender::CreateLogicalDevice()
 		{
 			//Ranges between 0.0 - 1.0
 			float QueuePriority = 1.0f;
@@ -412,10 +406,9 @@ namespace KE
 			vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &_VkPresentationQueue);
 
 
-			return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
 		}
 
-		KE::KReturn KRender::CreateSwapChain(VkPhysicalDevice _VkPhysicalDevice, VkDevice _VkDevice, VkSwapchainKHR& _VkSwapChain)
+		void KRender::CreateSwapChain()
 		{
 			SwapChainSupportDetails SwapChainDetails = GetSwapChainDetails(_VkPhysicalDevice);
 
@@ -467,7 +460,6 @@ namespace KE
 			if (result != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to create SwapChain");
-				return KE::KReturn::K_FAILURE;
 			}
 
 			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapChain, &ImageCount, nullptr);
@@ -477,10 +469,9 @@ namespace KE
 			_VkSwapChainFormat = SurfaceFormat.format;
 			_VkSwapChainExtent = Extent;
 
-			return KE::KReturn::K_SUCCESS;
 		}
 
-		KE::KReturn KRender::CreateImageViews(VkDevice _VkDevice)
+		void KRender::CreateImageViews()
 		{
 			ImageViews.resize(SwapChainImages.size());
 		
@@ -507,13 +498,11 @@ namespace KE
 				if (result != VK_SUCCESS)
 				{
 					throw std::runtime_error("Failed to create image views for swapchain");
-					return KE::KReturn::K_FAILURE;
 				}
 			}
-			return KE::KReturn::K_SUCCESS;
 		}
 
-		KE::KReturn KRender::CreatePipeline()
+		void KRender::CreatePipeline()
 		{
 			auto VertShaderCode = LoadShader("VertShader.spv");
 			auto PixelShaderCode = LoadShader("frag.spv");
@@ -566,7 +555,6 @@ namespace KE
 			vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
 
 
-			return KReturn::K_SUCCESS;
 		}
 
 		std::vector<const char*> KRender::GetRequiredInstanceExtensions()

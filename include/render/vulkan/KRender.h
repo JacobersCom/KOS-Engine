@@ -9,6 +9,7 @@
  const bool enableValidationLayers = true;
 #endif
 #pragma endregion
+
 #pragma region Includes
 #include <iostream>
 #include <cstdint>
@@ -20,11 +21,8 @@
 
 #include <vulkan/vulkan.h>
 #pragma endregion
+
 #pragma region Forward Declares
-namespace KE
-{
-	enum class KReturn : int;
-}
 namespace KE::SYSTEM
 {
 	class KWindow;
@@ -40,7 +38,7 @@ namespace KE
 		{
 		public:
 			
-			KRender(KE::SYSTEM::KWindow& _win) : _win(_win){}
+			KRender(KE::SYSTEM::KWindow* _win) : _win(_win){}
 
 			void run();
 
@@ -67,18 +65,18 @@ namespace KE
 
 		private:
 
-			KE::KReturn InitVulkan();
+			void InitVulkan();
 		
 			void UpdateLoop();
 			void CleanUp();
 		
-			KE::KReturn CreateVkInstance(VkInstance& _Instance);
-			KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
-			KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
-			KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
-			KE::KReturn CreateSwapChain(VkPhysicalDevice _VkPhysicalDevice, VkDevice _VkDevice, VkSwapchainKHR& _VkSwapChain);
-			KE::KReturn CreateImageViews(VkDevice _VkDevice);
-			KE::KReturn CreatePipeline();
+			void CreateVkInstance();
+			void PickPhysicalDevice();
+			void CreateWin32Surface();
+			void CreateLogicalDevice();
+			void CreateSwapChain();
+			void CreateImageViews();
+			void CreatePipeline();
 			QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 			QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 		
@@ -115,7 +113,7 @@ namespace KE
 
 		private:
 
-			KE::SYSTEM::KWindow& _win;
+			KE::SYSTEM::KWindow* _win;
 			VkInstance _VkInstance;
 			VkDevice _VkDevice;
 			VkQueue _VkGraphicsQueue;
