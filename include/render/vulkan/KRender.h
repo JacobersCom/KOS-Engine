@@ -18,6 +18,7 @@
 #include <optional>
 #include <set>
 #include <fstream>
+#include <filesystem>
 
 #include <vulkan/vulkan.h>
 #pragma endregion

@@ -608,14 +608,19 @@ namespace KE
 			return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
 		}
 
+		//Why are you not loading files
 		std::vector<char> KRender::LoadShader(const std::string& _FileName)
 		{
 			//Starts reading at the end of the file
 			std::ifstream file(_FileName, std::ios::ate | std::ios::binary);
 
+			file.open(_FileName);
+			
 			if (!file.is_open())
 			{
+				printf("Failed to load shader files");
 				throw std::runtime_error("Failed to load shader files");
+
 			}
 
 			//Returns the files size in bytes
