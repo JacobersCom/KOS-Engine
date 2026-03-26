@@ -90,7 +90,7 @@ namespace KE
 			VkPipelineViewportStateCreateInfo CreateViewPort();
 			VkPipelineRasterizationStateCreateInfo CreateRasterizationState();
 			VkPipelineColorBlendAttachmentState CreateColorBlendAttachmentState();
-			VkRenderPassCreateInfo CreateRenderPassInfo()
+			VkRenderPassCreateInfo CreateRenderPassInfo();
 
 			//All SwapChain helpers
 			SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);

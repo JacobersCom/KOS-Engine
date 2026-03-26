@@ -28,6 +28,8 @@ namespace KE
 
 		}
 
+		/*
+		*/
 		void KRender::CleanUp()
 		{
 
@@ -41,7 +43,8 @@ namespace KE
 			vkDestroyDevice(_VkDevice, nullptr);
 		}
 
-
+		/*
+		*/
 		void KRender::CreateVkInstance()
 		{
 			//Applcation information
@@ -84,6 +87,8 @@ namespace KE
 
 		}
 
+		/*
+		*/
 		void KRender::CreateWin32Surface()
 		{
 
@@ -99,6 +104,8 @@ namespace KE
 			}
 		}
 
+		/*
+		*/
 		void KRender::PickPhysicalDevice()
 		{
 			//Get device count
@@ -131,6 +138,8 @@ namespace KE
 
 		}
 
+		/*
+		*/
 		KE::RENDERER::KRender::QueueFamilyIndices KRender::FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice)
 		{
 			QueueFamilyIndices indices;
@@ -166,17 +175,17 @@ namespace KE
 
 			return indices;
 		}
-
+		
+		/*
+		*/
 		KE::RENDERER::KRender::QueueFamilyIndices KRender::GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice)
 		{
 			QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
 			return indices;
 		}
 
-		//Allows different parts of the renderer to be dynamic instead of fixed during draw time
-		//Current dynamic states
-		//-Dynamic view port
-		//-Dynamic scissor
+		/*
+		*/
 		VkPipelineDynamicStateCreateInfo KRender::CreateDynaminceStateInfo(int DynamicStateCount, VkDynamicState* DynamicStateData)
 		{
 			VkPipelineDynamicStateCreateInfo DynamicStateInfo{};
@@ -187,7 +196,8 @@ namespace KE
 			return DynamicStateInfo;
 		}
 
-		//Set the VertexInputState for the pipeline
+		/*
+		*/
 		VkPipelineVertexInputStateCreateInfo KRender::CreateVertexInputStateInfo()
 		{
 			VkPipelineVertexInputStateCreateInfo VertexStateInfo{};
@@ -199,8 +209,8 @@ namespace KE
 			return VertexStateInfo;
 		}
 
-		//Handles how shapes are drawn.
-		//PrimitiveRestart allows you to break up strips
+		/*
+		*/
 		VkPipelineInputAssemblyStateCreateInfo KRender::CreateAssemblyInputStateInfo()
 		{
 			VkPipelineInputAssemblyStateCreateInfo AssemblyStateInfo{};
@@ -211,6 +221,8 @@ namespace KE
 			return AssemblyStateInfo;
 		}
 
+		/*
+		*/
 		VkPipelineViewportStateCreateInfo KRender::CreateViewPort()
 		{
 			VkViewport viewport{};
@@ -235,6 +247,8 @@ namespace KE
 			return ViewPortInfo;
 		}
 
+		/*
+		*/
 		VkPipelineRasterizationStateCreateInfo KRender::CreateRasterizationState()
 		{
 			VkPipelineRasterizationStateCreateInfo RasterStateInfo{};
@@ -255,6 +269,8 @@ namespace KE
 			return RasterStateInfo;
 		}
 
+		/*
+		*/
 		VkPipelineColorBlendAttachmentState KRender::CreateColorBlendAttachmentState()
 		{
 			//Alpha blending
@@ -280,6 +296,9 @@ namespace KE
 			return VkRenderPassCreateInfo();
 		}
 
+
+		/*
+		*/
 		KE::RENDERER::KRender::SwapChainSupportDetails KRender::GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice)
 		{
 			SwapChainSupportDetails SwapChainDetails;
@@ -310,6 +329,8 @@ namespace KE
 			return SwapChainDetails;
 		}
 
+		/*
+		*/
 		VkSurfaceFormatKHR KRender::ChooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR> formats)
 		{
 			for (const auto availableFormat : formats)
@@ -324,6 +345,8 @@ namespace KE
 			}
 		}
 
+		/*
+		*/
 		VkPresentModeKHR KRender::ChooseSwapChainPresentMode(const std::vector<VkPresentModeKHR>& presentModes)
 		{
 			for (const auto& availablePresentMode : presentModes)
@@ -334,6 +357,8 @@ namespace KE
 			return VK_PRESENT_MODE_FIFO_KHR;
 		}
 
+		/*
+		*/
 		VkExtent2D KRender::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities)
 		{
 			if (capabilities.currentExtent.width != UINT32_MAX)
@@ -360,6 +385,8 @@ namespace KE
 			}
 		}
 
+		/*
+		*/
 		void KE::RENDERER::KRender::CreateLogicalDevice()
 		{
 			//Ranges between 0.0 - 1.0
@@ -418,6 +445,8 @@ namespace KE
 
 		}
 
+		/*
+		*/
 		void KRender::CreateSwapChain()
 		{
 			SwapChainSupportDetails SwapChainDetails = GetSwapChainDetails(_VkPhysicalDevice);
@@ -481,6 +510,8 @@ namespace KE
 
 		}
 
+		/*
+		*/
 		void KRender::CreateImageViews()
 		{
 			ImageViews.resize(SwapChainImages.size());
@@ -512,6 +543,8 @@ namespace KE
 			}
 		}
 
+		/*
+		*/
 		void KRender::CreatePipeline()
 		{
 			auto VertShaderCode = LoadShader("VertShader.spv");
@@ -567,6 +600,8 @@ namespace KE
 
 		}
 
+		/*
+		*/
 		void KRender::CreateFramebuffers()
 		{
 			//For each swapchain image there needs to be a frame buffer with it. hence the resize.
@@ -585,6 +620,8 @@ namespace KE
 			
 		}
 
+		/*
+		*/
 		std::vector<const char*> KRender::GetRequiredInstanceExtensions()
 		{
 			std::vector<const char*> extensions;
@@ -600,6 +637,8 @@ namespace KE
 			return extensions;
 		}
 
+		/*
+		*/
 		std::vector<const char*> KRender::GetRequiredInstaceLayers()
 		{
 			std::vector<const char*> layers;
@@ -611,6 +650,8 @@ namespace KE
 			return layers;
 		}
 
+		/*
+		*/
 		std::vector<const char*> KRender::GetRequiredDeviceExtensions()
 		{
 			std::vector<const char*> extensions;
@@ -619,6 +660,8 @@ namespace KE
 			return extensions;
 		}
 
+		/*
+		*/
 		bool KRender::IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
 		{
 			QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
@@ -636,7 +679,8 @@ namespace KE
 			return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
 		}
 
-		//Why are you not loading files
+		/*
+		*/
 		std::vector<char> KRender::LoadShader(const std::string& _FileName)
 		{
 			//Starts reading at the end of the file
@@ -664,6 +708,8 @@ namespace KE
 			return buffer;
 		}
 
+		/*
+		*/
 		bool KRender::CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)
 		{
 			uint32_t extensionCount;
@@ -682,6 +728,8 @@ namespace KE
 			return requiredExtensions.empty();
 		}
 
+		/*
+		*/
 		bool KRender::CheckVaildationLayerSupport()
 		{
 			uint32_t LayerCount;
@@ -709,6 +757,8 @@ namespace KE
 			return true;
 		}
 
+		/*
+		*/
 		VkShaderModule KRender::CreateShaderModule(const std::vector<char>& code)
 		{
 			VkShaderModuleCreateInfo ShaderModuleCreateInfo{};
