@@ -78,6 +78,8 @@ namespace KE
 			void CreateSwapChain();
 			void CreateImageViews();
 			void CreatePipeline();
+			void CreateFramebuffers();
+
 			QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 			QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 		
@@ -88,6 +90,7 @@ namespace KE
 			VkPipelineViewportStateCreateInfo CreateViewPort();
 			VkPipelineRasterizationStateCreateInfo CreateRasterizationState();
 			VkPipelineColorBlendAttachmentState CreateColorBlendAttachmentState();
+			VkRenderPassCreateInfo CreateRenderPassInfo()
 
 			//All SwapChain helpers
 			SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);
@@ -129,10 +132,12 @@ namespace KE
 			std::vector<const char*> validationLayers;
 			std::vector<const char*> InstanceExtensions;
 			std::vector<const char*> deviceExtensions;
+
 			std::vector<VkImage> SwapChainImages;
 			std::vector<VkImageView> ImageViews;
 			std::vector<VkDynamicState> DynamicStates;
-		};
+			std::vector<VkFramebuffer> Framebuffers;
+};
 	}
 
 }

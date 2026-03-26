@@ -270,6 +270,16 @@ namespace KE
 			return  ColorBlendState;
 		}
 
+		/*
+		 RenderPassInfo is need to discarible how many depth, color buffers there will be and how
+		 many smaples to use for each of them and how there contents should be handle during the 
+		 rendering process
+		*/
+		VkRenderPassCreateInfo KRender::CreateRenderPassInfo()
+		{
+			return VkRenderPassCreateInfo();
+		}
+
 		KE::RENDERER::KRender::SwapChainSupportDetails KRender::GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice)
 		{
 			SwapChainSupportDetails SwapChainDetails;
@@ -555,6 +565,24 @@ namespace KE
 			vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
 
 
+		}
+
+		void KRender::CreateFramebuffers()
+		{
+			//For each swapchain image there needs to be a frame buffer with it. hence the resize.
+			Framebuffers.resize(SwapChainImages.size());
+
+			for (int i = 0; i < SwapChainImages.size(); i++)
+			{
+				VkImage attachments[] =
+				{
+					SwapChainImages[i]
+				};
+			}
+
+			VkFramebufferCreateInfo FrameBufferInfo{};
+			FrameBufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+			
 		}
 
 		std::vector<const char*> KRender::GetRequiredInstanceExtensions()
