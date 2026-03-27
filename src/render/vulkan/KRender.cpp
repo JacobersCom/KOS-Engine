@@ -39,6 +39,7 @@ namespace KE
 			{
 				vkDestroyImageView(_VkDevice, ImageView, nullptr);
 			}
+			vkDestroyRenderPass(_VkDevice, _VkRenderPass, nullptr);
 			vkDestroyPipelineLayout(_VkDevice, _VkPipelineLayout, nullptr);
 			vkDestroyDevice(_VkDevice, nullptr);
 		}
