@@ -288,8 +288,10 @@ namespace KE
 
 		/*
 		 RenderPassInfo is need to discarible how many depth, color buffers there will be and how
-		 many smaples to use for each of them and how there contents should be handle during the 
+		 many samples to use for each of them and how there contents should be handle during the 
 		 rendering process
+
+		 A RenderPass allows for operations to be performed on a image to improve the quaitily of the final image
 		*/
 		VkRenderPassCreateInfo KRender::CreateRenderPassInfo()
 		{
@@ -310,7 +312,32 @@ namespace KE
 			ColorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; //Image layout unknown and not saved.
 			ColorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR; //Images in the swapchain
 
-			return VkRenderPassCreateInfo();
+			//Simply a reference to the ColorAttachment above
+			VkAttachmentReference ColorAttachmentRef{};
+			ColorAttachmentRef.attachment = 0; //The index is found in the shader code COLOR0
+			ColorAttachmentRef.layout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL; //Gives better performance
+
+			//Subpasses allow for different effects to be grouped togther in a renderpass to reorder the operations to save on memory and give better performance
+			VkSubpassDescription Subpass{};
+			Subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS; //Tells Vulkan this is a graphics subpass
+			Subpass.colorAttachmentCount = 0; 
+			Subpass.pColorAttachments = &ColorAttachmentRef;
+
+			//Linking it all togther
+			VkRenderPassCreateInfo RenderPassInfo{};
+			RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+			RenderPassInfo.attachmentCount = 1;
+			RenderPassInfo.pAttachments = &ColorAttachment;
+			RenderPassInfo.subpassCount = 1;
+			RenderPassInfo.pSubpasses = &Subpass;
+
+			VkResult result = vkCreateRenderPass(_VkDevice, &RenderPassInfo, nullptr, &_VkRenderPass);
+			if (result != VK_SUCCESS)
+			{
+				printf("Failed to create RenderPass");
+			}
+
+			return RenderPassInfo;
 		}
 
 		/*
