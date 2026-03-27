@@ -34,7 +34,7 @@ namespace KE
 		{
 
 			vkDestroySurfaceKHR(_VkInstance, _VkSurface, nullptr);
-			vkDestroySwapchainKHR(_VkDevice, _VkSwapChain, nullptr);
+			vkDestroySwapchainKHR(_VkDevice, _VkSwapchain, nullptr);
 			for (auto& ImageView : ImageViews)
 			{
 				vkDestroyImageView(_VkDevice, ImageView, nullptr);
@@ -228,14 +228,14 @@ namespace KE
 			VkViewport viewport{};
 			viewport.x = 0.0f;
 			viewport.y = 0.0f;
-			viewport.width = static_cast<float>(_VkSwapChainExtent.width);
-			viewport.height = static_cast<float>(_VkSwapChainExtent.height);
+			viewport.width = static_cast<float>(_VkSwapchainExtent.width);
+			viewport.height = static_cast<float>(_VkSwapchainExtent.height);
 			viewport.minDepth = 0.0f;
 			viewport.maxDepth = 1.0f;
 
 			VkRect2D scissor{};
 			scissor.offset = { 0, 0 };
-			scissor.extent = _VkSwapChainExtent;
+			scissor.extent = _VkSwapchainExtent;
 
 			VkPipelineViewportStateCreateInfo ViewPortInfo{};
 			ViewPortInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -293,9 +293,25 @@ namespace KE
 		*/
 		VkRenderPassCreateInfo KRender::CreateRenderPassInfo()
 		{
+			//The description of an color attachment
+			VkAttachmentDescription ColorAttachment{};
+			ColorAttachment.format = _VkSwapchainFormat; //Format of the image view that will be used
+			ColorAttachment.samples = VK_SAMPLE_COUNT_1_BIT; //Each pixel's depth, coverage, and stencil will be tested once
+
+			//These value will describle how the contents color and depth are treated before and after pass
+			ColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; //Values will become const at the start
+			ColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; //Write contents to memory to read later
+
+			//These value will describle how the contents of the stencil components will be treated before and after pass
+			ColorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE; //Do not save the content within the render area
+			ColorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE; //Content is not needed after rendering
+
+			//The layout of the image from beginning to end of pass
+			ColorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; //Image layout unknown and not saved.
+			ColorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR; //Images in the swapchain
+
 			return VkRenderPassCreateInfo();
 		}
-
 
 		/*
 		*/
@@ -494,19 +510,19 @@ namespace KE
 			SwapChainInfo.clipped = VK_TRUE; // Dont care about covered pixels
 			SwapChainInfo.oldSwapchain = VK_NULL_HANDLE;
 		
-			VkResult result = vkCreateSwapchainKHR(_VkDevice, &SwapChainInfo, nullptr, &_VkSwapChain);
+			VkResult result = vkCreateSwapchainKHR(_VkDevice, &SwapChainInfo, nullptr, &_VkSwapchain);
 
 			if (result != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to create SwapChain");
 			}
 
-			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapChain, &ImageCount, nullptr);
+			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapchain, &ImageCount, nullptr);
 			SwapChainImages.resize(ImageCount);
-			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapChain, &ImageCount, SwapChainImages.data());
+			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapchain, &ImageCount, SwapChainImages.data());
 
-			_VkSwapChainFormat = SurfaceFormat.format;
-			_VkSwapChainExtent = Extent;
+			_VkSwapchainFormat = SurfaceFormat.format;
+			_VkSwapchainExtent = Extent;
 
 		}
 
@@ -522,7 +538,7 @@ namespace KE
 				ImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 				ImageViewInfo.image = SwapChainImages[i];
 				ImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-				ImageViewInfo.format = _VkSwapChainFormat;
+				ImageViewInfo.format = _VkSwapchainFormat;
 				ImageViewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
 				ImageViewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
 				ImageViewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;

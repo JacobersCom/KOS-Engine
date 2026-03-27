@@ -124,9 +124,9 @@ namespace KE
 			VkQueue _VkPresentationQueue;
 			VkSurfaceKHR _VkSurface;
 			VkPhysicalDevice _VkPhysicalDevice;
-			VkSwapchainKHR _VkSwapChain;
-			VkFormat _VkSwapChainFormat;
-			VkExtent2D _VkSwapChainExtent;
+			VkSwapchainKHR _VkSwapchain;
+			VkFormat _VkSwapchainFormat;
+			VkExtent2D _VkSwapchainExtent;
 			VkPipelineLayout _VkPipelineLayout;
 
 			std::vector<const char*> validationLayers;
