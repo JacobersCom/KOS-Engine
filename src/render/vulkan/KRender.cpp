@@ -45,20 +45,25 @@ namespace KE
 		}
 
 		/*
+		This is the beginning of the applcation! Creating a instance of the vulkan API.
+		 
+		Defines the name and Verison of the applcation built using vulkan and the verison of the vulkan instance used 
 		*/
 		void KRender::CreateVkInstance()
 		{
 			//Applcation information
 			VkApplicationInfo AppInfo{};
 
+
 			AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 			AppInfo.pNext = VK_NULL_HANDLE;
-			AppInfo.pApplicationName = "KOS Engine";
-			AppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-			AppInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-			AppInfo.pEngineName = "KOS";
-			AppInfo.apiVersion = VK_API_VERSION_1_4;
+			AppInfo.pApplicationName = "KOS Engine"; //Name of the applcation
+			AppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0); //Version of the applcation
+			AppInfo.pEngineName = "KOS"; //Name of engine used to make the applcation
+			AppInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0); //Version of the engine used to make the applcation
+			AppInfo.apiVersion = VK_API_VERSION_1_4; //Version of the vulkan instance
 
+			//The parameters for the newly created vulkan instance
 			VkInstanceCreateInfo InstanceInfo{};
 
 			InstanceExtensions = GetRequiredInstanceExtensions();
@@ -88,22 +93,29 @@ namespace KE
 
 		}
 
+#ifdef _WIN32
+
 		/*
+		Specificly creates a win32 surfce for a win32 window if thats the end users OS
 		*/
 		void KRender::CreateWin32Surface()
 		{
-
+			//Info for a win32 surface object
 			VkWin32SurfaceCreateInfoKHR _WinSurfaceInfo{};
 
 			_WinSurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-			_WinSurfaceInfo.hwnd = _win->GetWindowHandle();
-			_WinSurfaceInfo.hinstance = _win->GetWindowInstance();
+			_WinSurfaceInfo.hwnd = _win->GetWindowHandle(); //Handle to win32 window
+			_WinSurfaceInfo.hinstance = _win->GetWindowInstance();//Instance of the win32 window
 
-			if (vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface) != VK_SUCCESS)
+			VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface);
+
+			if (result != VK_SUCCESS)
 			{
-				throw std::runtime_error("Win32 Surface creation failed");
+				printf("Failed to create win32 surface");
 			}
 		}
+
+#endif // _WIN32
 
 		/*
 		*/
