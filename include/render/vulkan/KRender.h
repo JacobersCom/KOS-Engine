@@ -88,10 +88,21 @@ namespace KE
 			VkPipelineDynamicStateCreateInfo CreateDynaminceStateInfo(int DynamicStateCount, VkDynamicState* DynamicStateData);
 			VkPipelineVertexInputStateCreateInfo CreateVertexInputStateInfo();
 			VkPipelineInputAssemblyStateCreateInfo CreateAssemblyInputStateInfo();
-			VkPipelineViewportStateCreateInfo CreateViewPort();
+
+			VkViewport CreateViewportInfo();
+			VkRect2D CreateScissorInfo();
+			VkPipelineViewportStateCreateInfo CreateViewPortStateInfo(VkViewport& _VkViewport, VkRect2D& _VkScissor,
+				uint32_t ViewportCount, uint32_t ScissorCount);
+			
 			VkPipelineRasterizationStateCreateInfo CreateRasterizationState();
-			VkPipelineColorBlendStateCreateInfo CreatePipelineColorBlendStateInfo();
+
+			VkPipelineColorBlendAttachmentState CreateColorBlendInfo();
+			VkPipelineColorBlendStateCreateInfo CreatePipelineColorBlendStateInfo(
+				VkPipelineColorBlendAttachmentState& ColorBlendState);
+
+			std::vector<VkDynamicState> CreateDynamicStates(); 
 			VkPipelineMultisampleStateCreateInfo CreatePipelineMultisampleStateInfo();
+
 			VkRenderPassCreateInfo CreateRenderPassInfo();
 
 			//All SwapChain helpers
@@ -129,11 +140,8 @@ namespace KE
 			VkSwapchainKHR _VkSwapchain;
 			VkFormat _VkSwapchainFormat;
 			VkExtent2D _VkSwapchainExtent;
-			VkViewport _VkViewport;
-			VkRect2D _VkScissor;
 			VkRenderPass _VkRenderPass;
 			VkPipelineLayout _VkPipelineLayout;
-			VkPipelineColorBlendAttachmentState ColorBlendState;
 			VkPipeline _VkPipeline;
 
 			std::vector<const char*> validationLayers;
@@ -142,7 +150,6 @@ namespace KE
 
 			std::vector<VkImage> SwapChainImages;
 			std::vector<VkImageView> ImageViews;
-			std::vector<VkDynamicState> DynamicStates;
 			std::vector<VkFramebuffer> Framebuffers;
 };
 	}

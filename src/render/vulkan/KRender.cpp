@@ -235,10 +235,9 @@ namespace KE
 			return AssemblyStateInfo;
 		}
 
-		/*
-		*/
-		VkPipelineViewportStateCreateInfo KRender::CreateViewPort()
+		VkViewport KRender::CreateViewportInfo()
 		{
+			VkViewport _VkViewport{};
 			_VkViewport.x = 0.0f;
 			_VkViewport.y = 0.0f;
 			_VkViewport.width = static_cast<float>(_VkSwapchainExtent.width);
@@ -246,14 +245,27 @@ namespace KE
 			_VkViewport.minDepth = 0.0f;
 			_VkViewport.maxDepth = 1.0f;
 
+			return _VkViewport;
+		}
+
+		VkRect2D KRender::CreateScissorInfo()
+		{
+			VkRect2D _VkScissor{};
+
 			_VkScissor.offset = { 0, 0 };
 			_VkScissor.extent = _VkSwapchainExtent;
+		}
 
+		/*
+		*/
+		VkPipelineViewportStateCreateInfo KRender::CreateViewPortStateInfo(VkViewport& _VkViewport, VkRect2D& _VkScissor, 
+			uint32_t ViewportCount, uint32_t ScissorCount)
+		{
 			VkPipelineViewportStateCreateInfo ViewPortInfo{};
 			ViewPortInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-			ViewPortInfo.viewportCount = 1;
+			ViewPortInfo.viewportCount = ViewportCount;
 			ViewPortInfo.pViewports = &_VkViewport;
-			ViewPortInfo.scissorCount = 1;
+			ViewPortInfo.scissorCount = ScissorCount;
 			ViewPortInfo.pScissors = &_VkScissor;
 
 			return ViewPortInfo;
@@ -282,31 +294,48 @@ namespace KE
 			return RasterStateInfo;
 		}
 
+		VkPipelineColorBlendAttachmentState KRender::CreateColorBlendInfo()
+		{
+			VkPipelineColorBlendAttachmentState ColorblendAttachmentInfo{};
+
+			ColorblendAttachmentInfo.blendEnable = VK_TRUE;
+			ColorblendAttachmentInfo.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+			ColorblendAttachmentInfo.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+			ColorblendAttachmentInfo.colorBlendOp = VK_BLEND_OP_ADD;
+			ColorblendAttachmentInfo.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+			ColorblendAttachmentInfo.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+			ColorblendAttachmentInfo.alphaBlendOp = VK_BLEND_OP_ADD;
+
+			return ColorblendAttachmentInfo;
+		}
+
 		/*
 		*/
-		VkPipelineColorBlendStateCreateInfo KRender::CreatePipelineColorBlendStateInfo()
+		VkPipelineColorBlendStateCreateInfo KRender::CreatePipelineColorBlendStateInfo(
+			VkPipelineColorBlendAttachmentState& ColorBlendAttachmentInfo)
 		{
-			//Alpha blending
-			ColorBlendState.blendEnable = VK_TRUE;
-			ColorBlendState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-			ColorBlendState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-			ColorBlendState.colorBlendOp = VK_BLEND_OP_ADD;
-			ColorBlendState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-			ColorBlendState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-			ColorBlendState.alphaBlendOp = VK_BLEND_OP_ADD;
 
-			VkPipelineColorBlendStateCreateInfo colorBlending{};
-			colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-			colorBlending.logicOpEnable = VK_FALSE;
-			colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
-			colorBlending.attachmentCount = 1;
-			colorBlending.pAttachments = &ColorBlendState;
-			colorBlending.blendConstants[0] = 0.0f; // Optional
-			colorBlending.blendConstants[1] = 0.0f; // Optional
-			colorBlending.blendConstants[2] = 0.0f; // Optional
-			colorBlending.blendConstants[3] = 0.0f; // Optional
+			VkPipelineColorBlendStateCreateInfo ColorblendingStateInfo{};
+			ColorblendingStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+			ColorblendingStateInfo.logicOpEnable = VK_FALSE;
+			ColorblendingStateInfo.logicOp = VK_LOGIC_OP_COPY; // Optional
+			ColorblendingStateInfo.attachmentCount = 1;
+			ColorblendingStateInfo.pAttachments = &ColorBlendAttachmentInfo;
+			ColorblendingStateInfo.blendConstants[0] = 0.0f; // Optional
+			ColorblendingStateInfo.blendConstants[1] = 0.0f; // Optional
+			ColorblendingStateInfo.blendConstants[2] = 0.0f; // Optional
+			ColorblendingStateInfo.blendConstants[3] = 0.0f; // Optional
 
-			return  colorBlending;
+			return  ColorblendingStateInfo;
+		}
+
+		std::vector<VkDynamicState> KRender::CreateDynamicStates()
+		{
+			std::vector<VkDynamicState> states
+			{
+				VK_DYNAMIC_STATE_SCISSOR,
+				VK_DYNAMIC_STATE_VIEWPORT
+			};
 		}
 
 		/*
@@ -640,7 +669,6 @@ namespace KE
 			VkShaderModule VertModule = CreateShaderModule(VertShaderCode);
 			VkShaderModule PixelModule = CreateShaderModule(PixelShaderCode);
 
-
 			VkPipelineShaderStageCreateInfo VertexStage{};
 			VertexStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 			VertexStage.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -659,20 +687,21 @@ namespace KE
 
 			VkPipelineInputAssemblyStateCreateInfo AssemblyInput = CreateAssemblyInputStateInfo();
 
-			VkPipelineViewportStateCreateInfo ViewPortInfo = CreateViewPort();
+			VkViewport _VkViewport = CreateViewportInfo();
+			VkRect2D _VkScissor = CreateScissorInfo();
+
+			VkPipelineViewportStateCreateInfo ViewPortInfo = CreateViewPortStateInfo(_VkViewport, _VkScissor,1,1);
 
 			VkPipelineRasterizationStateCreateInfo RasterizationInfo = CreateRasterizationState();
 
-			VkPipelineColorBlendStateCreateInfo ColorBlendInfo = CreatePipelineColorBlendStateInfo();
+			VkPipelineColorBlendAttachmentState ColorBlendAttachment = CreateColorBlendInfo();
 
+			VkPipelineColorBlendStateCreateInfo ColorBlendInfo = CreatePipelineColorBlendStateInfo(ColorBlendAttachment);
+
+			std::vector<VkDynamicState> States = CreateDynamicStates();
+			VkPipelineDynamicStateCreateInfo DynamicStateInfo = CreateDynaminceStateInfo(States.size(), States.data());
+			
 			VkPipelineMultisampleStateCreateInfo MultiSampleInfo = CreatePipelineMultisampleStateInfo();
-
-			DynamicStates = {
-				VK_DYNAMIC_STATE_SCISSOR,
-				VK_DYNAMIC_STATE_VIEWPORT
-			};
-
-			VkPipelineDynamicStateCreateInfo DynamicStateInfo = CreateDynaminceStateInfo(DynamicStates.size(), DynamicStates.data());
 
 			VkPipelineLayoutCreateInfo PipelinelayoutInfo{};
 			PipelinelayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -705,9 +734,8 @@ namespace KE
 			PipelineInfo.basePipelineHandle = VK_NULL_HANDLE; //Ref to another pipeline
 			PipelineInfo.basePipelineIndex = 0; //Index of pipeline
 
-			result = vkCreateGraphicsPipelines(_VkDevice, VK_NULL_HANDLE, 1, &PipelineInfo, nullptr, &_VkPipeline);
-
-			if (result != VK_SUCCESS) {
+			if (vkCreateGraphicsPipelines(_VkDevice, VK_NULL_HANDLE, 1, 
+				&PipelineInfo, nullptr, &_VkPipeline) != VK_SUCCESS) {
 				
 				throw std::runtime_error("Failed to create GraphicsPipeLine");
 			}
