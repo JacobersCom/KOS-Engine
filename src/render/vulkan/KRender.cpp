@@ -239,24 +239,22 @@ namespace KE
 		*/
 		VkPipelineViewportStateCreateInfo KRender::CreateViewPort()
 		{
-			VkViewport viewport{};
-			viewport.x = 0.0f;
-			viewport.y = 0.0f;
-			viewport.width = static_cast<float>(_VkSwapchainExtent.width);
-			viewport.height = static_cast<float>(_VkSwapchainExtent.height);
-			viewport.minDepth = 0.0f;
-			viewport.maxDepth = 1.0f;
+			_VkViewport.x = 0.0f;
+			_VkViewport.y = 0.0f;
+			_VkViewport.width = static_cast<float>(_VkSwapchainExtent.width);
+			_VkViewport.height = static_cast<float>(_VkSwapchainExtent.height);
+			_VkViewport.minDepth = 0.0f;
+			_VkViewport.maxDepth = 1.0f;
 
-			VkRect2D scissor{};
-			scissor.offset = { 0, 0 };
-			scissor.extent = _VkSwapchainExtent;
+			_VkScissor.offset = { 0, 0 };
+			_VkScissor.extent = _VkSwapchainExtent;
 
 			VkPipelineViewportStateCreateInfo ViewPortInfo{};
 			ViewPortInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 			ViewPortInfo.viewportCount = 1;
-			ViewPortInfo.pViewports = &viewport;
+			ViewPortInfo.pViewports = &_VkViewport;
 			ViewPortInfo.scissorCount = 1;
-			ViewPortInfo.pScissors = &scissor;
+			ViewPortInfo.pScissors = &_VkScissor;
 
 			return ViewPortInfo;
 		}
@@ -289,7 +287,6 @@ namespace KE
 		VkPipelineColorBlendStateCreateInfo KRender::CreatePipelineColorBlendStateInfo()
 		{
 			//Alpha blending
-			VkPipelineColorBlendAttachmentState ColorBlendState{};
 			ColorBlendState.blendEnable = VK_TRUE;
 			ColorBlendState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
 			ColorBlendState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -691,24 +688,26 @@ namespace KE
 				printf("Failed to create pipeline layout");
 			}
 
-			VkGraphicsPipelineCreateInfo Pipeline{};
-			Pipeline.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-			Pipeline.stageCount = 2;
-			Pipeline.pVertexInputState = &VertexInput;
-			Pipeline.pInputAssemblyState = &AssemblyInput;
-			Pipeline.pViewportState = &ViewPortInfo;
-			Pipeline.pRasterizationState = &RasterizationInfo;
-			Pipeline.pColorBlendState = &ColorBlendInfo;
-			Pipeline.pMultisampleState = &MultiSampleInfo;
-			Pipeline.pDynamicState = &DynamicStateInfo;
-			Pipeline.layout = _VkPipelineLayout;
-			Pipeline.renderPass = _VkRenderPass;
-			Pipeline.subpass = 0; //Index of subpass where this pipeline will be used
-			Pipeline.basePipelineHandle = VK_NULL_HANDLE; //Ref to another pipeline
-			Pipeline.basePipelineIndex = 0; //Index of pipeline
+			VkGraphicsPipelineCreateInfo PipelineInfo{};
+			PipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+			PipelineInfo.stageCount = 2;
+			PipelineInfo.pStages = ShaderStages;
+			PipelineInfo.pVertexInputState = &VertexInput;
+			PipelineInfo.pInputAssemblyState = &AssemblyInput;
+			PipelineInfo.pViewportState = &ViewPortInfo;
+			PipelineInfo.pRasterizationState = &RasterizationInfo;
+			PipelineInfo.pColorBlendState = &ColorBlendInfo;
+			PipelineInfo.pMultisampleState = &MultiSampleInfo;
+			PipelineInfo.pDynamicState = &DynamicStateInfo;
+			PipelineInfo.layout = _VkPipelineLayout;
+			PipelineInfo.renderPass = _VkRenderPass;
+			PipelineInfo.subpass = 0; //Index of subpass where this pipeline will be used
+			PipelineInfo.basePipelineHandle = VK_NULL_HANDLE; //Ref to another pipeline
+			PipelineInfo.basePipelineIndex = 0; //Index of pipeline
 
-			if (vkCreateGraphicsPipelines(_VkDevice, VK_NULL_HANDLE, 1,
-				&Pipeline, nullptr, &_VkPipeline) != VK_SUCCESS) {
+			result = vkCreateGraphicsPipelines(_VkDevice, VK_NULL_HANDLE, 1, &PipelineInfo, nullptr, &_VkPipeline);
+
+			if (result != VK_SUCCESS) {
 				
 				throw std::runtime_error("Failed to create GraphicsPipeLine");
 			}

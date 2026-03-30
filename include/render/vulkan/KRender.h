@@ -129,8 +129,11 @@ namespace KE
 			VkSwapchainKHR _VkSwapchain;
 			VkFormat _VkSwapchainFormat;
 			VkExtent2D _VkSwapchainExtent;
+			VkViewport _VkViewport;
+			VkRect2D _VkScissor;
 			VkRenderPass _VkRenderPass;
 			VkPipelineLayout _VkPipelineLayout;
+			VkPipelineColorBlendAttachmentState ColorBlendState;
 			VkPipeline _VkPipeline;
 
 			std::vector<const char*> validationLayers;
