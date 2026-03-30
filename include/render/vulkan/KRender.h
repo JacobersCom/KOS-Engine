@@ -3,6 +3,7 @@
 #pragma region Defines
 #define VK_USE_PLATFORM_WIN32_KHR
 
+
 #ifdef NDEBUG
  const bool enableValidationLayers = false;
 #else 
@@ -89,7 +90,8 @@ namespace KE
 			VkPipelineInputAssemblyStateCreateInfo CreateAssemblyInputStateInfo();
 			VkPipelineViewportStateCreateInfo CreateViewPort();
 			VkPipelineRasterizationStateCreateInfo CreateRasterizationState();
-			VkPipelineColorBlendAttachmentState CreateColorBlendAttachmentState();
+			VkPipelineColorBlendStateCreateInfo CreatePipelineColorBlendStateInfo();
+			VkPipelineMultisampleStateCreateInfo CreatePipelineMultisampleStateInfo();
 			VkRenderPassCreateInfo CreateRenderPassInfo();
 
 			//All SwapChain helpers
@@ -101,7 +103,7 @@ namespace KE
 
 			//All Shader helpers
 			//Takes in the a spv compiled shader
-			std::vector<char> LoadShader(const std::string& _FileName);
+			std::vector<char> LoadShader(std::filesystem::path& _FileName);
 			//Takes in the return from LoadShaders
 			VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
@@ -129,6 +131,7 @@ namespace KE
 			VkExtent2D _VkSwapchainExtent;
 			VkRenderPass _VkRenderPass;
 			VkPipelineLayout _VkPipelineLayout;
+			VkPipeline _VkPipeline;
 
 			std::vector<const char*> validationLayers;
 			std::vector<const char*> InstanceExtensions;

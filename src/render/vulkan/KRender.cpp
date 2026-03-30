@@ -20,6 +20,7 @@ namespace KE
 			KE::RENDERER::KRender::PickPhysicalDevice();
 			KE::RENDERER::KRender::CreateLogicalDevice();
 			KE::RENDERER::KRender::CreateSwapChain();
+			KE::RENDERER::KRender::CreateRenderPassInfo();
 			KE::RENDERER::KRender::CreatePipeline();
 		}
 
@@ -267,9 +268,10 @@ namespace KE
 			VkPipelineRasterizationStateCreateInfo RasterStateInfo{};
 			RasterStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 			RasterStateInfo.depthClampEnable = VK_FALSE; // Using this requires enabling VkPipelineRasterizationDepthClipStateCreateInfoEXT within the pipeline
-			RasterStateInfo.rasterizerDiscardEnable = VK_FALSE; // if trust it stops everything from reaching the frame buffer
+			RasterStateInfo.rasterizerDiscardEnable = VK_FALSE; // if true it stops everything from reaching the frame buffer
 			RasterStateInfo.polygonMode = VK_POLYGON_MODE_FILL;
 			RasterStateInfo.lineWidth = 1.f; //Anything thicker than 1.f requries a gpu feature
+			
 			//Determines the type of face culling to use
 			RasterStateInfo.cullMode = VK_CULL_MODE_BACK_BIT; 
 			RasterStateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
@@ -284,7 +286,7 @@ namespace KE
 
 		/*
 		*/
-		VkPipelineColorBlendAttachmentState KRender::CreateColorBlendAttachmentState()
+		VkPipelineColorBlendStateCreateInfo KRender::CreatePipelineColorBlendStateInfo()
 		{
 			//Alpha blending
 			VkPipelineColorBlendAttachmentState ColorBlendState{};
@@ -296,7 +298,39 @@ namespace KE
 			ColorBlendState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
 			ColorBlendState.alphaBlendOp = VK_BLEND_OP_ADD;
 
-			return  ColorBlendState;
+			VkPipelineColorBlendStateCreateInfo colorBlending{};
+			colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+			colorBlending.logicOpEnable = VK_FALSE;
+			colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
+			colorBlending.attachmentCount = 1;
+			colorBlending.pAttachments = &ColorBlendState;
+			colorBlending.blendConstants[0] = 0.0f; // Optional
+			colorBlending.blendConstants[1] = 0.0f; // Optional
+			colorBlending.blendConstants[2] = 0.0f; // Optional
+			colorBlending.blendConstants[3] = 0.0f; // Optional
+
+			return  colorBlending;
+		}
+
+		/*
+		Multisampling is a way to preform anti-aliasing which helps to prevent jaggies.
+		This is also a type of spatial-anti-aliasing which also helps prevent jaggies, 
+		when presenting a high res image at a low res.
+
+		Multisampling is also faster than supersampling because it only performs the operation on the pixel once
+		instead of once for every sample of the pixel.
+		*/
+		VkPipelineMultisampleStateCreateInfo KRender::CreatePipelineMultisampleStateInfo()
+		{
+			VkPipelineMultisampleStateCreateInfo MultiSampleInfo{};
+			MultiSampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+			MultiSampleInfo.sampleShadingEnable = VK_TRUE; //allows the pixel shader to be evaulated for each sample within a pixel instead of one fragment
+			MultiSampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT; //Number of samples used in rasterzation
+			MultiSampleInfo.minSampleShading = 1.0f; //The minmum number of sample shading
+			MultiSampleInfo.alphaToCoverageEnable = VK_FALSE; //Creates a temp value based off the color of the fragments first output
+			MultiSampleInfo.alphaToOneEnable = VK_FALSE; //Controls wither the aphla value of the first color is replaced on one
+
+			return MultiSampleInfo;
 		}
 
 		/*
@@ -333,7 +367,7 @@ namespace KE
 			//Subpasses allow for different effects to be grouped togther in a renderpass to reorder the operations to save on memory and give better performance
 			VkSubpassDescription Subpass{};
 			Subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS; //Tells Vulkan this is a graphics subpass
-			Subpass.colorAttachmentCount = 0; 
+			Subpass.colorAttachmentCount = 1; 
 			Subpass.pColorAttachments = &ColorAttachmentRef;
 
 			//Linking it all togther
@@ -554,7 +588,7 @@ namespace KE
 
 			if (result != VK_SUCCESS)
 			{
-				throw std::runtime_error("Failed to create SwapChain");
+				printf("Failed to create SwapChain");
 			}
 
 			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapchain, &ImageCount, nullptr);
@@ -603,8 +637,8 @@ namespace KE
 		*/
 		void KRender::CreatePipeline()
 		{
-			auto VertShaderCode = LoadShader("VertShader.spv");
-			auto PixelShaderCode = LoadShader("frag.spv");
+			auto VertShaderCode = LoadShader(std::filesystem::path(KENGINE_SHADER_DIR) / "VertShader.spv");
+			auto PixelShaderCode = LoadShader(std::filesystem::path(KENGINE_SHADER_DIR) / "FragShader.spv");
 		
 			VkShaderModule VertModule = CreateShaderModule(VertShaderCode);
 			VkShaderModule PixelModule = CreateShaderModule(PixelShaderCode);
@@ -617,16 +651,24 @@ namespace KE
 			VertexStage.pName = "main";
 
 			VkPipelineShaderStageCreateInfo PixelStage{};
-			VertexStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-			VertexStage.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-			VertexStage.module = PixelModule;
-			VertexStage.pName = "main";
+			PixelStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			PixelStage.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+			PixelStage.module = PixelModule;
+			PixelStage.pName = "main";
 
 			VkPipelineShaderStageCreateInfo ShaderStages[] = { VertexStage, PixelStage };
 
 			VkPipelineVertexInputStateCreateInfo VertexInput = CreateVertexInputStateInfo();
 
 			VkPipelineInputAssemblyStateCreateInfo AssemblyInput = CreateAssemblyInputStateInfo();
+
+			VkPipelineViewportStateCreateInfo ViewPortInfo = CreateViewPort();
+
+			VkPipelineRasterizationStateCreateInfo RasterizationInfo = CreateRasterizationState();
+
+			VkPipelineColorBlendStateCreateInfo ColorBlendInfo = CreatePipelineColorBlendStateInfo();
+
+			VkPipelineMultisampleStateCreateInfo MultiSampleInfo = CreatePipelineMultisampleStateInfo();
 
 			DynamicStates = {
 				VK_DYNAMIC_STATE_SCISSOR,
@@ -635,25 +677,45 @@ namespace KE
 
 			VkPipelineDynamicStateCreateInfo DynamicStateInfo = CreateDynaminceStateInfo(DynamicStates.size(), DynamicStates.data());
 
-			VkPipelineLayoutCreateInfo PipelineInfo{};
-			PipelineInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-			PipelineInfo.setLayoutCount = 0;
-			PipelineInfo.pSetLayouts = nullptr;
-			PipelineInfo.pushConstantRangeCount = 0;
-			PipelineInfo.pPushConstantRanges = nullptr;
+			VkPipelineLayoutCreateInfo PipelinelayoutInfo{};
+			PipelinelayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+			PipelinelayoutInfo.setLayoutCount = 0;
+			PipelinelayoutInfo.pSetLayouts = nullptr;
+			PipelinelayoutInfo.pushConstantRangeCount = 0;
+			PipelinelayoutInfo.pPushConstantRanges = nullptr;
 
-			VkResult result = vkCreatePipelineLayout(_VkDevice, &PipelineInfo, nullptr, &_VkPipelineLayout);
+			VkResult result = vkCreatePipelineLayout(_VkDevice, &PipelinelayoutInfo, nullptr, &_VkPipelineLayout);
 
 			if (result != VK_SUCCESS)
 			{
-				throw std::runtime_error("Failed to create pipeline layout");
+				printf("Failed to create pipeline layout");
+			}
+
+			VkGraphicsPipelineCreateInfo Pipeline{};
+			Pipeline.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+			Pipeline.stageCount = 2;
+			Pipeline.pVertexInputState = &VertexInput;
+			Pipeline.pInputAssemblyState = &AssemblyInput;
+			Pipeline.pViewportState = &ViewPortInfo;
+			Pipeline.pRasterizationState = &RasterizationInfo;
+			Pipeline.pColorBlendState = &ColorBlendInfo;
+			Pipeline.pMultisampleState = &MultiSampleInfo;
+			Pipeline.pDynamicState = &DynamicStateInfo;
+			Pipeline.layout = _VkPipelineLayout;
+			Pipeline.renderPass = _VkRenderPass;
+			Pipeline.subpass = 0; //Index of subpass where this pipeline will be used
+			Pipeline.basePipelineHandle = VK_NULL_HANDLE; //Ref to another pipeline
+			Pipeline.basePipelineIndex = 0; //Index of pipeline
+
+			if (vkCreateGraphicsPipelines(_VkDevice, VK_NULL_HANDLE, 1,
+				&Pipeline, nullptr, &_VkPipeline) != VK_SUCCESS) {
+				
+				throw std::runtime_error("Failed to create GraphicsPipeLine");
 			}
 
 			//Clean up
 			vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
 			vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
-
-
 		}
 
 		/*
@@ -737,16 +799,13 @@ namespace KE
 
 		/*
 		*/
-		std::vector<char> KRender::LoadShader(const std::string& _FileName)
+		std::vector<char> KRender::LoadShader(std::filesystem::path& _FileName)
 		{
 			//Starts reading at the end of the file
 			std::ifstream file(_FileName, std::ios::ate | std::ios::binary);
-
-			file.open(_FileName);
 			
 			if (!file.is_open())
 			{
-				printf("Failed to load shader files");
 				throw std::runtime_error("Failed to load shader files");
 
 			}

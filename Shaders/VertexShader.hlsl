@@ -1,12 +1,12 @@
 
-float2 pos[3] =
+static const float2 pos[3] =
 {
     float2(0.0f, -0.5),
 	float2(0.5f, 0.0),
 	float2(-0.5, 0.0)
 };
 
-float3 color[3] =
+static const float3 color[3] =
 {
     float3(1.0f, 0.0f, 0.0f),
     float3(0.0f, 1.0f, 0.0f),
