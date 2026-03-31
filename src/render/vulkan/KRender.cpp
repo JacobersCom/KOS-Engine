@@ -36,9 +36,13 @@ namespace KE
 
 			vkDestroySurfaceKHR(_VkInstance, _VkSurface, nullptr);
 			vkDestroySwapchainKHR(_VkDevice, _VkSwapchain, nullptr);
-			for (auto& ImageView : ImageViews)
+			for (auto& ImageView : _VkSwapchainImageViews)
 			{
 				vkDestroyImageView(_VkDevice, ImageView, nullptr);
+			}
+			for (auto& Framebuffer : _VkFramebuffers)
+			{
+				vkDestroyFramebuffer(_VkDevice, Framebuffer, nullptr);
 			}
 			vkDestroyRenderPass(_VkDevice, _VkRenderPass, nullptr);
 			vkDestroyPipelineLayout(_VkDevice, _VkPipelineLayout, nullptr);
@@ -67,13 +71,13 @@ namespace KE
 			//The parameters for the newly created vulkan instance
 			VkInstanceCreateInfo InstanceInfo{};
 
-			InstanceExtensions = GetRequiredInstanceExtensions();
+			_VkInstanceExtensions = GetRequiredInstanceExtensions();
 
 			InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 			InstanceInfo.pApplicationInfo = &AppInfo;
 			InstanceInfo.pNext = VK_NULL_HANDLE;
-			InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(InstanceExtensions.size());
-			InstanceInfo.ppEnabledExtensionNames = InstanceExtensions.data();
+			InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(_VkInstanceExtensions.size());
+			InstanceInfo.ppEnabledExtensionNames = _VkInstanceExtensions.data();
 
 			if (enableValidationLayers && !CheckVaildationLayerSupport())
 			{
@@ -81,8 +85,8 @@ namespace KE
 			}
 			else
 			{
-				InstanceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-				InstanceInfo.ppEnabledLayerNames = validationLayers.data();
+				InstanceInfo.enabledLayerCount = static_cast<uint32_t>(_VkValidationLayers.size());
+				InstanceInfo.ppEnabledLayerNames = _VkValidationLayers.data();
 			}
 
 			VkResult result = vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);
@@ -108,9 +112,7 @@ namespace KE
 			_WinSurfaceInfo.hwnd = _win->GetWindowHandle(); //Handle to win32 window
 			_WinSurfaceInfo.hinstance = _win->GetWindowInstance();//Instance of the win32 window
 
-			VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface);
-
-			if (result != VK_SUCCESS)
+			if (vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface) != VK_SUCCESS)
 			{
 				printf("Failed to create win32 surface");
 			}
@@ -360,6 +362,44 @@ namespace KE
 		}
 
 		/*
+		Creates a FrameBuffer for all the images that correspond to 
+		the retreived image at drawing time.
+
+		Framebuffers are refernces to VkImageView objects that 
+		represent attachements
+		*/
+		std::vector<VkFramebuffer> KRender::CreateFrameBuffers()
+		{
+			_VkFramebuffers.resize(_VkSwapchainImageViews.size());
+
+			//Iterate through the Imageviews to create a framebuffer form them
+			for (int i = 0; i < _VkSwapchainImageViews.size(); i++)
+			{
+				//Lists of attachements for each _VkSawpchainImageview
+				VkImageView Attachments[] = {
+					_VkSwapchainImageViews[i]
+				};
+
+				VkFramebufferCreateInfo FramebufferInfo{};
+				FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+				FramebufferInfo.renderPass = _VkRenderPass;
+				FramebufferInfo.attachmentCount = 1;
+				FramebufferInfo.pAttachments = Attachments;
+				FramebufferInfo.height = _VkSwapchainExtent.height;
+				FramebufferInfo.width = _VkSwapchainExtent.width;
+				FramebufferInfo.layers = 1; //the total sides of an image
+
+				if (vkCreateFramebuffer(_VkDevice, &FramebufferInfo, nullptr, &_VkFramebuffers[i]) != VK_SUCCESS)
+				{
+					throw std::runtime_error("Failed to create Framebuffer for Swapchain Image view");
+				}
+			}
+
+
+			return std::vector<VkFramebuffer>();
+		}
+
+		/*
 		 RenderPassInfo is need to discarible how many depth, color buffers there will be and how
 		 many samples to use for each of them and how there contents should be handle during the 
 		 rendering process
@@ -528,20 +568,20 @@ namespace KE
 
 			VkPhysicalDeviceFeatures DeviceFeaturesInfo{};
 
-			deviceExtensions = GetRequiredDeviceExtensions();
+			_VkDeviceExtensions = GetRequiredDeviceExtensions();
 
 			VkDeviceCreateInfo DeviceInfo{};
 			DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 			DeviceInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 			DeviceInfo.pQueueCreateInfos = queueCreateInfos.data();
 			DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
-			DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
-			DeviceInfo.ppEnabledExtensionNames = deviceExtensions.data();
+			DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(_VkDeviceExtensions.size());
+			DeviceInfo.ppEnabledExtensionNames = _VkDeviceExtensions.data();
 
 			if (enableValidationLayers)
 			{
-				DeviceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-				DeviceInfo.ppEnabledLayerNames = validationLayers.data();
+				DeviceInfo.enabledLayerCount = static_cast<uint32_t>(_VkValidationLayers.size());
+				DeviceInfo.ppEnabledLayerNames = _VkValidationLayers.data();
 			}
 			else
 			{
@@ -618,8 +658,8 @@ namespace KE
 			}
 
 			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapchain, &ImageCount, nullptr);
-			SwapChainImages.resize(ImageCount);
-			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapchain, &ImageCount, SwapChainImages.data());
+			_VkSwapchainImages.resize(ImageCount);
+			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapchain, &ImageCount, _VkSwapchainImages.data());
 
 			_VkSwapchainFormat = SurfaceFormat.format;
 			_VkSwapchainExtent = Extent;
@@ -630,13 +670,13 @@ namespace KE
 		*/
 		void KRender::CreateImageViews()
 		{
-			ImageViews.resize(SwapChainImages.size());
+			_VkSwapchainImageViews.resize(_VkSwapchainImages.size());
 		
-			for (int i = 0; i < SwapChainImages.size(); i++)
+			for (int i = 0; i < _VkSwapchainImages.size(); i++)
 			{
 				VkImageViewCreateInfo ImageViewInfo{};
 				ImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-				ImageViewInfo.image = SwapChainImages[i];
+				ImageViewInfo.image = _VkSwapchainImages[i];
 				ImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 				ImageViewInfo.format = _VkSwapchainFormat;
 				ImageViewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -650,7 +690,7 @@ namespace KE
 				ImageViewInfo.subresourceRange.baseArrayLayer = 0;
 				ImageViewInfo.subresourceRange.layerCount = 1;
 
-				VkResult result = vkCreateImageView(_VkDevice, &ImageViewInfo, nullptr, &ImageViews[i]);
+				VkResult result = vkCreateImageView(_VkDevice, &ImageViewInfo, nullptr, &_VkSwapchainImageViews[i]);
 
 				if (result != VK_SUCCESS)
 				{
@@ -750,13 +790,13 @@ namespace KE
 		void KRender::CreateFramebuffers()
 		{
 			//For each swapchain image there needs to be a frame buffer with it. hence the resize.
-			Framebuffers.resize(SwapChainImages.size());
+			_VkFramebuffers.resize(_VkSwapchainImages.size());
 
-			for (int i = 0; i < SwapChainImages.size(); i++)
+			for (int i = 0; i < _VkSwapchainImages.size(); i++)
 			{
 				VkImage attachments[] =
 				{
-					SwapChainImages[i]
+					_VkSwapchainImages[i]
 				};
 			}
 
@@ -861,7 +901,7 @@ namespace KE
 			std::vector<VkExtensionProperties> availableExtensions(extensionCount);
 			vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, availableExtensions.data());
 
-			std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+			std::set<std::string> requiredExtensions(_VkDeviceExtensions.begin(), _VkDeviceExtensions.end());
 
 			for (const auto& extension : availableExtensions)
 			{
@@ -880,7 +920,7 @@ namespace KE
 			std::vector<VkLayerProperties> availableLayers(LayerCount);
 			vkEnumerateInstanceLayerProperties(&LayerCount, availableLayers.data());
 
-			for (const auto* LayerName : validationLayers)
+			for (const auto* LayerName : _VkValidationLayers)
 			{
 				bool LayerFound = false;
 			

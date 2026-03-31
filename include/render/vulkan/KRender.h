@@ -103,6 +103,7 @@ namespace KE
 			std::vector<VkDynamicState> CreateDynamicStates(); 
 			VkPipelineMultisampleStateCreateInfo CreatePipelineMultisampleStateInfo();
 
+			std::vector<VkFramebuffer> CreateFrameBuffers();
 			VkRenderPassCreateInfo CreateRenderPassInfo();
 
 			//All SwapChain helpers
@@ -144,13 +145,13 @@ namespace KE
 			VkPipelineLayout _VkPipelineLayout;
 			VkPipeline _VkPipeline;
 
-			std::vector<const char*> validationLayers;
-			std::vector<const char*> InstanceExtensions;
-			std::vector<const char*> deviceExtensions;
+			std::vector<const char*> _VkValidationLayers;
+			std::vector<const char*> _VkInstanceExtensions;
+			std::vector<const char*> _VkDeviceExtensions;
 
-			std::vector<VkImage> SwapChainImages;
-			std::vector<VkImageView> ImageViews;
-			std::vector<VkFramebuffer> Framebuffers;
+			std::vector<VkImage> _VkSwapchainImages;
+			std::vector<VkImageView> _VkSwapchainImageViews;
+			std::vector<VkFramebuffer> _VkFramebuffers;
 };
 	}
 
