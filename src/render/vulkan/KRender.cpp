@@ -22,6 +22,7 @@ namespace KE
 			KE::RENDERER::KRender::CreateSwapChain();
 			KE::RENDERER::KRender::CreateRenderPassInfo();
 			KE::RENDERER::KRender::CreatePipeline();
+			KE::RENDERER::KRender::CreateFramebuffers();
 		}
 
 		void KRender::UpdateLoop()
@@ -46,6 +47,7 @@ namespace KE
 			}
 			vkDestroyRenderPass(_VkDevice, _VkRenderPass, nullptr);
 			vkDestroyPipelineLayout(_VkDevice, _VkPipelineLayout, nullptr);
+			vkDestroyCommandPool(_VkDevice, _VkCommandPool, nullptr);
 			vkDestroyDevice(_VkDevice, nullptr);
 		}
 
@@ -368,7 +370,7 @@ namespace KE
 		Framebuffers are refernces to VkImageView objects that 
 		represent attachements
 		*/
-		std::vector<VkFramebuffer> KRender::CreateFrameBuffers()
+		void KRender::CreateFramebuffers()
 		{
 			_VkFramebuffers.resize(_VkSwapchainImageViews.size());
 
@@ -395,8 +397,6 @@ namespace KE
 				}
 			}
 
-
-			return std::vector<VkFramebuffer>();
 		}
 
 		/*
@@ -451,6 +451,27 @@ namespace KE
 			}
 
 			return RenderPassInfo;
+		}
+
+		/*
+		CommandPools manage the memory used to store buffers and command buffers used to allocate them
+		*/
+		void KRender::CreateCommandPool()
+		{
+			QueueFamilyIndices Indices = GetQueueFamilyIndices(_VkPhysicalDevice);
+
+			VkCommandPoolCreateInfo CommandPoolInfo{};
+			CommandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+
+			//allows the command buffer to record all the commands but if a reset happens it will have to rerecord all the commands
+			CommandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; 
+			CommandPoolInfo.queueFamilyIndex = Indices.GraphicsFamily.value();
+
+			if (vkCreateCommandPool(_VkDevice, &CommandPoolInfo, nullptr, &_VkCommandPool) != VK_SUCCESS)
+			{
+				throw std::runtime_error("Failed to create command pool");
+			}
+
 		}
 
 		/*
@@ -784,26 +805,7 @@ namespace KE
 			vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
 			vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
 		}
-
-		/*
-		*/
-		void KRender::CreateFramebuffers()
-		{
-			//For each swapchain image there needs to be a frame buffer with it. hence the resize.
-			_VkFramebuffers.resize(_VkSwapchainImages.size());
-
-			for (int i = 0; i < _VkSwapchainImages.size(); i++)
-			{
-				VkImage attachments[] =
-				{
-					_VkSwapchainImages[i]
-				};
-			}
-
-			VkFramebufferCreateInfo FrameBufferInfo{};
-			FrameBufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-			
-		}
+		
 
 		/*
 		*/

@@ -103,8 +103,10 @@ namespace KE
 			std::vector<VkDynamicState> CreateDynamicStates(); 
 			VkPipelineMultisampleStateCreateInfo CreatePipelineMultisampleStateInfo();
 
-			std::vector<VkFramebuffer> CreateFrameBuffers();
+			void CreateFramebuffers();
 			VkRenderPassCreateInfo CreateRenderPassInfo();
+
+			void CreateCommandPool();
 
 			//All SwapChain helpers
 			SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);
@@ -142,6 +144,7 @@ namespace KE
 			VkFormat _VkSwapchainFormat;
 			VkExtent2D _VkSwapchainExtent;
 			VkRenderPass _VkRenderPass;
+			VkCommandPool _VkCommandPool;
 			VkPipelineLayout _VkPipelineLayout;
 			VkPipeline _VkPipeline;
 
