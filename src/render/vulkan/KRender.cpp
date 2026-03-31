@@ -475,6 +475,26 @@ namespace KE
 		}
 
 		/*
+		Creates the buffer where commands will be recorded.
+		Command buffers are freed when the CommandPool is freed
+		*/
+		void KRender::CreateCommandBuffer()
+		{
+			VkCommandBufferAllocateInfo AllocateInfo{};
+			AllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+			AllocateInfo.commandPool = _VkCommandPool;
+			AllocateInfo.commandBufferCount = 1;
+
+			//Can be submitted to queue but not to another command buffer
+			AllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+			if (vkAllocateCommandBuffers(_VkDevice, &AllocateInfo, &_VkCommandBuffer))
+			{
+				throw std::runtime_error("Failed to create primary command buffer");
+			}
+		}
+
+		/*
 		*/
 		KE::RENDERER::KRender::SwapChainSupportDetails KRender::GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice)
 		{

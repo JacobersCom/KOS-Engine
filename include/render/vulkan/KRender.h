@@ -107,6 +107,7 @@ namespace KE
 			VkRenderPassCreateInfo CreateRenderPassInfo();
 
 			void CreateCommandPool();
+			void CreateCommandBuffer();
 
 			//All SwapChain helpers
 			SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);
@@ -144,7 +145,10 @@ namespace KE
 			VkFormat _VkSwapchainFormat;
 			VkExtent2D _VkSwapchainExtent;
 			VkRenderPass _VkRenderPass;
+
 			VkCommandPool _VkCommandPool;
+			VkCommandBuffer _VkCommandBuffer;
+			
 			VkPipelineLayout _VkPipelineLayout;
 			VkPipeline _VkPipeline;
 
