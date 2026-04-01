@@ -79,7 +79,6 @@ namespace KE
 			void CreateSwapChain();
 			void CreateImageViews();
 			void CreatePipeline();
-			void CreateFramebuffers();
 
 			QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 			QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
@@ -102,12 +101,18 @@ namespace KE
 
 			std::vector<VkDynamicState> CreateDynamicStates(); 
 			VkPipelineMultisampleStateCreateInfo CreatePipelineMultisampleStateInfo();
-
+			
 			void CreateFramebuffers();
+
 			VkRenderPassCreateInfo CreateRenderPassInfo();
 
 			void CreateCommandPool();
 			void CreateCommandBuffer();
+
+			/*
+			Writes commands to the CommandBuffer we want to run
+			*/
+			void RecordCommandBuffer(VkCommandBuffer _VkCommandBuffer, uint32_t ImageIndex);
 
 			//All SwapChain helpers
 			SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);

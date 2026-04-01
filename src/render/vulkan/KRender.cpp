@@ -258,6 +258,8 @@ namespace KE
 
 			_VkScissor.offset = { 0, 0 };
 			_VkScissor.extent = _VkSwapchainExtent;
+
+			return _VkScissor;
 		}
 
 		/*
@@ -340,6 +342,8 @@ namespace KE
 				VK_DYNAMIC_STATE_SCISSOR,
 				VK_DYNAMIC_STATE_VIEWPORT
 			};
+
+			return states;
 		}
 
 		/*
@@ -493,6 +497,53 @@ namespace KE
 				throw std::runtime_error("Failed to create primary command buffer");
 			}
 		}
+
+		
+		void KRender::RecordCommandBuffer(VkCommandBuffer _VkCommandBuffer, uint32_t ImageIndex)
+		{
+			VkCommandBufferBeginInfo BeginInfo{};
+			BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+			
+			if (vkBeginCommandBuffer(_VkCommandBuffer, &BeginInfo) != VK_SUCCESS)
+			{
+				throw std::runtime_error("Failed to write to commandbuffer");
+			}
+
+			VkRenderPassBeginInfo RenderPassBeginInfo{};
+			RenderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			RenderPassBeginInfo.renderPass = _VkRenderPass;
+			RenderPassBeginInfo.framebuffer = _VkFramebuffers[ImageIndex]; //The framebuffer and the attachements 
+			//Affected area of the render pass
+			RenderPassBeginInfo.renderArea.offset = { 0,0 };
+			RenderPassBeginInfo.renderArea.extent = _VkSwapchainExtent;
+
+			VkClearValue ClearValues = { {{0.0f, 0.0f, 0.0f, 1.0f}} }; //Clear color used for VK_ATTACHMENT_LOAD_OP_CLEAR
+			RenderPassBeginInfo.clearValueCount = 1;
+			RenderPassBeginInfo.pClearValues = &ClearValues;
+
+			//The commands being recorded will be stored here and VK_SUBPASS_CONTENTS_INLINE means the commands
+			//will be embedded in the primary command buffer
+			vkCmdBeginRenderPass(_VkCommandBuffer, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			vkCmdBindPipeline(_VkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _VkPipeline);
+
+			//Because the viewport and scissor is dynmic so they must be set in the command buffer before drawing
+
+			VkViewport viewport = CreateViewportInfo();
+			vkCmdSetViewport(_VkCommandBuffer, 1, 1, &viewport);
+			VkRect2D scissor = CreateScissorInfo();
+			vkCmdSetScissor(_VkCommandBuffer, 1, 1, &scissor);
+
+			//Now we can draw
+			vkCmdDraw(_VkCommandBuffer, 3, 1, 0, 0);
+
+			vkCmdEndRenderPass(_VkCommandBuffer);
+
+			if (vkEndCommandBuffer(_VkCommandBuffer) != VK_SUCCESS)
+			{
+				throw std::runtime_error("failed to record to command buffer");
+			}
+		};
 
 		/*
 		*/
