@@ -114,6 +114,13 @@ namespace KE
 			*/
 			void RecordCommandBuffer(VkCommandBuffer _VkCommandBuffer, uint32_t ImageIndex);
 
+			/*
+			Used to create sempahores
+			*/
+			void CreateSyncObjects();
+
+			void DrawFrame();
+			
 			//All SwapChain helpers
 			SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);
 			VkSurfaceFormatKHR ChooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR> formats);
@@ -156,6 +163,10 @@ namespace KE
 			
 			VkPipelineLayout _VkPipelineLayout;
 			VkPipeline _VkPipeline;
+
+			VkSemaphore imageAvailableSemaphore;
+			VkSemaphore renderFinishedSemaphore;
+			VkFence inFlightFence;
 
 			std::vector<const char*> _VkValidationLayers;
 			std::vector<const char*> _VkInstanceExtensions;

@@ -37,17 +37,25 @@ namespace KE
 
 			vkDestroySurfaceKHR(_VkInstance, _VkSurface, nullptr);
 			vkDestroySwapchainKHR(_VkDevice, _VkSwapchain, nullptr);
+			
 			for (auto& ImageView : _VkSwapchainImageViews)
 			{
 				vkDestroyImageView(_VkDevice, ImageView, nullptr);
 			}
+			
 			for (auto& Framebuffer : _VkFramebuffers)
 			{
 				vkDestroyFramebuffer(_VkDevice, Framebuffer, nullptr);
 			}
+			
 			vkDestroyRenderPass(_VkDevice, _VkRenderPass, nullptr);
 			vkDestroyPipelineLayout(_VkDevice, _VkPipelineLayout, nullptr);
 			vkDestroyCommandPool(_VkDevice, _VkCommandPool, nullptr);
+
+			vkDestroySemaphore(_VkDevice, imageAvailableSemaphore, nullptr);
+			vkDestroySemaphore(_VkDevice, renderFinishedSemaphore, nullptr);
+			vkDestroyFence(_VkDevice, inFlightFence, nullptr);
+			
 			vkDestroyDevice(_VkDevice, nullptr);
 		}
 
@@ -543,7 +551,30 @@ namespace KE
 			{
 				throw std::runtime_error("failed to record to command buffer");
 			}
-		};
+		}
+
+		void KRender::CreateSyncObjects()
+		{
+			VkSemaphoreCreateInfo SemaphoreInfo{};
+			SemaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+			VkFenceCreateInfo FenceInfo{};
+			FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+
+			if (vkCreateSemaphore(_VkDevice, &SemaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS
+				|| vkCreateSemaphore(_VkDevice, &SemaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS
+				|| vkCreateFence(_VkDevice, &FenceInfo, nullptr, &inFlightFence) != VK_SUCCESS
+				)
+			{
+				throw std::runtime_error("Failed to create semaphores and fence!");
+			}
+		}
+
+		void KRender::DrawFrame()
+		{
+
+		}
+		;
 
 		/*
 		*/
