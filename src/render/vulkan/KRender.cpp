@@ -8,12 +8,11 @@ namespace KE
 
 		void KRender::run()
 		{
-			InitVulkan();
 			UpdateLoop();
-			
+			CleanUp();
 		}
 
-		void KRender::InitVulkan() 
+		bool KRender::InitVulkan() 
 		{
 			KE::RENDERER::KRender::CreateVkInstance();
 			KE::RENDERER::KRender::CreateWin32Surface();
@@ -27,12 +26,13 @@ namespace KE
 			KE::RENDERER::KRender::CreateCommandPool();
 			KE::RENDERER::KRender::CreateCommandBuffer();
 			KE::RENDERER::KRender::CreateSyncObjects();
-			KE::RENDERER::KRender::DrawFrame();
+
+			return true;
 		}
 
 		void KRender::UpdateLoop()
 		{
-
+			DrawFrame();	
 		}
 
 		/*
@@ -62,6 +62,8 @@ namespace KE
 			vkDestroyFence(_VkDevice, inFlightFence, nullptr);
 			
 			vkDestroyDevice(_VkDevice, nullptr);
+
+			printf("Program cleaned up");
 		}
 
 		/*
@@ -271,6 +273,7 @@ namespace KE
 
 			_VkScissor.offset = { 0, 0 };
 			_VkScissor.extent = _VkSwapchainExtent;
+			
 
 			return _VkScissor;
 		}
@@ -557,10 +560,8 @@ namespace KE
 
 			//Because the viewport and scissor is dynmic so they must be set in the command buffer before drawing
 
-			VkViewport viewport = CreateViewportInfo();
-			vkCmdSetViewport(_VkCommandBuffer, 1, 1, &viewport);
-			VkRect2D scissor = CreateScissorInfo();
-			vkCmdSetScissor(_VkCommandBuffer, 1, 1, &scissor);
+			vkCmdSetViewport(_VkCommandBuffer, 1, 1, &_VkViewport);
+			vkCmdSetScissor(_VkCommandBuffer, 1, 1, &_VkScissor);
 
 			//Now we can draw
 			vkCmdDraw(_VkCommandBuffer, 3, 1, 0, 0);
@@ -937,8 +938,8 @@ namespace KE
 
 			VkPipelineInputAssemblyStateCreateInfo AssemblyInput = CreateAssemblyInputStateInfo();
 
-			VkViewport _VkViewport = CreateViewportInfo();
-			VkRect2D _VkScissor = CreateScissorInfo();
+			_VkViewport = CreateViewportInfo();
+			_VkScissor = CreateScissorInfo();
 
 			VkPipelineViewportStateCreateInfo ViewPortInfo = CreateViewPortStateInfo(_VkViewport, _VkScissor,1,1);
 

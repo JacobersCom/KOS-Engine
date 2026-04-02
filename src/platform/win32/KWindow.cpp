@@ -168,7 +168,7 @@ namespace KE
 				DispatchMessageW(&msg);
 			}
 
-			printf("Program shutdown");
+			printf("Program shutdown\n");
 		}
 
 		LRESULT CALLBACK KWindow::WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam)
@@ -213,24 +213,7 @@ namespace KE
 				}
 				break;
 			}
-			case WM_SIZE:
-			{
-				RECT ClientRect;
-				GetClientRect(Window, &ClientRect);
-				int width = ClientRect.right - ClientRect.left;
-				int height = ClientRect.bottom - ClientRect.top;
-				break;
-			}
-			case WM_PAINT:
-			{
-
-				PAINTSTRUCT Paint;
-				HDC DeviceContext = BeginPaint(Window, &Paint);
-				RECT ClientRECT;
-				GetClientRect(Window, &ClientRECT);
-				//EndPaint(hwnd, &Paint);
-				break;
-			}
+			
 		}
 			return DefWindowProc(Window, message, wParam, lParam);
 		}

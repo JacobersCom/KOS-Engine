@@ -43,6 +43,10 @@ namespace KE
 			KRender(KE::SYSTEM::KWindow* _win) : _win(_win){}
 
 			void run();
+			bool InitVulkan();
+			void UpdateLoop();
+			void DrawFrame();
+			void CleanUp();
 
 			const VkInstance GetVkInstance() { return _VkInstance; }
 			
@@ -67,10 +71,7 @@ namespace KE
 
 		private:
 
-			void InitVulkan();
 		
-			void UpdateLoop();
-			void CleanUp();
 		
 			void CreateVkInstance();
 			void PickPhysicalDevice();
@@ -119,7 +120,6 @@ namespace KE
 			*/
 			void CreateSyncObjects();
 
-			void DrawFrame();
 			
 			//All SwapChain helpers
 			SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);
@@ -156,6 +156,8 @@ namespace KE
 			VkSwapchainKHR _VkSwapchain;
 			VkFormat _VkSwapchainFormat;
 			VkExtent2D _VkSwapchainExtent;
+			VkViewport _VkViewport;
+			VkRect2D _VkScissor;
 			VkRenderPass _VkRenderPass;
 
 			VkCommandPool _VkCommandPool;
