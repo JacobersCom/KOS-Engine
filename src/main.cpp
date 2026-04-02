@@ -10,14 +10,11 @@ int main()
 {
 	KE::SYSTEM::KWindow _win;
 	KE::RENDERER::KRender _render(&_win);
-	KE::RENDERER::KRender::QueueFamilyIndices fm;
-	KE::RENDERER::KRender::SwapChainSupportDetails sd;
 
 
 	_win.SetWindowDesc(L"KOS", L"KOS Engine", 500, 500);
 	_win.Create();
 	_render.run();
-	std::cout << sizeof(sd);
 	_win.EventDispatcher();
 
 	

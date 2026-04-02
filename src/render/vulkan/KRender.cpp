@@ -10,7 +10,7 @@ namespace KE
 		{
 			InitVulkan();
 			UpdateLoop();
-			CleanUp();
+			
 		}
 
 		void KRender::InitVulkan() 
@@ -20,9 +20,14 @@ namespace KE
 			KE::RENDERER::KRender::PickPhysicalDevice();
 			KE::RENDERER::KRender::CreateLogicalDevice();
 			KE::RENDERER::KRender::CreateSwapChain();
+			KE::RENDERER::KRender::CreateImageViews();
 			KE::RENDERER::KRender::CreateRenderPassInfo();
 			KE::RENDERER::KRender::CreatePipeline();
 			KE::RENDERER::KRender::CreateFramebuffers();
+			KE::RENDERER::KRender::CreateCommandPool();
+			KE::RENDERER::KRender::CreateCommandBuffer();
+			KE::RENDERER::KRender::CreateSyncObjects();
+			KE::RENDERER::KRender::DrawFrame();
 		}
 
 		void KRender::UpdateLoop()
@@ -366,7 +371,7 @@ namespace KE
 		{
 			VkPipelineMultisampleStateCreateInfo MultiSampleInfo{};
 			MultiSampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-			MultiSampleInfo.sampleShadingEnable = VK_TRUE; //allows the pixel shader to be evaulated for each sample within a pixel instead of one fragment
+			MultiSampleInfo.sampleShadingEnable = VK_FALSE; //allows the pixel shader to be evaulated for each sample within a pixel instead of one fragment
 			MultiSampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT; //Number of samples used in rasterzation
 			MultiSampleInfo.minSampleShading = 1.0f; //The minmum number of sample shading
 			MultiSampleInfo.alphaToCoverageEnable = VK_FALSE; //Creates a temp value based off the color of the fragments first output
@@ -448,6 +453,19 @@ namespace KE
 			Subpass.colorAttachmentCount = 1; 
 			Subpass.pColorAttachments = &ColorAttachmentRef;
 
+			//SubpassDependencys manage the transition of the image layouts
+			VkSubpassDependency SubpassDependency{};
+			
+			SubpassDependency.srcSubpass = VK_SUBPASS_EXTERNAL; //Ensures the subpass begins before vkCmdBeginRenderpass
+			SubpassDependency.dstSubpass = 0;
+			
+			SubpassDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;//The subpass will wait to till the image is done reading from the swapchain
+			SubpassDependency.srcAccessMask = 0;
+
+			//Where the dst commands will have access to memory
+			SubpassDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+			SubpassDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
 			//Linking it all togther
 			VkRenderPassCreateInfo RenderPassInfo{};
 			RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -455,6 +473,8 @@ namespace KE
 			RenderPassInfo.pAttachments = &ColorAttachment;
 			RenderPassInfo.subpassCount = 1;
 			RenderPassInfo.pSubpasses = &Subpass;
+			RenderPassInfo.dependencyCount = 1;
+			RenderPassInfo.pDependencies = &SubpassDependency;
 
 			VkResult result = vkCreateRenderPass(_VkDevice, &RenderPassInfo, nullptr, &_VkRenderPass);
 			if (result != VK_SUCCESS)
@@ -525,7 +545,7 @@ namespace KE
 			RenderPassBeginInfo.renderArea.offset = { 0,0 };
 			RenderPassBeginInfo.renderArea.extent = _VkSwapchainExtent;
 
-			VkClearValue ClearValues = { {{0.0f, 0.0f, 0.0f, 1.0f}} }; //Clear color used for VK_ATTACHMENT_LOAD_OP_CLEAR
+			VkClearValue ClearValues = { {{1.0f, 0.0f, 0.0f, 1.0f}} }; //Clear color used for VK_ATTACHMENT_LOAD_OP_CLEAR
 			RenderPassBeginInfo.clearValueCount = 1;
 			RenderPassBeginInfo.pClearValues = &ClearValues;
 
@@ -560,6 +580,7 @@ namespace KE
 
 			VkFenceCreateInfo FenceInfo{};
 			FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+			FenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; //fences start signed
 
 			if (vkCreateSemaphore(_VkDevice, &SemaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS
 				|| vkCreateSemaphore(_VkDevice, &SemaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS
@@ -570,11 +591,68 @@ namespace KE
 			}
 		}
 
+		/*
+		
+		*/
 		void KRender::DrawFrame()
 		{
+			//Waits for all fences to be signed before returning and disables a time out.
+			//All fences start off signed so this is oki
+			vkWaitForFences(_VkDevice, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
 
-		}
-		;
+			vkResetFences(_VkDevice, 1, &inFlightFence);
+
+			uint32_t ImageIndex;
+
+			vkAcquireNextImageKHR(_VkDevice, _VkSwapchain, UINT64_MAX,
+				imageAvailableSemaphore, inFlightFence, &ImageIndex);
+
+			//Ensures the buffer is able to record commands
+			vkResetCommandBuffer(_VkCommandBuffer, 0);
+
+			//Record info to submit it
+			RecordCommandBuffer(_VkCommandBuffer, ImageIndex);
+
+			VkSubmitInfo SubmittedInfo{};
+			SubmittedInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+			//The Semaphore upon which to wait on before exe the commandbuffer
+			VkSemaphore WaitSemaphore[] = {imageAvailableSemaphore};
+			SubmittedInfo.waitSemaphoreCount = 1;
+			SubmittedInfo.pWaitSemaphores = WaitSemaphore;
+
+			//Where each semaphore will wait for occur. In this case is when the pipeline writes color
+			VkPipelineStageFlags Stage[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+			SubmittedInfo.pWaitDstStageMask = Stage;
+
+			SubmittedInfo.commandBufferCount = 1;
+			SubmittedInfo.pCommandBuffers = &_VkCommandBuffer;
+			
+			//Which semaphore to sign once the commandbuffer is finished
+			VkSemaphore SingleSemaphore[] = { renderFinishedSemaphore };
+			SubmittedInfo.signalSemaphoreCount = 1;
+			SubmittedInfo.pSignalSemaphores = SingleSemaphore;
+
+			//All commands will be submitted to the queue
+			if (vkQueueSubmit(_VkGraphicsQueue, 1, &SubmittedInfo, inFlightFence) != VK_SUCCESS)
+			{
+				throw std::runtime_error("Failed to submit commands to queue");
+			}
+
+			VkPresentInfoKHR PresentInfo{};
+			PresentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+			
+			//Program waits on these before presenting
+			PresentInfo.waitSemaphoreCount = 1;
+			PresentInfo.pWaitSemaphores = SingleSemaphore;
+
+			PresentInfo.swapchainCount = 1;
+			PresentInfo.pSwapchains = &_VkSwapchain;
+			PresentInfo.pImageIndices = &ImageIndex;
+
+			vkQueuePresentKHR(_VkPresentationQueue, &PresentInfo);
+
+		};
 
 		/*
 		*/
@@ -609,6 +687,11 @@ namespace KE
 		}
 
 		/*
+		Finds a format SRGB to eliminates the need for manual gramma correction.
+		Also find a color space to super the format
+
+		In this case I use nonlinear to apply a curve to allocate more bits to the 
+		darker colors.
 		*/
 		VkSurfaceFormatKHR KRender::ChooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR> formats)
 		{
@@ -630,10 +713,13 @@ namespace KE
 		{
 			for (const auto& availablePresentMode : presentModes)
 			{
+				//Single entry queue for presentation request
 				if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+				{
 					return availablePresentMode;
+				}
 			}
-			return VK_PRESENT_MODE_FIFO_KHR;
+			return VK_PRESENT_MODE_FIFO_KHR; //New request are appended to the end of the queue and the beginning one is removed
 		}
 
 		/*
@@ -728,6 +814,7 @@ namespace KE
 		*/
 		void KRender::CreateSwapChain()
 		{
+			//Get SwapChain details
 			SwapChainSupportDetails SwapChainDetails = GetSwapChainDetails(_VkPhysicalDevice);
 
 			VkSurfaceFormatKHR SurfaceFormat = ChooseSwapChainFormat(SwapChainDetails.ImageFormats);
