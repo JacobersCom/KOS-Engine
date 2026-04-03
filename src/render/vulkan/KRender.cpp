@@ -320,13 +320,11 @@ namespace KE
 		{
 			VkPipelineColorBlendAttachmentState ColorblendAttachmentInfo{};
 
-			ColorblendAttachmentInfo.blendEnable = VK_TRUE;
-			ColorblendAttachmentInfo.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-			ColorblendAttachmentInfo.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-			ColorblendAttachmentInfo.colorBlendOp = VK_BLEND_OP_ADD;
-			ColorblendAttachmentInfo.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-			ColorblendAttachmentInfo.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-			ColorblendAttachmentInfo.alphaBlendOp = VK_BLEND_OP_ADD;
+			ColorblendAttachmentInfo.colorWriteMask =
+				VK_COLOR_COMPONENT_R_BIT |
+				VK_COLOR_COMPONENT_G_BIT |
+				VK_COLOR_COMPONENT_B_BIT |
+				VK_COLOR_COMPONENT_A_BIT;
 
 			return ColorblendAttachmentInfo;
 		}
@@ -385,10 +383,10 @@ namespace KE
 
 		/*
 		Creates a FrameBuffer for all the images that correspond to 
-		the retreived image at drawing time.
+		the retrieved image at drawing time.
 
-		Framebuffers are refernces to VkImageView objects that 
-		represent attachements
+		Framebuffers are references to VkImageView objects that 
+		represent attachments
 		*/
 		void KRender::CreateFramebuffers()
 		{
@@ -548,7 +546,7 @@ namespace KE
 			RenderPassBeginInfo.renderArea.offset = { 0,0 };
 			RenderPassBeginInfo.renderArea.extent = _VkSwapchainExtent;
 
-			VkClearValue ClearValues = { {{1.0f, 0.0f, 0.0f, 1.0f}} }; //Clear color used for VK_ATTACHMENT_LOAD_OP_CLEAR
+			VkClearValue ClearValues = { {{0.0f, 0.0f, 0.0f, 1.0f}} }; //Clear color used for VK_ATTACHMENT_LOAD_OP_CLEAR
 			RenderPassBeginInfo.clearValueCount = 1;
 			RenderPassBeginInfo.pClearValues = &ClearValues;
 
