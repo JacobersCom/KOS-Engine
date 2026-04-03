@@ -102,12 +102,12 @@ namespace KE
 			}
 			else
 			{
+				_VkValidationLayers = GetRequiredInstaceLayers();
 				InstanceInfo.enabledLayerCount = static_cast<uint32_t>(_VkValidationLayers.size());
 				InstanceInfo.ppEnabledLayerNames = _VkValidationLayers.data();
 			}
 
-			VkResult result = vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);
-		
+			
 			if (vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to create VkInstance");
@@ -560,8 +560,8 @@ namespace KE
 
 			//Because the viewport and scissor is dynmic so they must be set in the command buffer before drawing
 
-			vkCmdSetViewport(_VkCommandBuffer, 1, 1, &_VkViewport);
-			vkCmdSetScissor(_VkCommandBuffer, 1, 1, &_VkScissor);
+			vkCmdSetViewport(_VkCommandBuffer, 0, 1, &_VkViewport);
+			vkCmdSetScissor(_VkCommandBuffer, 0, 1, &_VkScissor);
 
 			//Now we can draw
 			vkCmdDraw(_VkCommandBuffer, 3, 1, 0, 0);
@@ -600,17 +600,18 @@ namespace KE
 			//Waits for all fences to be signed before returning and disables a time out.
 			//All fences start off signed so this is oki
 			vkWaitForFences(_VkDevice, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
-
 			vkResetFences(_VkDevice, 1, &inFlightFence);
 
 			uint32_t ImageIndex;
 
+			//imageavailablesemaphore signeds when the presentation engine is finish
 			vkAcquireNextImageKHR(_VkDevice, _VkSwapchain, UINT64_MAX,
-				imageAvailableSemaphore, inFlightFence, &ImageIndex);
+				imageAvailableSemaphore, VK_NULL_HANDLE, &ImageIndex);
+			
 
 			//Ensures the buffer is able to record commands
 			vkResetCommandBuffer(_VkCommandBuffer, 0);
-
+			
 			//Record info to submit it
 			RecordCommandBuffer(_VkCommandBuffer, ImageIndex);
 
@@ -634,11 +635,12 @@ namespace KE
 			SubmittedInfo.signalSemaphoreCount = 1;
 			SubmittedInfo.pSignalSemaphores = SingleSemaphore;
 
-			//All commands will be submitted to the queue
+			//All commands will be submitted to the queue. The fence Will singal when it is finished
 			if (vkQueueSubmit(_VkGraphicsQueue, 1, &SubmittedInfo, inFlightFence) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to submit commands to queue");
 			}
+			
 
 			VkPresentInfoKHR PresentInfo{};
 			PresentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -652,6 +654,8 @@ namespace KE
 			PresentInfo.pImageIndices = &ImageIndex;
 
 			vkQueuePresentKHR(_VkPresentationQueue, &PresentInfo);
+			
+			vkDeviceWaitIdle(_VkDevice);
 
 		};
 
@@ -777,14 +781,21 @@ namespace KE
 
 
 			VkPhysicalDeviceFeatures DeviceFeaturesInfo{};
-
-			_VkDeviceExtensions = GetRequiredDeviceExtensions();
+			
+			//Enabled to allow VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
+			VkPhysicalDeviceSynchronization2FeaturesKHR PhysicalDeviceSync{};
+			PhysicalDeviceSync.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR;
+			PhysicalDeviceSync.synchronization2 = VK_TRUE;
 
 			VkDeviceCreateInfo DeviceInfo{};
 			DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+			DeviceInfo.pNext = &PhysicalDeviceSync;
+
 			DeviceInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 			DeviceInfo.pQueueCreateInfos = queueCreateInfos.data();
 			DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
+			
+			_VkDeviceExtensions = GetRequiredDeviceExtensions();
 			DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(_VkDeviceExtensions.size());
 			DeviceInfo.ppEnabledExtensionNames = _VkDeviceExtensions.data();
 
@@ -798,17 +809,14 @@ namespace KE
 				DeviceInfo.enabledLayerCount = 0;
 			}
 
-			VkResult result = vkCreateDevice(_VkPhysicalDevice, &DeviceInfo, nullptr, &_VkDevice);
 
-			if (result != VK_SUCCESS)
+			if (vkCreateDevice(_VkPhysicalDevice, &DeviceInfo, nullptr, &_VkDevice) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to create logical device!");
 			}
 
 			vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &_VkGraphicsQueue);
-			vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &_VkPresentationQueue);
-
-
+			vkGetDeviceQueue(_VkDevice, indices.PresentFamily.value(), 0, &_VkPresentationQueue);
 		}
 
 		/*
@@ -1033,6 +1041,7 @@ namespace KE
 		{
 			std::vector<const char*> extensions;
 			extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+			extensions.push_back(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME);
 
 			return extensions;
 		}
