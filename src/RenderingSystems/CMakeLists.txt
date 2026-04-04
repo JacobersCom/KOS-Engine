@@ -1,9 +1,9 @@
 
 #Create a library called vulkan that can be used to link back to main
-add_library(vulkan)
+add_library(RenderingSystems)
 
 #All the src files held with the vulkan lib. Being these are src files they are private
-target_sources(vulkan
+target_sources(RenderingSystems
 PRIVATE
     KRender.cpp
 	
@@ -15,14 +15,14 @@ PUBLIC
 )
 
 #Links the src files to the renderer header files
-target_include_directories(vulkan
+target_include_directories(RenderingSystems
 PUBLIC
     ${PROJECT_SOURCE_DIR}/include/vulkan/
 	${PROJECT_SOURCE_DIR}/include/win32/
 )
 
 #Links the Vulkan SDK to the KRender header file
-target_link_libraries(vulkan
+target_link_libraries(RenderingSystems
 PUBLIC
     Vulkan::Vulkan
 )
@@ -37,7 +37,7 @@ find_program(GLSLC
 
 #Set source and output folders
 set(SHADER_SRC_DIR "${PROJECT_SOURCE_DIR}/Shaders")
-set(SHADER_OUT_DIR "${CMAKE_BINARY_DIR}//shaders")
+set(SHADER_OUT_DIR "${CMAKE_BINARY_DIR}/Shaders")
 
 #Set HLSL source files
 set(HLSL_VERT "${SHADER_SRC_DIR}/VertexShader.hlsl")
@@ -73,7 +73,7 @@ add_custom_command(
     VERBATIM
 )
 
-target_sources(vulkan PRIVATE
+target_sources(RenderingSystems PRIVATE
     "${HLSL_VERT}"
     "${HLSL_FRAG}"
     "${SPV_VERT}"
@@ -96,6 +96,6 @@ set_source_files_properties(
     PROPERTIES HEADER_FILE_ONLY ON
 )
 
-target_compile_definitions(vulkan
+target_compile_definitions(RenderingSystems
     PRIVATE KENGINE_SHADER_DIR="${SHADER_OUT_DIR}"
 )
