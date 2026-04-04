@@ -1,12 +1,12 @@
 find_package(Vulkan QUIET)
 
-add_subdirectory(platform)
-add_subdirectory(render)
+add_library(KOS-Engine-Main)
+add_subdirectory(win32)
+add_subdirectory(vulkan)
 
 add_executable(KOS-Engine main.cpp)
 
 target_link_libraries(KOS-Engine 
 PUBLIC 
-    render
-    platform
+    vulkan
 )

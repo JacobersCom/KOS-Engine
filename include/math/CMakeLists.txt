@@ -5,7 +5,7 @@ add_library(math
 
 target_link_directories(math
 PRIVATE    
-    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/include/math
 )
 
 set_target_properties(math PROPERTIES LINKER_LANGUAGE CXX)

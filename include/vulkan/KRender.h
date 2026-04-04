@@ -2,7 +2,7 @@
 
 #pragma region Defines
 #define VK_USE_PLATFORM_WIN32_KHR
-
+const int FRAMES_IN_FLIGHT = 2;
 
 #ifdef NDEBUG
  const bool enableValidationLayers = false;
@@ -108,7 +108,7 @@ namespace KE
 			VkRenderPassCreateInfo CreateRenderPassInfo();
 
 			void CreateCommandPool();
-			void CreateCommandBuffer();
+			void CreateCommandBuffers();
 
 			/*
 			Writes commands to the CommandBuffer we want to run
@@ -161,14 +161,14 @@ namespace KE
 			VkRenderPass _VkRenderPass;
 
 			VkCommandPool _VkCommandPool;
-			VkCommandBuffer _VkCommandBuffer;
+			std::vector<VkCommandBuffer> _VkCommandBuffer;
 			
 			VkPipelineLayout _VkPipelineLayout;
 			VkPipeline _VkPipeline;
 
-			VkSemaphore imageAvailableSemaphore;
-			VkSemaphore renderFinishedSemaphore;
-			VkFence inFlightFence;
+			std::vector<VkSemaphore> imageAvailableSemaphore;
+			std::vector<VkSemaphore> renderFinishedSemaphore;
+			std::vector<VkFence> inFlightFence;
 
 			std::vector<const char*> _VkValidationLayers;
 			std::vector<const char*> _VkInstanceExtensions;

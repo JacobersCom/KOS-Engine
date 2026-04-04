@@ -11,13 +11,14 @@ PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${PROJECT_SOURCE_DIR}/include
     FILES
-        ${PROJECT_SOURCE_DIR}/include/render/vulkan/KRender.h
+        ${PROJECT_SOURCE_DIR}/include/vulkan/KRender.h
 )
 
 #Links the src files to the renderer header files
 target_include_directories(vulkan
 PUBLIC
-    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/include/vulkan/
+	${PROJECT_SOURCE_DIR}/include/win32/
 )
 
 #Links the Vulkan SDK to the KRender header file

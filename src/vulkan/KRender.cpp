@@ -1,5 +1,5 @@
-#include <render/vulkan/KRender.h>
-#include <platform/win32/KWindow.h>
+#include <KRender.h>
+#include <KWindow.h>
 
 namespace KE
 {
@@ -24,7 +24,7 @@ namespace KE
 			KE::RENDERER::KRender::CreatePipeline();
 			KE::RENDERER::KRender::CreateFramebuffers();
 			KE::RENDERER::KRender::CreateCommandPool();
-			KE::RENDERER::KRender::CreateCommandBuffer();
+			KE::RENDERER::KRender::CreateCommandBuffers();
 			KE::RENDERER::KRender::CreateSyncObjects();
 
 			return true;
@@ -56,11 +56,14 @@ namespace KE
 			vkDestroyRenderPass(_VkDevice, _VkRenderPass, nullptr);
 			vkDestroyPipelineLayout(_VkDevice, _VkPipelineLayout, nullptr);
 			vkDestroyCommandPool(_VkDevice, _VkCommandPool, nullptr);
-
-			vkDestroySemaphore(_VkDevice, imageAvailableSemaphore, nullptr);
-			vkDestroySemaphore(_VkDevice, renderFinishedSemaphore, nullptr);
-			vkDestroyFence(_VkDevice, inFlightFence, nullptr);
+			for (int i = 0; i < FRAMES_IN_FLIGHT; i++)
+			{
+				vkDestroySemaphore(_VkDevice, imageAvailableSemaphore[i], nullptr);
+				vkDestroySemaphore(_VkDevice, renderFinishedSemaphore[i], nullptr);
+				vkDestroyFence(_VkDevice, inFlightFence[i], nullptr);
 			
+
+			}
 			vkDestroyDevice(_VkDevice, nullptr);
 
 			printf("Program cleaned up");
@@ -511,17 +514,20 @@ namespace KE
 		Creates the buffer where commands will be recorded.
 		Command buffers are freed when the CommandPool is freed
 		*/
-		void KRender::CreateCommandBuffer()
+		void KRender::CreateCommandBuffers()
 		{
+			_VkCommandBuffer.resize(FRAMES_IN_FLIGHT);
+
 			VkCommandBufferAllocateInfo AllocateInfo{};
 			AllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 			AllocateInfo.commandPool = _VkCommandPool;
-			AllocateInfo.commandBufferCount = 1;
+			
+			AllocateInfo.commandBufferCount = static_cast<uint32_t>(_VkCommandBuffer.size());
 
 			//Can be submitted to queue but not to another command buffer
 			AllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
-			if (vkAllocateCommandBuffers(_VkDevice, &AllocateInfo, &_VkCommandBuffer))
+			if (vkAllocateCommandBuffers(_VkDevice, &AllocateInfo, _VkCommandBuffer.data()))
 			{
 				throw std::runtime_error("Failed to create primary command buffer");
 			}
@@ -574,19 +580,27 @@ namespace KE
 
 		void KRender::CreateSyncObjects()
 		{
+			imageAvailableSemaphore.resize(FRAMES_IN_FLIGHT);
+			renderFinishedSemaphore.resize(FRAMES_IN_FLIGHT);
+			inFlightFence.resize(FRAMES_IN_FLIGHT);
+
 			VkSemaphoreCreateInfo SemaphoreInfo{};
 			SemaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
 			VkFenceCreateInfo FenceInfo{};
 			FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 			FenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; //fences start signed
-
-			if (vkCreateSemaphore(_VkDevice, &SemaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS
-				|| vkCreateSemaphore(_VkDevice, &SemaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS
-				|| vkCreateFence(_VkDevice, &FenceInfo, nullptr, &inFlightFence) != VK_SUCCESS
-				)
+			
+			for (int i = 0; i < FRAMES_IN_FLIGHT; i++)
 			{
-				throw std::runtime_error("Failed to create semaphores and fence!");
+				if (vkCreateSemaphore(_VkDevice, &SemaphoreInfo, nullptr, &imageAvailableSemaphore[i]) != VK_SUCCESS
+					|| vkCreateSemaphore(_VkDevice, &SemaphoreInfo, nullptr, &renderFinishedSemaphore[i]) != VK_SUCCESS
+					|| vkCreateFence(_VkDevice, &FenceInfo, nullptr, &inFlightFence[i]) != VK_SUCCESS
+					)
+				{
+					throw std::runtime_error("Failed to create semaphores and fence!");
+				}
+
 			}
 		}
 
@@ -595,29 +609,31 @@ namespace KE
 		*/
 		void KRender::DrawFrame()
 		{
+			uint32_t CurrentFrame = 0;
+
 			//Waits for all fences to be signed before returning and disables a time out.
 			//All fences start off signed so this is oki
-			vkWaitForFences(_VkDevice, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
-			vkResetFences(_VkDevice, 1, &inFlightFence);
+			vkWaitForFences(_VkDevice, 1, &inFlightFence[CurrentFrame], VK_TRUE, UINT64_MAX);
+			vkResetFences(_VkDevice, 1, &inFlightFence[CurrentFrame]);
 
 			uint32_t ImageIndex;
 
 			//imageavailablesemaphore signeds when the presentation engine is finish
 			vkAcquireNextImageKHR(_VkDevice, _VkSwapchain, UINT64_MAX,
-				imageAvailableSemaphore, VK_NULL_HANDLE, &ImageIndex);
+				imageAvailableSemaphore[CurrentFrame], VK_NULL_HANDLE, &ImageIndex);
 			
 
 			//Ensures the buffer is able to record commands
-			vkResetCommandBuffer(_VkCommandBuffer, 0);
+			vkResetCommandBuffer(_VkCommandBuffer[CurrentFrame], 0);
 			
 			//Record info to submit it
-			RecordCommandBuffer(_VkCommandBuffer, ImageIndex);
+			RecordCommandBuffer(_VkCommandBuffer[CurrentFrame], ImageIndex);
 
 			VkSubmitInfo SubmittedInfo{};
 			SubmittedInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
 			//The Semaphore upon which to wait on before exe the commandbuffer
-			VkSemaphore WaitSemaphore[] = {imageAvailableSemaphore};
+			VkSemaphore WaitSemaphore[] = {imageAvailableSemaphore[CurrentFrame] };
 			SubmittedInfo.waitSemaphoreCount = 1;
 			SubmittedInfo.pWaitSemaphores = WaitSemaphore;
 
@@ -626,15 +642,15 @@ namespace KE
 			SubmittedInfo.pWaitDstStageMask = Stage;
 
 			SubmittedInfo.commandBufferCount = 1;
-			SubmittedInfo.pCommandBuffers = &_VkCommandBuffer;
+			SubmittedInfo.pCommandBuffers = &_VkCommandBuffer[CurrentFrame];
 			
 			//Which semaphore to sign once the commandbuffer is finished
-			VkSemaphore SingleSemaphore[] = { renderFinishedSemaphore };
+			VkSemaphore SingleSemaphore[] = { renderFinishedSemaphore[CurrentFrame] };
 			SubmittedInfo.signalSemaphoreCount = 1;
 			SubmittedInfo.pSignalSemaphores = SingleSemaphore;
 
 			//All commands will be submitted to the queue. The fence Will singal when it is finished
-			if (vkQueueSubmit(_VkGraphicsQueue, 1, &SubmittedInfo, inFlightFence) != VK_SUCCESS)
+			if (vkQueueSubmit(_VkGraphicsQueue, 1, &SubmittedInfo, inFlightFence[CurrentFrame]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to submit commands to queue");
 			}
@@ -653,8 +669,10 @@ namespace KE
 
 			vkQueuePresentKHR(_VkPresentationQueue, &PresentInfo);
 			
-			vkDeviceWaitIdle(_VkDevice);
+			//Ensures the frames stay between 0 and 2
+			CurrentFrame = (CurrentFrame + 1) % FRAMES_IN_FLIGHT;
 
+			vkDeviceWaitIdle(_VkDevice);
 		};
 
 		/*
