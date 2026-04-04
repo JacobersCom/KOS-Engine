@@ -5,19 +5,19 @@ add_library(RenderingSystems)
 #All the src files held with the vulkan lib. Being these are src files they are private
 target_sources(RenderingSystems
 PRIVATE
-    KRender.cpp
+    Vulkan/KRender.cpp
 	
 PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${PROJECT_SOURCE_DIR}/include
     FILES
-        ${PROJECT_SOURCE_DIR}/include/RenderingSystems/KRender.h
+        ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KRender.h
 )
 
 #Links the src files to the renderer header files
 target_include_directories(RenderingSystems
 PUBLIC
-    ${PROJECT_SOURCE_DIR}/include/RenderingSystems/
+    ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/
 	${PROJECT_SOURCE_DIR}/include/KOS-Engine-Core/win32/
 )
 
