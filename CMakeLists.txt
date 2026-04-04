@@ -11,4 +11,3 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #Adding both subdirectorys
 add_subdirectory(src)
-add_subdirectory(include)
