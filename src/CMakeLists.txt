@@ -8,5 +8,6 @@ add_subdirectory(RenderingSystems)
 
 target_link_libraries(KOS-Engine 
 PUBLIC 
+    KOS-Engine-Core
     RenderingSystems
 )
