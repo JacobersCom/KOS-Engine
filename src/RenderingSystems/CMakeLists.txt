@@ -6,12 +6,16 @@ add_library(RenderingSystems)
 target_sources(RenderingSystems
 PRIVATE
     Vulkan/KOSVulkanWindow.cpp
+    Vulkan/KOSVulkanRenderer.cpp
 	
 PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${PROJECT_SOURCE_DIR}/include
     FILES
         ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KOSVulkanWindow.h
+        ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KOSVulkanRenderer.h
+        ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KOSVulkanPrerequisites.h
+
 )
 
 #Links the src files to the renderer header files
