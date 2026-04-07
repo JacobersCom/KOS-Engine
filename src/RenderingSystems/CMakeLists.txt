@@ -5,14 +5,14 @@ add_library(RenderingSystems)
 #All the src files held with the vulkan lib. Being these are src files they are private
 target_sources(RenderingSystems
 PRIVATE
-    Vulkan/KOSVulkanWindow.cpp
+    Vulkan/KOSVulkanBuffers.cpp
     Vulkan/KOSVulkanRenderer.cpp
 	
 PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${PROJECT_SOURCE_DIR}/include
     FILES
-        ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KOSVulkanWindow.h
+        ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KOSVulkanBuffers.h
         ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KOSVulkanRenderer.h
         ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KOSVulkanPrerequisites.h
 
