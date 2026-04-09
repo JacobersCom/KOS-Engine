@@ -1,12 +1,5 @@
 #include "KOSVulkanPrerequisites.h"
 
-#ifdef _WIN32
-#define VK_USE_PLATFORM_WIN32_KHR
-#define WINDOWS_LEAN_AND_MEAN
-#include <Windows.h>
-#include "vulkan/vulkan_win32.h"
-#endif
-
 class KOSVulkanRenderer;
 
 /*
@@ -29,4 +22,5 @@ public:
 
 private:
 
+	std::uniquePointer
 };

@@ -15,12 +15,16 @@ public:
 	bool KActive;
 
 
-	void Init();
+	void CreateInstance();
 
 private:
 
 	VulkanRenderer() {};
 	~VulkanRenderer() {};
 
-
+	/*
+	Checks layers to ensure it is avabile on our system, 
+	and returns that layer
+	*/
+	std::vector<const char*> GetRequiredDebuggingLayers();
 };
