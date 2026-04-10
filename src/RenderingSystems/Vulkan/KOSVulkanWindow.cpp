@@ -1,5 +1,5 @@
-#include "KOSVulkanWindow.h"
-#include "KOSVulkanRenderer.h"
+#include "RenderingSystems/Vulkan/KOSVulkanWindow.h"
+#include "RenderingSystems/Vulkan/KOSVulkanRenderer.h"
 
 KOSVulkanWindow::KOSVulkanWindow(const char* WindowTitle, int width, int height)
 	: KWindowTitle(WindowTitle), KWidth(width), KHeight(height)

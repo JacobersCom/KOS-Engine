@@ -1,5 +1,3 @@
-#include <KOSVulkanWindow.h>
-#include <KWindow.h>
 
 namespace KE
 {

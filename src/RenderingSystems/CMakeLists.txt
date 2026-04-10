@@ -1,28 +1,38 @@
 
+set(VULKAN_SRC_PATH "${PROJECT_SOURCE_DIR}/src/RenderingSystems/Vulkan")
+set(VULKAN_INC_PATH "${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan")
+
+set(VULKAN_SRC 
+	${VULKAN_SRC_PATH}/KOSVulkanWindow.cpp
+	${VULKAN_SRC_PATH}/KOSVulkanRenderer.cpp
+	${VULKAN_SRC_PATH}/KOSVulkanBuffers.cpp
+)
+
+set(VULKAN_INC
+	${VULKAN_INC_PATH}/KOSVulkanWindow.h
+	${VULKAN_INC_PATH}/KOSVulkanRenderer.h
+	${VULKAN_INC_PATH}/KOSVulkanBuffers.h
+)
+
 #Create a library called vulkan that can be used to link back to main
 add_library(RenderingSystems)
 
 #All the src files held with the vulkan lib. Being these are src files they are private
 target_sources(RenderingSystems
 PRIVATE
-    Vulkan/KOSVulkanBuffers.cpp
-    Vulkan/KOSVulkanRenderer.cpp
+    ${VULKAN_SRC}
 	
 PUBLIC
     FILE_SET HEADERS
-    BASE_DIRS ${PROJECT_SOURCE_DIR}/include
+    BASE_DIRS ${VULKAN_INC_PATH}
     FILES
-        ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KOSVulkanBuffers.h
-        ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KOSVulkanRenderer.h
-        ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/KOSVulkanPrerequisites.h
-
+        ${VULKAN_INC}
 )
 
 #Links the src files to the renderer header files
 target_include_directories(RenderingSystems
 PUBLIC
-    ${PROJECT_SOURCE_DIR}/include/RenderingSystems/Vulkan/
-	${PROJECT_SOURCE_DIR}/include/KOS-Engine-Core/win32/
+    ${PROJECT_SOURCE_DIR}/include/
 )
 
 #Links the Vulkan SDK to the KRender header file
