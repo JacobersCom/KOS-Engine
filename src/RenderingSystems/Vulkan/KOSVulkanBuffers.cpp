@@ -12,8 +12,6 @@ namespace KE
 
 		bool KRender::InitVulkan() 
 		{
-			KE::RENDERER::KRender::CreateVkInstance();
-			KE::RENDERER::KRender::CreateWin32Surface();
 			KE::RENDERER::KRender::PickPhysicalDevice();
 			KE::RENDERER::KRender::CreateLogicalDevice();
 			KE::RENDERER::KRender::CreateSwapChain();
@@ -72,69 +70,8 @@ namespace KE
 		 
 		Defines the name and Verison of the applcation built using vulkan and the verison of the vulkan instance used 
 		*/
-		void KRender::CreateVkInstance()
-		{
-			//Applcation information
-			VkApplicationInfo AppInfo{};
-
-
-			AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-			AppInfo.pNext = VK_NULL_HANDLE;
-			AppInfo.pApplicationName = "KOS Engine"; //Name of the applcation
-			AppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0); //Version of the applcation
-			AppInfo.pEngineName = "KOS"; //Name of engine used to make the applcation
-			AppInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0); //Version of the engine used to make the applcation
-			AppInfo.apiVersion = VK_API_VERSION_1_4; //Version of the vulkan instance
-
-			//The parameters for the newly created vulkan instance
-			VkInstanceCreateInfo InstanceInfo{};
-
-			_VkInstanceExtensions = GetRequiredInstanceExtensions();
-
-			InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-			InstanceInfo.pApplicationInfo = &AppInfo;
-			InstanceInfo.pNext = VK_NULL_HANDLE;
-			InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(_VkInstanceExtensions.size());
-			InstanceInfo.ppEnabledExtensionNames = _VkInstanceExtensions.data();
-
-			if (enableValidationLayers && !CheckVaildationLayerSupport())
-			{
-				throw std::runtime_error("Validation layers requested, but not available");
-			}
-			else
-			{
-				_VkValidationLayers = GetRequiredInstaceLayers();
-				InstanceInfo.enabledLayerCount = static_cast<uint32_t>(_VkValidationLayers.size());
-				InstanceInfo.ppEnabledLayerNames = _VkValidationLayers.data();
-			}
-
-			
-			if (vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance) != VK_SUCCESS)
-			{
-				throw std::runtime_error("Failed to create VkInstance");
-			}
-
-		}
 
 #ifdef _WIN32
-
-		/*
-		Specificly creates a win32 surfce for a win32 window if thats the end users OS
-		*/
-		void KRender::CreateWin32Surface()
-		{
-			//Info for a win32 surface object
-			VkWin32SurfaceCreateInfoKHR _WinSurfaceInfo{};
-
-			_WinSurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-			_WinSurfaceInfo.hwnd = _win->GetWindowHandle(); //Handle to win32 window
-			_WinSurfaceInfo.hinstance = _win->GetWindowInstance();//Instance of the win32 window
-
-			if (vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface) != VK_SUCCESS)
-			{
-				printf("Failed to create win32 surface");
-			}
-		}
 
 #endif // _WIN32
 

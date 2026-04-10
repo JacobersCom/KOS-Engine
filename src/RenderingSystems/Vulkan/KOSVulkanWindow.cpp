@@ -1,6 +1,13 @@
 #include "RenderingSystems/Vulkan/KOSVulkanWindow.h"
 #include "RenderingSystems/Vulkan/KOSVulkanRenderer.h"
 
+#ifdef _WIN32
+#define WINDOWS_LEAN_AND_MEAN
+#define VK_USE_PLATFORM_WIN32_KHR
+#include "vulkan/vulkan_win32.h"
+#include "Windows.h"
+#endif
+
 KOSVulkanWindow::KOSVulkanWindow(const char* WindowTitle, int width, int height)
 	: KWindowTitle(WindowTitle), KWidth(width), KHeight(height)
 {
@@ -12,6 +19,7 @@ void KOSVulkanWindow::CreateSurface(size_t windowhandle)
 #ifdef _WIN32
 	
 	std::unique_ptr<KOSVulkanRenderer> renderer = std::make_unique<KOSVulkanRenderer>();
+	auto& Instance = renderer->KInstance;
 
 	VkSurfaceKHR Surface = VK_NULL_HANDLE;
 
@@ -22,7 +30,9 @@ void KOSVulkanWindow::CreateSurface(size_t windowhandle)
 	SurInfo.hinstance = GetModuleHandle(NULL);
 
 	
-	VkResult result = vkCreateWin32SurfaceKHR(renderer->KInstance, &SurInfo, nullptr, &Surface);
+	VkResult result = vkCreateWin32SurfaceKHR(Instance, &SurInfo, nullptr, &Surface);
+
+#if _DEBUG
 	if (result == VK_SUCCESS)
 	{
 		printf("Win32 Surface created");
@@ -31,6 +41,8 @@ void KOSVulkanWindow::CreateSurface(size_t windowhandle)
 	{
 		printf("Failed to create Win32 Surface");
 	}
+#endif // _DEBUG
+
 #endif // _WIN32
 
 	

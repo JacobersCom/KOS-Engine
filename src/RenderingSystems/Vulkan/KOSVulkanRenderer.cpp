@@ -1,4 +1,5 @@
 #include "RenderingSystems/Vulkan/KOSVulkanRenderer.h"
+#include "RenderingSystems/Vulkan/KOSVulkanComponents.h"
 
 
 void KOSVulkanRenderer::CreateInstance()
@@ -24,6 +25,8 @@ void KOSVulkanRenderer::CreateInstance()
 
 	//Replace when logger is created
 	VkResult result = vkCreateInstance(&InstanceInfo, nullptr, &KInstance);
+
+
 	if (result == VK_SUCCESS)
 	{
 		printf("- Vulkan Instance Created");
@@ -60,4 +63,9 @@ std::vector<const char*> KOSVulkanRenderer::GetRequiredDebuggingLayers()
 	}
 	return WantedLayers;
 	
+}
+
+bool KOSVulkanRenderer::IsGPUSupported(VkPhysicalDevice PhysicalDevice)
+{
+	QueueFamily 
 }

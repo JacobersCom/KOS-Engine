@@ -6,6 +6,7 @@ set(VULKAN_SRC
 	${VULKAN_SRC_PATH}/KOSVulkanWindow.cpp
 	${VULKAN_SRC_PATH}/KOSVulkanRenderer.cpp
 	${VULKAN_SRC_PATH}/KOSVulkanBuffers.cpp
+	${VULKAN_SRC_PATH}/KOSVulkanSystems.cpp
 )
 
 set(VULKAN_INC
@@ -13,6 +14,7 @@ set(VULKAN_INC
 	${VULKAN_INC_PATH}/KOSVulkanRenderer.h
 	${VULKAN_INC_PATH}/KOSVulkanBuffers.h
 	${VULKAN_INC_PATH}/KOSVulkanPrerequisites.h
+	${VULKAN_INC_PATH}/KOSVulkanComponents.h
 )
 
 #Create a library called vulkan that can be used to link back to main
