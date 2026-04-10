@@ -22,5 +22,4 @@ public:
 
 private:
 
-	std::uniquePointer
 };

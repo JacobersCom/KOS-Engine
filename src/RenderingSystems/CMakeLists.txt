@@ -12,6 +12,7 @@ set(VULKAN_INC
 	${VULKAN_INC_PATH}/KOSVulkanWindow.h
 	${VULKAN_INC_PATH}/KOSVulkanRenderer.h
 	${VULKAN_INC_PATH}/KOSVulkanBuffers.h
+	${VULKAN_INC_PATH}/KOSVulkanPrerequisites.h
 )
 
 #Create a library called vulkan that can be used to link back to main

@@ -1,7 +1,7 @@
 #include "RenderingSystems/Vulkan/KOSVulkanRenderer.h"
 
 
-void VulkanRenderer::CreateInstance()
+void KOSVulkanRenderer::CreateInstance()
 {
 	VkApplicationInfo AppInfo{};
 
@@ -23,21 +23,18 @@ void VulkanRenderer::CreateInstance()
 #endif
 
 	//Replace when logger is created
-	try {
-		VkResult result = vkCreateInstance(&InstanceInfo, nullptr, &KInstance);
-		if (result == VK_SUCCESS)
-		{
-			printf("- Vulkan Instance Created");
-		}
-		throw result;
+	VkResult result = vkCreateInstance(&InstanceInfo, nullptr, &KInstance);
+	if (result == VK_SUCCESS)
+	{
+		printf("- Vulkan Instance Created");
 	}
-	catch (int errorCode)
+	else
 	{
 		printf("- Vulkan Instance Creation Failed");
 	}
 }
 
-std::vector<const char*> VulkanRenderer::GetRequiredDebuggingLayers()
+std::vector<const char*> KOSVulkanRenderer::GetRequiredDebuggingLayers()
 {
 	uint32_t count;
 
