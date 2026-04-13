@@ -1,7 +1,5 @@
-add_library(KECS)
 
 target_sources(KECS
-PRIVATE
     KECS.cpp
 
     PUBLIC
