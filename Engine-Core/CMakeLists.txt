@@ -30,3 +30,5 @@ target_include_directories(Engine-Core
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
+
+target_compile_definitions(Engine-Core PUBLIC cxx_std_17)
