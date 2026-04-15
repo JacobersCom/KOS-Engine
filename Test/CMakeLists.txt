@@ -2,7 +2,7 @@ add_executable(Engine-Test)
 
 target_sources(Engine-Test
 PRIAVTE
-    ${CMAKE_CURRENT_SOURCE_DIR}/main_test.cpp
+    main_test.cpp
 )
 
 #Link Engine test to the engine core

@@ -15,5 +15,5 @@
 
 int main()
 {
-    
+    kecs::NewEntity();
 }
