@@ -1,7 +1,6 @@
 add_executable(Engine-Test)
 
 target_sources(Engine-Test
-PRIAVTE
     main_test.cpp
 )
 
