@@ -11,9 +11,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #Adding both subdirectorys
 add_subdirectory(Engine-Core)
-
-option(BUILD_TESTS "Build tests" OFF)
-
-if(BUILD_TESTS)
-    add_subdirectory(Test)
-endif()
+add_subdirectory(Test)

@@ -13,6 +13,7 @@ namespace kecs
         EntityID id;
         ComponentMask mask;
     };
+    std::vector<EntityDecs> entities;
 
     EntityID NewEntity()
     {
@@ -20,5 +21,4 @@ namespace kecs
         return entities.back().id;
     }
 
-    std::vector<EntityDecs> entities;
 }
