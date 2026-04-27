@@ -1,4 +1,5 @@
-#include "KOSVulkanPrerequisites.h"
+#include "vulkan/vulkan.h"
+
 
 class VulkanBuffers; // May remove
 

@@ -1,4 +1,4 @@
-#include "RenderingSystems/Vulkan/KOSVulkanComponents.h"
+#include "VulkanRenderer/KOSVulkanComponents.h"
 
 /*
 Finds the graphics and presentation queue familys for rendering

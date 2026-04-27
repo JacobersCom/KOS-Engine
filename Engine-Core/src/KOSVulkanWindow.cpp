@@ -1,10 +1,9 @@
-#include "RenderingSystems/Vulkan/KOSVulkanWindow.h"
-#include "RenderingSystems/Vulkan/KOSVulkanRenderer.h"
+#include "VulkanRenderer/KOSVulkanWindow.h"
+#include "VulkanRenderer/KOSVulkanSystems.h"
 
 #ifdef _WIN32
 #define WINDOWS_LEAN_AND_MEAN
 #define VK_USE_PLATFORM_WIN32_KHR
-#include "vulkan/vulkan_win32.h"
 #include "Windows.h"
 #endif
 

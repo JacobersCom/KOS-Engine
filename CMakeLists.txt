@@ -10,5 +10,5 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #Adding both subdirectorys
+add_subdirectory(App)
 add_subdirectory(Engine-Core)
-add_subdirectory(Test)

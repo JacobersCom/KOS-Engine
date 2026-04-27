@@ -4,7 +4,6 @@ add_library(Engine-Core STATIC)
 
 target_sources(Engine-Core
 PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}/src/KECS.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSVulkanBuffers.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSVulkanRenderer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSVulkanSystems.cpp
@@ -12,14 +11,12 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RenderManager.cpp
 
 PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/core/KMat4.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/core/KVector3.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/ecs/KECS.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/vulkan/KOSVulkanBuffers.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/vulkan/KOSVulkanRenderer.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/vulkan/KOSVulkanSystems.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/vulkan/KOSVulkanWindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/vulkan/RenderManager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSVulkanBuffers.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSVulkanRenderer.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSVulkanComponents.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSVulkanSystems.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSVulkanWindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/RenderManager.h
 )
 
 target_include_directories(Engine-Core
@@ -31,4 +28,19 @@ target_include_directories(Engine-Core
     ${CMAKE_CURRENT_SOURCE_DIR}/src/
 )
 
+include(FetchContent)
+FetchContent_Declare(
+    fetch_vk_bootstrap
+    GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
+    GIT_TAG        BRANCH_OR_TAG #suggest using a tag so the library doesn't update whenever new commits are pushed to a branch
+)
+FetchContent_MakeAvailable(fetch_vk_bootstrap)
+
+target_link_libraries(Engine-Core 
+PRIVATE 
+    Vulkan::Vulkan
+    vk-bootstrap::vk-bootstrap
+)
+
 target_compile_definitions(Engine-Core PUBLIC cxx_std_17)
+
