@@ -1,5 +1,12 @@
 find_package(Vulkan QUIET)
 
+include(FetchContent)
+FetchContent_Declare(
+    EnTT
+    GIT_REPOSITORY https://github.com/skypjack/entt.git
+    GIT_TAG v3.13.1  # Specify a specific version or commit hash
+)
+
 add_library(Engine-Core STATIC)
 
 target_sources(Engine-Core
@@ -9,6 +16,8 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSVulkanSystems.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSVulkanWindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RenderManager.cpp
+    ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.cpp
+
 
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSVulkanBuffers.h
@@ -17,6 +26,8 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSVulkanSystems.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSVulkanWindow.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/RenderManager.h
+    ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.h
+
 )
 
 target_include_directories(Engine-Core
@@ -28,18 +39,10 @@ target_include_directories(Engine-Core
     ${CMAKE_CURRENT_SOURCE_DIR}/src/
 )
 
-include(FetchContent)
-FetchContent_Declare(
-    fetch_vk_bootstrap
-    GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
-    GIT_TAG        BRANCH_OR_TAG #suggest using a tag so the library doesn't update whenever new commits are pushed to a branch
-)
-FetchContent_MakeAvailable(fetch_vk_bootstrap)
-
 target_link_libraries(Engine-Core 
 PRIVATE 
     Vulkan::Vulkan
-    vk-bootstrap::vk-bootstrap
+    EnTT::EnTT
 )
 
 target_compile_definitions(Engine-Core PUBLIC cxx_std_17)

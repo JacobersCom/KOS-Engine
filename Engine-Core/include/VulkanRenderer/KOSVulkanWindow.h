@@ -1,4 +1,3 @@
-#include "KOSVulkanPrerequisites.h"
 
 class KOSVulkanRenderer;
 

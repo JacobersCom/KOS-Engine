@@ -4,8 +4,12 @@
 #ifdef _WIN32
 #define WINDOWS_LEAN_AND_MEAN
 #define VK_USE_PLATFORM_WIN32_KHR
+#include "vulkan/vulkan_win32.h"
 #include "Windows.h"
 #endif
+
+//ios
+#include <iostream>
 
 KOSVulkanWindow::KOSVulkanWindow(const char* WindowTitle, int width, int height)
 	: KWindowTitle(WindowTitle), KWidth(width), KHeight(height)
@@ -20,7 +24,7 @@ void KOSVulkanWindow::CreateSurface(size_t windowhandle)
 	std::unique_ptr<KOSVulkanRenderer> renderer = std::make_unique<KOSVulkanRenderer>();
 	auto& Instance = renderer->KInstance;
 
-	VkSurfaceKHR Surface = VK_NULL_HANDLE;
+	 Surface = VK_NULL_HANDLE;
 
 	VkWin32SurfaceCreateInfoKHR SurInfo{};
 
