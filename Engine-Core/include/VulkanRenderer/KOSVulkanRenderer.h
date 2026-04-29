@@ -1,4 +1,4 @@
-#include "vulkan/vulkan.h"
+
 
 
 class VulkanBuffers; // May remove
@@ -12,25 +12,17 @@ class KOSVulkanRenderer {
 
 public:
 
-	VkInstance KInstance;
-	bool KActive;
 
+	KOSVulkanRenderer(std::string ApplicationName);
+	~KOSVulkanRenderer();
 
-	void CreateInstance();
+	KOSVulkanRenderer(const KOSVulkanRenderer&) = delete;
+	KOSVulkanRenderer& operator=(const KOSVulkanRenderer) = delete;
 
 private:
+	
+	void InitVulkan();
 
-	KOSVulkanRenderer() {};
-	~KOSVulkanRenderer() {};
+	std::string ApplicationName;
 
-	/*
-	Checks layers to ensure it is avabile on our system, 
-	and returns that layer
-	*/
-	std::vector<const char*> GetRequiredDebuggingLayers();
-
-	/*
-	Checks if the users GPU has the required support for features of the engine
-	*/
-	bool IsGPUSupported(VkPhysicalDevice PhysicalDevice);
 };

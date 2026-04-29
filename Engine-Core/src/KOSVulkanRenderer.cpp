@@ -1,71 +1,30 @@
-#include "RenderingSystems/Vulkan/KOSVulkanRenderer.h"
-#include "RenderingSystems/Vulkan/KOSVulkanComponents.h"
+#include "VulkanRenderer/KOSVulkanRenderer.h"
 
+#include <VkBootstrap.h>
 
-void KOSVulkanRenderer::CreateInstance()
+#include <iostream>
+
+KOSVulkanRenderer::KOSVulkanRenderer(std::string ApplicationName)
+	:ApplicationName(ApplicationName)
 {
-	VkApplicationInfo AppInfo{};
-
-	AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	AppInfo.pNext = VK_NULL_HANDLE;
-	AppInfo.pApplicationName = "KOS Engine";
-	AppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	AppInfo.apiVersion = VK_API_VERSION_1_4;
-
-	VkInstanceCreateInfo InstanceInfo{};
-	InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	InstanceInfo.pApplicationInfo = &AppInfo;
-
-#if _DEBUG
-	auto& Layers = GetRequiredDebuggingLayers();
-
-	InstanceInfo.enabledLayerCount = Layers.size();
-	InstanceInfo.ppEnabledLayerNames = Layers.data();
-#endif
-
-	//Replace when logger is created
-	VkResult result = vkCreateInstance(&InstanceInfo, nullptr, &KInstance);
-
-
-	if (result == VK_SUCCESS)
-	{
-		printf("- Vulkan Instance Created");
-	}
-	else
-	{
-		printf("- Vulkan Instance Creation Failed");
-	}
+	InitVulkan();
 }
 
-std::vector<const char*> KOSVulkanRenderer::GetRequiredDebuggingLayers()
+void KOSVulkanRenderer::InitVulkan()
 {
-	uint32_t count;
+	vkb::InstanceBuilder InsBuilder;
 
-	vkEnumerateInstanceLayerProperties(&count, nullptr);
-	
-	std::vector<VkLayerProperties> AvailableLayers(count);
-	vkEnumerateInstanceLayerProperties(&count, AvailableLayers.data());
-	
-	std::vector<const char*> WantedLayers = { "VK_LAYER_KHRONOS_validation" };
+	vkb::Result<vkb::Instance> InsReturn = InsBuilder.set_app_name(ApplicationName.c_str())
+		.request_validation_layers()
+		.use_default_debug_messenger()
+		.build();
 
-	for (const auto& Layers : WantedLayers)
+	if (!InsReturn)
 	{
-		bool found = false;
-
-		for (const auto& AllowedLayers : AvailableLayers)
-		{
-			if (strcmp(Layers, AllowedLayers.layerName) == 0)
-			{
-				found = true;
-				break;
-			}
-		}
+		std::cout << InsReturn.error().message() << "\n";
+		
+		return;
 	}
-	return WantedLayers;
-	
-}
 
-bool KOSVulkanRenderer::IsGPUSupported(VkPhysicalDevice PhysicalDevice)
-{
-	QueueFamily 
+
 }

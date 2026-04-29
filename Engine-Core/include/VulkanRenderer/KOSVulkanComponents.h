@@ -1,19 +1,29 @@
 #include <vulkan/vulkan.h>
 
-//May need to include optional
+#include <VkBootstrap.h>
 
-struct QueueFamilys
-{
-	uint32_t GraphicsBit;
-	uint32_t PresentBit;
-};
 
-struct Surfaces
+namespace DRAW
 {
-	VkSurfaceKHR Win32Surface;
-};
 
-struct SwapChainDetails
-{
-	
-};
+	struct VulkanRenderer
+	{
+		vkb::Instance vkbIns;
+		vkb::PhysicalDevice vkbPhy;
+		vkb::Device vkbDev;
+		vkb::Swapchain vkbSwapChain;
+	};
+
+	struct QueueFamilys
+	{
+		uint32_t GraphicsBit;
+		uint32_t PresentBit;
+	};
+
+	struct Surfaces
+	{
+		VkSurfaceKHR Win32Surface;
+	};
+
+}
+

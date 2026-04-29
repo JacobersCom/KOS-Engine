@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+
 int main()
 {
 	KE::SYSTEM::KWindow _win;

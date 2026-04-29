@@ -1,4 +1,7 @@
+
 #include "VulkanRenderer/KOSVulkanComponents.h"
+
+#include <entt/entt.hpp>
 
 /*
 Finds the graphics and presentation queue familys for rendering
@@ -6,6 +9,8 @@ The data for this function is held within KOSVulkanComponents
 */
 QueueFamilys FindQueueFamilys(VkPhysicalDevice PhysicalDevice)
 {
+
+	
 	//Enables the code to access the original queue family to avoid having to make copies later
 	std::unique_ptr<QueueFamilys> indices = std::make_unique<QueueFamilys>();
 	std::unique_ptr<Surfaces> surf = std::make_unique<Surfaces>();
