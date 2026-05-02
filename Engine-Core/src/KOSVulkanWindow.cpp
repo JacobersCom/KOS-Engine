@@ -18,30 +18,44 @@ KOSVulkanWindow::KOSVulkanWindow(const char* WindowTitle, int width, int height)
 	KOSCreateWindow();
 }
 
+LRESULT CALLBACK WindowProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_QUIT:
+    {
+        DestroyWindow(handle);
+    }
+    break;
+    }
+
+    return DefWindowProc(handle, message, wParam, lParam);
+}
+
 void KOSVulkanWindow::KOSCreateWindow()
 {
 
 	char className[] = "KOSWindowClass";
 
-	WNDCLASS wc;
+    WNDCLASS wc{};
 	wc.lpfnWndProc = WindowProc;
-    wc.hInstance = 
+    wc.hInstance = GetModuleHandle(nullptr);
     wc.lpszClassName = className;
 
     RegisterClass(&wc);
 
-    windowHandle = CreateWindowEx(
+    windowHandle = CreateWindowExA(
         0,
         className,
         windowTitle,
-        WS_OVERLAPPED, //Window Style
+        WS_OVERLAPPEDWINDOW, //Window Style
         CW_USEDEFAULT,
         CW_USEDEFAULT,
         width,
         height,
         NULL,
         NULL,
-        windowHandle,
+       GetModuleHandle(nullptr),
         NULL
         );
 
@@ -61,16 +75,3 @@ void KOSVulkanWindow::KOSCreateWindow()
     }
 }
 
-LRESULT CALLBACK WindowProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-    case WM_QUIT:
-    {
-        DestroyWindow(handle);
-    }
-    break;
-    }
-
-    return DefWindowProc(handle, message, wParam, lParam);
-}

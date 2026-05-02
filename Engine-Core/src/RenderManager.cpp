@@ -9,5 +9,6 @@ RenderManager::RenderManager(entt::registry& registry)
 
 	entt::entity Manager = registry.create();
 
-	registry.emplace<Renderer::VulkanData>(Manager);
+	registry.emplace<RENDERER::Surface>(Manager);
+	registry.emplace<RENDERER::VulkanData>(Manager);
 }

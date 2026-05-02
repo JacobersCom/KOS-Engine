@@ -1,5 +1,5 @@
 
-
+#include "Windows.h"
 /*
 KOSVulkanWindow depends on KOSVulkanRenderer to be enabled first
 KOSVulkanWindow handles everything that is presented to the window
@@ -20,5 +20,7 @@ private:
 
 	const char* windowTitle;
 	int width, height;
+
+	HWND windowHandle;
 
 };

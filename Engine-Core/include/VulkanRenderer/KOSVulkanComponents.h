@@ -1,7 +1,18 @@
 #include <vulkan/vulkan.h>
+
+#ifdef _WIN32
+
+#define WINDOWS_LEAN_AND_MEAN
+#define VK_USE_PLATFORM_WIN32_KHR
+
+#include "Windows.h"
+#include "vulkan/vulkan_win32.h"
+
+#endif
+
 #include <VkBootstrap.h>
 
-namespace Renderer
+namespace RENDERER
 {
 	//Everything to init vulkan
 	struct VulkanData
@@ -12,16 +23,9 @@ namespace Renderer
 		vkb::Swapchain vkbSwapchain;
 	};
 
-	struct QueueFamilys
-	{
-		uint32_t GraphicsBit;
-		uint32_t PresentBit;
-	};
-
-	struct Surfaces
+	struct Surface
 	{
 		VkSurfaceKHR Win32Surface;
 	};
 
 }
-
