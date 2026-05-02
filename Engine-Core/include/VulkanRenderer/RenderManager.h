@@ -1,7 +1,7 @@
-#include <entt/entt.hpp>
+#pragma once
 
-class VulkanComponents;
-class VulkanSystems;
+
+#include <entt/entt.hpp>
 
 class RenderManager
 {

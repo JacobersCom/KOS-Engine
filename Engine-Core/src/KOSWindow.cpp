@@ -39,7 +39,7 @@ bool KOSWindow::PollEvents()
         DispatchMessage(&message);
     }
 
-    return windowState = false
+    return windowState = false;
 }
 
 void KOSWindow::CreateWin32()

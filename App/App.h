@@ -1,3 +1,5 @@
+#pragma once
+
 #include "VulkanRenderer/KOSWindow.h"
 
 class App
@@ -11,5 +13,5 @@ public:
 
 private:
 	//KOSWindow resource initialization
-	class KOSWindow window{ "TestWindow", WIDTH, HEIGHT };
+	KOSWindow window{ "TestWindow", WIDTH, HEIGHT };
 };

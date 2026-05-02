@@ -1,3 +1,6 @@
+#pragma once
+
+
 #include <vulkan/vulkan.h>
 
 #ifdef _WIN32
