@@ -1,6 +1,4 @@
-#include "VulkanRenderer/KOSVulkanWindow.h"
-#include "VulkanRenderer/KOSVulkanSystems.h"
-#include "entt/entt.hpp"
+#include "VulkanRenderer/KOSWindow.h"
 
 #ifdef _WIN32
 #define WINDOWS_LEAN_AND_MEAN
@@ -12,10 +10,10 @@
 #include <iostream>
 #include <errno.h>
 
-KOSVulkanWindow::KOSVulkanWindow(const char* WindowTitle, int width, int height)
+KOSWindow::KOSWindow(const char* WindowTitle, int width, int height)
 	: windowTitle(WindowTitle), width(width), height(height)
 {
-	KOSCreateWindow();
+	CreateWin32();
 }
 
 LRESULT CALLBACK WindowProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
@@ -32,8 +30,21 @@ LRESULT CALLBACK WindowProc(HWND handle, UINT message, WPARAM wParam, LPARAM lPa
     return DefWindowProc(handle, message, wParam, lParam);
 }
 
-void KOSVulkanWindow::KOSCreateWindow()
+bool KOSWindow::PollEvents()
 {
+    MSG message = {};
+    while (GetMessage(&message, NULL, 0, 0) > 0)
+    {
+        TranslateMessage(&message);
+        DispatchMessage(&message);
+    }
+
+    return windowState = false
+}
+
+void KOSWindow::CreateWin32()
+{
+    windowState = true;
 
 	char className[] = "KOSWindowClass";
 
@@ -65,13 +76,6 @@ void KOSVulkanWindow::KOSCreateWindow()
         EXIT_FAILURE;
     }
 
-    ShowWindow(windowHandle, 1);
-
-    MSG message = {};
-    while (GetMessage(&message, NULL, 0, 0) > 0)
-    {
-        TranslateMessage(&message);
-        DispatchMessage(&message);
-    }
+    ShowWindow(windowHandle, 1);     
 }
 

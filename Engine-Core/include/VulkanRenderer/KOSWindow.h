@@ -4,22 +4,23 @@
 KOSVulkanWindow depends on KOSVulkanRenderer to be enabled first
 KOSVulkanWindow handles everything that is presented to the window
 */
-class KOSVulkanWindow {
+class KOSWindow {
 public:
 
 
-	KOSVulkanWindow(const char* WindowTitle, int width, int height);
+	KOSWindow(const char* WindowTitle, int width, int height);
 
-	/*
-	Used to created a surface for the rendering system
-	*/
+	const bool shouldClose() { return windowState; };
+	bool PollEvents();
 
 private:
 
-	void KOSCreateWindow();
+	void CreateWin32();
 
 	const char* windowTitle;
 	int width, height;
+
+	bool windowState;
 
 	HWND windowHandle;
 
