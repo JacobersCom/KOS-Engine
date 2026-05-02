@@ -1,7 +1,7 @@
 
 
 
-class VulkanBuffers; // May remove
+class KOSVulkanWindow;
 
 /*
 VulkanRenderer will is independed and can start up first
@@ -13,7 +13,7 @@ class KOSVulkanRenderer {
 public:
 
 
-	KOSVulkanRenderer(std::string ApplicationName);
+	KOSVulkanRenderer(std::string AppName);
 	~KOSVulkanRenderer();
 
 	KOSVulkanRenderer(const KOSVulkanRenderer&) = delete;
@@ -24,5 +24,8 @@ private:
 	void InitVulkan();
 
 	std::string ApplicationName;
+	vkb::Instance vkb_Ins;
+
+
 
 };

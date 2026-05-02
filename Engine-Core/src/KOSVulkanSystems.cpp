@@ -1,44 +1,41 @@
-
+#include "VulkanRenderer/RenderManager.h"
 #include "VulkanRenderer/KOSVulkanComponents.h"
 
-#include <entt/entt.hpp>
 
-/*
-Finds the graphics and presentation queue familys for rendering
-The data for this function is held within KOSVulkanComponents
-*/
-QueueFamilys FindQueueFamilys(VkPhysicalDevice PhysicalDevice)
+#include <entt/entt.hpp>
+#include "VkBootstrap.h"
+
+#include <iostream>
+
+namespace Renderer
 {
 
-	
-	//Enables the code to access the original queue family to avoid having to make copies later
-	std::unique_ptr<QueueFamilys> indices = std::make_unique<QueueFamilys>();
-	std::unique_ptr<Surfaces> surf = std::make_unique<Surfaces>();
-
-	uint32_t count;
-	VkBool32 PresentationEnabled;
-
-	vkGetPhysicalDeviceQueueFamilyProperties(PhysicalDevice, &count, nullptr);
-
-	std::vector<VkQueueFamilyProperties> Familys(count);
-
-	vkGetPhysicalDeviceQueueFamilyProperties(PhysicalDevice, &count, Familys.data());
-
-
-	for (uint32_t i = 0; i < Familys.size(); i++)
+	void InitVulkanData(entt::registry& reigstry, entt::entity entity)
 	{
-
-		if (Familys[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		vkb::InstanceBuilder builder;
+		vkb::Result<vkb::Instance> instResults = builder.set_app_name("KOS-Engine")
+			.request_validation_layers()
+			.use_default_debug_messenger()
+			.build();
+		if (!instResults)
 		{
-			indices->GraphicsBit = i;
+			std::cout << instResults.error().message() << "\n";
+			EXIT_FAILURE;
 		}
-
-		vkGetPhysicalDeviceSurfaceSupportKHR(PhysicalDevice, i, surf->Win32Surface, &PresentationEnabled);
-
-		if (PresentationEnabled)
+		auto& vkbIns = reigstry.try_get<Renderer::VulkanData>(entity)->vkbIns;
+		if (nullptr != vkbIns)
 		{
-			indices->PresentBit = i;
+			vkbIns = instResults.value();
 		}
-		break;
+	}
+
+}
+
+namespace Callbacks
+{
+	void RegistryCallback(entt::registry& registry)
+	{
+		registry.on_construct<Renderer::VulkanData>().connect<>
 	}
 }
+

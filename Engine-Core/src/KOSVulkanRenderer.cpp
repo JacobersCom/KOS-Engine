@@ -1,11 +1,12 @@
 #include "VulkanRenderer/KOSVulkanRenderer.h"
 
 #include <VkBootstrap.h>
+#include <entt/entt.hpp>
 
 #include <iostream>
 
-KOSVulkanRenderer::KOSVulkanRenderer(std::string ApplicationName)
-	:ApplicationName(ApplicationName)
+KOSVulkanRenderer::KOSVulkanRenderer(std::string AppName)
+	:ApplicationName(AppName)
 {
 	InitVulkan();
 }
@@ -25,6 +26,13 @@ void KOSVulkanRenderer::InitVulkan()
 		
 		return;
 	}
+	vkb_Ins = InsReturn.value();
+
+	vkb::PhysicalDeviceSelector PhySelector(vkb_Ins);
+	vkb::Result<vkb::PhysicalDevice> PhyReturn = PhySelector.set_surface()
+
+
+
 
 
 }

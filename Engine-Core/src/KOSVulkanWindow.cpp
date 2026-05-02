@@ -1,52 +1,76 @@
 #include "VulkanRenderer/KOSVulkanWindow.h"
 #include "VulkanRenderer/KOSVulkanSystems.h"
+#include "entt/entt.hpp"
 
 #ifdef _WIN32
 #define WINDOWS_LEAN_AND_MEAN
 #define VK_USE_PLATFORM_WIN32_KHR
-#include "vulkan/vulkan_win32.h"
 #include "Windows.h"
 #endif
 
 //ios
 #include <iostream>
+#include <errno.h>
 
 KOSVulkanWindow::KOSVulkanWindow(const char* WindowTitle, int width, int height)
-	: KWindowTitle(WindowTitle), KWidth(width), KHeight(height)
+	: windowTitle(WindowTitle), width(width), height(height)
 {
-	KActive = true;
+	KOSCreateWindow();
 }
 
-void KOSVulkanWindow::CreateSurface(size_t windowhandle)
+void KOSVulkanWindow::KOSCreateWindow()
 {
-#ifdef _WIN32
-	
-	std::unique_ptr<KOSVulkanRenderer> renderer = std::make_unique<KOSVulkanRenderer>();
-	auto& Instance = renderer->KInstance;
 
-	 Surface = VK_NULL_HANDLE;
+	char className[] = "KOSWindowClass";
 
-	VkWin32SurfaceCreateInfoKHR SurInfo{};
+	WNDCLASS wc;
+	wc.lpfnWndProc = WindowProc;
+    wc.hInstance = 
+    wc.lpszClassName = className;
 
-	SurInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-	SurInfo.hwnd = (HWND)windowhandle;
-	SurInfo.hinstance = GetModuleHandle(NULL);
+    RegisterClass(&wc);
 
-	
-	VkResult result = vkCreateWin32SurfaceKHR(Instance, &SurInfo, nullptr, &Surface);
+    windowHandle = CreateWindowEx(
+        0,
+        className,
+        windowTitle,
+        WS_OVERLAPPED, //Window Style
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        width,
+        height,
+        NULL,
+        NULL,
+        windowHandle,
+        NULL
+        );
 
-#if _DEBUG
-	if (result == VK_SUCCESS)
-	{
-		printf("Win32 Surface created");
-	}
-	else
-	{
-		printf("Failed to create Win32 Surface");
-	}
-#endif // _DEBUG
+    if (NULL == windowHandle)
+    {
+        printf("Error: %s\n", strerror(errno));
+        EXIT_FAILURE;
+    }
 
-#endif // _WIN32
+    ShowWindow(windowHandle, 1);
 
-	
+    MSG message = {};
+    while (GetMessage(&message, NULL, 0, 0) > 0)
+    {
+        TranslateMessage(&message);
+        DispatchMessage(&message);
+    }
+}
+
+LRESULT CALLBACK WindowProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_QUIT:
+    {
+        DestroyWindow(handle);
+    }
+    break;
+    }
+
+    return DefWindowProc(handle, message, wParam, lParam);
 }

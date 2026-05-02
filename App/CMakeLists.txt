@@ -1,8 +1,8 @@
 add_executable(App main.cpp)
 
-target_include_directories(App 
+target_link_libraries(App 
 PUBLIC
-	${PROJECT_SOURCE_DIR}/Engine-Core/include/
+	Engine-Core
 )
 
 target_compile_features(App PRIVATE cxx_std_17)

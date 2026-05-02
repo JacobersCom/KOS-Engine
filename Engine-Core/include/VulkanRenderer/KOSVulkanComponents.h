@@ -1,17 +1,15 @@
 #include <vulkan/vulkan.h>
-
 #include <VkBootstrap.h>
 
-
-namespace DRAW
+namespace Renderer
 {
-
-	struct VulkanRenderer
+	//Everything to init vulkan
+	struct VulkanData
 	{
 		vkb::Instance vkbIns;
 		vkb::PhysicalDevice vkbPhy;
 		vkb::Device vkbDev;
-		vkb::Swapchain vkbSwapChain;
+		vkb::Swapchain vkbSwapchain;
 	};
 
 	struct QueueFamilys
