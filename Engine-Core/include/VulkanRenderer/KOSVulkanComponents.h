@@ -28,6 +28,7 @@ namespace RENDERER
 
 	struct Surface
 	{
+		HWND WindowHandle;
 		VkSurfaceKHR Win32Surface;
 	};
 

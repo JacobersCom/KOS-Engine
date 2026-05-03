@@ -1,10 +1,11 @@
 #include "VulkanRenderer/RenderManager.h"
 #include "VulkanRenderer/KOSVulkanComponents.h"
-
+#include "VulkanRenderer/KOSWindow.h"
 
 #include "VkBootstrap.h"
 
 #include <iostream>
+
 
 namespace RENDERER
 {
@@ -43,11 +44,19 @@ namespace RENDERER
 
 	void Construct_Surface(entt::registry& registry, entt::entity entity)
 	{
-		auto& win32Sur = registry.try_get<RENDERER::Surface>(entity)->Win32Surface;
+		auto* Surface = registry.try_get<RENDERER::Surface>(entity);
+
+		if (Surface == nullptr)
+		{
+			printf("Error: %s\n", strerror(errno));
+			EXIT_FAILURE;
+		}
 
 		VkWin32SurfaceCreateInfoKHR Win32SurInfo{};
 		Win32SurInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 		Win32SurInfo.hinstance = GetModuleHandleA(nullptr);
+		Win32SurInfo.hwnd = Surface->WindowHandle;
+	
 	}
 
 }

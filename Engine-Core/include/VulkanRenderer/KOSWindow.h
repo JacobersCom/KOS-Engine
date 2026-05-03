@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Windows.h"
+
+//deps
+#include <entt/entt.hpp>
+
 /*
 KOSVulkanWindow depends on KOSVulkanRenderer to be enabled first
 KOSVulkanWindow handles everything that is presented to the window
@@ -9,14 +13,14 @@ class KOSWindow {
 public:
 
 
-	KOSWindow(const char* WindowTitle, int width, int height);
+	KOSWindow(entt::registry& registry, const char* WindowTitle, int width, int height);
+	bool PollEvents(); 
 
 	const bool shouldClose() { return windowState; };
-	bool PollEvents();
 
 private:
 
-	void CreateWin32();
+	void CreateWin32(entt::registry& registry);
 
 	const char* windowTitle;
 	int width, height;

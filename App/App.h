@@ -19,5 +19,5 @@ private:
 	
 	//KOSWindow resource initialization
 	RenderManager renderer{ registry };
-	KOSWindow window{ "TestWindow", WIDTH, HEIGHT };
+	KOSWindow window{registry,"TestWindow", WIDTH, HEIGHT };
 };
