@@ -1,16 +1,15 @@
 #include "VulkanRenderer/RenderManager.h"
 #include "VulkanRenderer/KOSVulkanComponents.h"
 
-void RegisterCallback(entt::registry& registry);
+//Replce this call with the function body
+inline void RegisterCallback(entt::registry& registry);
 
 RenderManager::RenderManager(entt::registry& registry)
 {
-	//Create all systems for rendering
 
 	/* Creates a new thread that creates the render manager
 	and ensures registry is a & */
-	RenderThread = std::thread(&RenderManager::StartRenderThread, 
-		this,std::ref(registry));
+	RenderThread = std::thread(&RenderManager::StartRenderThread, this,std::ref(registry));
 }
 
 void RenderManager::StartRenderThread(entt::registry& registry)

@@ -17,7 +17,7 @@ public:
 
 private:
 
-	void CreateManager(entt::registry& registry);
+	void StartRenderThread(entt::registry& registry);
 
 	std::thread RenderThread;
 };

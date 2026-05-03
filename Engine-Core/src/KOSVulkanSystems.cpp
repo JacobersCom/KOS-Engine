@@ -9,10 +9,10 @@
 namespace RENDERER
 {
 
-	inline void Construct_VulkanData(entt::registry& registry, entt::entity entity)
+	void Construct_VulkanData(entt::registry& registry, entt::entity entity)
 	{
 		vkb::InstanceBuilder builder;
-		vkb::Result<vkb::Instance> instResults = builder.set_app_name("KOS-Engine")
+		auto instResults = builder.set_app_name("KOS-Engine")
 			.request_validation_layers()
 			.use_default_debug_messenger()
 			.build();
@@ -22,10 +22,8 @@ namespace RENDERER
 			EXIT_FAILURE;
 		}
 		auto& vkbIns = registry.try_get<RENDERER::VulkanData>(entity)->vkbIns;
-		if (nullptr != vkbIns)
-		{
-			vkbIns = instResults.value();
-		}
+		vkbIns = instResults.value();
+		
 
 		vkb::PhysicalDeviceSelector selector{ vkbIns };
 		auto& vkbSur = registry.try_get<RENDERER::Surface>(entity)->Win32Surface;
@@ -39,14 +37,11 @@ namespace RENDERER
 			EXIT_FAILURE;
 		}
 		auto& vkbPhy = registry.try_get<RENDERER::VulkanData>(entity)->vkbPhy;
-		if (nullptr != vkbPhy)
-		{
-			vkbPhy = phyResults.value();
-		}
+		vkbPhy = phyResults.value();
 
 	}
 
-	inline void Construct_Surface(entt::registry& registry, entt::entity entity)
+	void Construct_Surface(entt::registry& registry, entt::entity entity)
 	{
 		auto& win32Sur = registry.try_get<RENDERER::Surface>(entity)->Win32Surface;
 
@@ -60,7 +55,7 @@ namespace RENDERER
 
 void RegisterCallback(entt::registry& registry)
 {
-	registry.on_construct<RENDERER::Surface>().connect<&RENDERER::Construct_VulkanData>();
+	registry.on_construct<RENDERER::Surface>().connect<&RENDERER::Construct_Surface>();
 	registry.on_construct<RENDERER::VulkanData>().connect<&RENDERER::Construct_VulkanData>();
 
 }
