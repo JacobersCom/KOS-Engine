@@ -2,7 +2,6 @@
 #include "VulkanRenderer/KOSVulkanComponents.h"
 
 
-#include <entt/entt.hpp>
 #include "VkBootstrap.h"
 
 #include <iostream>
@@ -10,7 +9,7 @@
 namespace RENDERER
 {
 
-	void Construct_VulkanData(entt::registry& registry, entt::entity entity)
+	inline void Construct_VulkanData(entt::registry& registry, entt::entity entity)
 	{
 		vkb::InstanceBuilder builder;
 		vkb::Result<vkb::Instance> instResults = builder.set_app_name("KOS-Engine")
@@ -47,7 +46,7 @@ namespace RENDERER
 
 	}
 
-	void Construct_Surface(entt::registry& registry, entt::entity entity)
+	inline void Construct_Surface(entt::registry& registry, entt::entity entity)
 	{
 		auto& win32Sur = registry.try_get<RENDERER::Surface>(entity)->Win32Surface;
 
@@ -58,13 +57,12 @@ namespace RENDERER
 
 }
 
-namespace CALLBACKS
-{
-	void RegistryCallback(entt::registry& registry)
-	{
-		registry.on_construct<RENDERER::VulkanData>().connect<RENDERER::Construct_VulkanData>();
-		registry.on_construct<RENDERER::Surface>().connect<RENDERER::Construct_VulkanData>();
 
-	}
+void RegisterCallback(entt::registry& registry)
+{
+	registry.on_construct<RENDERER::Surface>().connect<&RENDERER::Construct_VulkanData>();
+	registry.on_construct<RENDERER::VulkanData>().connect<&RENDERER::Construct_VulkanData>();
+
 }
+
 

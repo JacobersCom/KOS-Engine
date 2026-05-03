@@ -10,11 +10,20 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSVulkanSystems.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSWindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RenderManager.cpp
+    ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.cpp
+
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSVulkanComponents.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSVulkanSystems.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSWindow.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/RenderManager.h
+    ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.h
+)
+
+source_group("deps" FILES
+    ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.h
+    ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.cpp
+    
 )
 
 target_include_directories(Engine-Core
