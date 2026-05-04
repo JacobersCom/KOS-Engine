@@ -1,6 +1,9 @@
 #pragma once
 
+#ifdef _WIN32
+#define WINDOWS_LEAN_AND_MEAN
 #include "Windows.h"
+#endif
 
 //deps
 #include <entt/entt.hpp>

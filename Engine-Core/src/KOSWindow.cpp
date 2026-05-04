@@ -1,11 +1,6 @@
 #include "VulkanRenderer/KOSWindow.h"
 #include "VulkanRenderer/KOSVulkanComponents.h"
 
-#ifdef _WIN32
-#define WINDOWS_LEAN_AND_MEAN
-#define VK_USE_PLATFORM_WIN32_KHR
-#include "Windows.h"
-#endif
 
 
 //ios
@@ -46,7 +41,7 @@ bool KOSWindow::PollEvents()
 
 void KOSWindow::CreateWin32(entt::registry& registry)
 {
-    entt::entity Display = registry.create();
+    entt::entity display = registry.create();
 
 
     windowState = true;
@@ -81,7 +76,7 @@ void KOSWindow::CreateWin32(entt::registry& registry)
         EXIT_FAILURE;
     }
 
-    registry.emplace<RENDERER::Surface>(Display, windowHandle);
+    registry.emplace<RENDERER::Surface>(display);
 
     ShowWindow(windowHandle, 1);     
 }

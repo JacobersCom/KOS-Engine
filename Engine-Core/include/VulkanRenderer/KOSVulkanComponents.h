@@ -30,6 +30,8 @@ namespace RENDERER
 	{
 		HWND WindowHandle;
 		VkSurfaceKHR Win32Surface;
+
+		
 	};
 
 }
