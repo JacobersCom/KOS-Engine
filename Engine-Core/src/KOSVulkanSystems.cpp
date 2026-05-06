@@ -12,6 +12,10 @@
 
 void Construct_VulkanData(entt::registry& registry, entt::entity entity)
 {
+	auto* sync = registry.try_get<RENDERER::RenderSync>(entity);
+
+	//Locks thread
+
 	vkb::InstanceBuilder builder;
 	auto instResults = builder.set_app_name("KOS-Engine")
 		.request_validation_layers()
@@ -24,7 +28,29 @@ void Construct_VulkanData(entt::registry& registry, entt::entity entity)
 	}
 	auto& vkbIns = registry.try_get<RENDERER::VulkanData>(entity)->vkbIns;
 	vkbIns = instResults.value();
-		
+
+
+
+	//Tell the render thread to wait until the surface is ready
+
+	{
+		std::lock_guard<std::mutex> lock(sync->sharedLock);
+		sync->instanceReady = true;
+
+	}
+	
+	//Notify main thread
+	sync->cv.notify_one();
+
+	{
+		std::unique_lock<std::mutex> lock(sync->sharedLock);
+
+		sync->cv.wait(lock, [&sync]
+		{
+				return sync->surfaceReady;
+		});
+	}
+	
 	vkb::PhysicalDeviceSelector selector{ vkbIns };
 	auto& displayView = registry.view<RENDERER::Surface>();
 	
@@ -50,6 +76,9 @@ void Construct_VulkanData(entt::registry& registry, entt::entity entity)
 void Construct_Surface(entt::registry& registry, entt::entity entity)
 {
 	auto* Surface = registry.try_get<RENDERER::Surface>(entity);
+	auto* sync = registry.try_get<RENDERER::RenderSync>(entity);
+
+
 
 	if (Surface == nullptr)
 	{
@@ -69,14 +98,28 @@ void Construct_Surface(entt::registry& registry, entt::entity entity)
 	auto& vkbIns = registry.try_get<RENDERER::VulkanData>(renderManager)->vkbIns;
 
 
-	vkCreateWin32SurfaceKHR(vkbIns, &Win32SurInfo, nullptr, &Surface->Win32Surface);
+	//Lock Main thread here and tell it to wait until the ins is ready
+
+	auto result = vkCreateWin32SurfaceKHR(vkbIns, &Win32SurInfo, nullptr, &Surface->Win32Surface);
+
+	if (result != VK_SUCCESS)
+	{
+		printf("Error: %s\n" "Failed to create window surface");
+		EXIT_FAILURE;
+	}
+
+	sync->surfaceReady = true;
+
+	//Let render thread know the surface is ready
+	sync->cv.notify_one();
+
 }
 
 
 void RegisterCallback(entt::registry& registry)
 {
-	registry.on_construct<RENDERER::Surface>().connect<Construct_Surface>();
 	registry.on_construct<RENDERER::VulkanData>().connect<Construct_VulkanData>();
+	registry.on_construct<RENDERER::Surface>().connect<Construct_Surface>();
 
 }
 

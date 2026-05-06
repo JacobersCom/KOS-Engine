@@ -16,8 +16,9 @@ void RenderManager::StartRenderThread(entt::registry& registry)
 {
 	RegisterCallback(registry);
 
-	entt::entity Renderer = registry.create();
+	entt::entity RenderEntity = registry.create();
 
-	registry.emplace<RENDERER::VulkanData>(Renderer);
+	registry.emplace<RENDERER::RenderSync>(RenderEntity);
+	registry.emplace<RENDERER::VulkanData>(RenderEntity);
 
 }

@@ -41,8 +41,9 @@ bool KOSWindow::PollEvents()
 
 void KOSWindow::CreateWin32(entt::registry& registry)
 {
-    entt::entity display = registry.create();
+    entt::entity WindowEntity = registry.create();
 
+    auto& sync = registry.emplace<RENDERER::RenderSync>(WindowEntity);
 
     windowState = true;
 
@@ -76,7 +77,11 @@ void KOSWindow::CreateWin32(entt::registry& registry)
         EXIT_FAILURE;
     }
 
-    registry.emplace<RENDERER::Surface>(display);
+    //Using unique lock for more control.
+
+    //If instance is ready unlock thread
+   
+    registry.emplace<RENDERER::Surface>(WindowEntity, windowHandle);
 
     ShowWindow(windowHandle, 1);     
 }

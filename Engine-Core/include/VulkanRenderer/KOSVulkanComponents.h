@@ -13,7 +13,12 @@
 
 #endif
 
+//deps
 #include <VkBootstrap.h>
+
+#include <thread>
+#include <condition_variable>
+#include <mutex>
 
 namespace RENDERER
 {
@@ -30,8 +35,16 @@ namespace RENDERER
 	{
 		HWND WindowHandle;
 		VkSurfaceKHR Win32Surface;
-
 		
+	};
+
+	struct RenderSync
+	{
+		std::mutex sharedLock;
+		std::condition_variable cv;
+
+		bool instanceReady = false;
+		bool surfaceReady = false;
 	};
 
 }
