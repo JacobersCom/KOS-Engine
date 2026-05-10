@@ -38,13 +38,20 @@ namespace RENDERER
 		
 	};
 
-	struct RenderSync
+	struct RenderState
 	{
 		std::mutex sharedLock;
 		std::condition_variable cv;
 
 		bool instanceReady = false;
 		bool surfaceReady = false;
+		bool shutdown = false;
+	};
+
+	struct RenderSync
+	{
+		//Allows there to be on sychronizaed state instead of copying states
+		std::shared_ptr<RenderState> state = std::make_shared<RenderState>();
 	};
 
 }

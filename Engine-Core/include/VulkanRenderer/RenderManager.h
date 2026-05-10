@@ -18,6 +18,9 @@ public:
 private:
 
 	void StartRenderThread(entt::registry& registry);
+	void RequestShutDown();
 
-	std::thread RenderThread;
+
+	entt::registry* registryRef = nullptr;
+	std::thread renderThread;
 };
