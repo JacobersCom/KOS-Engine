@@ -127,6 +127,6 @@ void KOSWindow::CreateWin32(entt::registry& registry)
         renderThread.state->cv.notify_one();
     }
 
-    ShowWindow(windowHandle, 1);     
+    ShowWindow(windowHandle, WM_SHOWWINDOW);     
 }
 
