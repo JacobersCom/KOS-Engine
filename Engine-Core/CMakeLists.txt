@@ -43,5 +43,5 @@ PRIVATE
     Vulkan::Vulkan
 )
 
-target_compile_definitions(Engine-Core PUBLIC cxx_std_17)
+target_compile_features(Engine-Core PUBLIC cxx_std_17)
 
