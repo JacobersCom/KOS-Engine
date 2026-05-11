@@ -38,6 +38,7 @@ namespace RENDERER
 		
 	};
 
+	//Should never be emplaced onto a entity
 	struct RenderState
 	{
 		std::mutex lock;
@@ -48,6 +49,7 @@ namespace RENDERER
 		bool shutdown = false;
 	};
 
+	//Lives in ctx of entt
 	struct RenderSync
 	{
 		//Allows there to be on sychronizaed state instead of copying states

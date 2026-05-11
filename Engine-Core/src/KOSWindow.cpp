@@ -24,6 +24,10 @@ namespace
             }
             case WM_SIZE:
             {
+
+                RECT rect{ 0, 0, 800, 600 };
+                AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+
                 break;
             }
             case WM_PAINT:
@@ -86,6 +90,9 @@ void KOSWindow::CreateWin32(entt::registry& registry)
 
     RegisterClass(&wc);
 
+    RECT rect{ 0, 0, width, height };
+    AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+
         windowHandle = CreateWindowExA(
         0,
         className,
@@ -113,20 +120,13 @@ void KOSWindow::CreateWin32(entt::registry& registry)
     surface.WindowHandle = windowHandle;
 
     //Check if the render thread is working
-    auto& sync = registry.view<RENDERER::RenderSync>();
-    for (auto& thread : sync)
+    auto& sync = registry.ctx().get<RENDERER::RenderSync>();
     {
-        //if so set surface ready flag to true
-        auto& renderThread = registry.get<RENDERER::RenderSync>(thread);
-        {
-            std::lock_guard<std::mutex> lock(renderThread.state->lock);
-            renderThread.state->surfaceReady = true;
-        }
-
-        //Let the render thread know that the surface is ready
-        renderThread.state->cv.notify_one();
+        std::lock_guard<std::mutex> lock(sync.state->lock);
+        sync.state->surfaceReady = true;
     }
-
-    ShowWindow(windowHandle, WM_SHOWWINDOW);     
+    //Let the render thread know that the surface is ready
+    sync.state->cv.notify_one();
+    ShowWindow(windowHandle, SW_SHOW);     
 }
 

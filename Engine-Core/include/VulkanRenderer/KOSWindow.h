@@ -19,7 +19,7 @@ public:
 	KOSWindow(entt::registry& registry, const char* WindowTitle, int width, int height);
 	bool PollEvents(); 
 
-	const bool shouldClose() { return windowState; };
+	const bool shouldNotClose() { return windowState; };
 
 private:
 

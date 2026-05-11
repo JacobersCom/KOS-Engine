@@ -20,10 +20,12 @@ RenderManager::RenderManager(entt::registry& registry)
 	: registryRef(&registry)
 {
 
-	entt::entity syncEntity = registry.create();
-	auto& sync = registry.emplace<RENDERER::RenderSync>(syncEntity);
+	auto& sync = registry.ctx().emplace<RENDERER::RenderSync>();
+
+
 	auto surfaceView = registry.view<RENDERER::Surface>();
-	//Is there a entity with a valid surface state?
+	
+	//Set render thread surface flag
 	sync.state->surfaceReady = surfaceView.begin() != surfaceView.end();
 
 	/* Creates a new thread that creates the render manager
@@ -31,22 +33,38 @@ RenderManager::RenderManager(entt::registry& registry)
 	renderThread = std::thread(&RenderManager::StartRenderThread, this,std::ref(registry));
 }
 
-void RenderManager::RequestShutDown()
+RenderManager::~RenderManager()
 {
+	RequestShutDown();
 
+	if (renderThread.joinable())
+	{
+		renderThread.join();
+	}
 }
 
-void RenderManager::StartRenderThread(entt::registry& registry)
+void RenderManager::RequestShutDown()
 {
-	auto syncView = registry.view<RENDERER::RenderSync>();
-	//No entity has the RenderSync component
-	if (syncView.begin() == syncView.end())
+	if (registryRef == nullptr)
 	{
 		return;
 	}
 
+	//Tell all threads to shutdown and stop working
+	auto sync = registryRef->ctx().get<RENDERER::RenderSync>();
+	{
+		std::lock_guard<std::mutex> lock(sync.state->lock);
+		sync.state->shutdown = true;
+	}
+	sync.state->cv.notify_all();
+}
+
+
+void RenderManager::StartRenderThread(entt::registry& registry)
+{
+
 	//else get the component from the first entity
-	auto& sync = registry.get<RENDERER::RenderSync>(*syncView.begin());
+	auto& sync = registry.ctx().get<RENDERER::RenderSync>();
 
 	{
 		//Locks thread
@@ -67,8 +85,4 @@ void RenderManager::StartRenderThread(entt::registry& registry)
 	//Create new rendererEntity
 	entt::entity rendererEntity = registry.create();
 	registry.emplace<RENDERER::VulkanData>(rendererEntity);
-
-
-	
-
 }
