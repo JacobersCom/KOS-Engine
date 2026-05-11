@@ -6,6 +6,49 @@
 //ios
 #include <iostream>
 #include <errno.h>
+namespace
+{
+    LRESULT CALLBACK WindowProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
+    {
+        switch (message)
+        {
+            case WM_DESTROY:
+            {
+                PostQuitMessage(0);
+                return 0;
+            }
+            case WM_CLOSE:
+            {
+                DestroyWindow(handle);
+                return 0;
+            }
+            case WM_SIZE:
+            {
+                break;
+            }
+            case WM_PAINT:
+            {
+                PAINTSTRUCT ps;
+                //Create a device context for drawing using the GDI
+                HDC hdc = BeginPaint(handle, &ps);
+
+                //All painting happens here
+
+                //rcPaint contains the client region on call of WM_PAINT
+                HBRUSH windowColor = CreateSolidBrush(0x0000ff);
+
+                FillRect(hdc, &ps.rcPaint, windowColor);
+
+                EndPaint(handle, &ps);
+
+                break;
+            }
+            default:
+                return DefWindowProc(handle, message, wParam, lParam);
+        }
+    }
+}
+
 
 KOSWindow::KOSWindow(entt::registry& registry, const char* WindowTitle, int width, int height)
 	: windowTitle(WindowTitle), width(width), height(height)
@@ -13,19 +56,6 @@ KOSWindow::KOSWindow(entt::registry& registry, const char* WindowTitle, int widt
 	CreateWin32(registry);
 }
 
-LRESULT CALLBACK WindowProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-    case WM_QUIT:
-    {
-        DestroyWindow(handle);
-    }
-    break;
-    }
-
-    return DefWindowProc(handle, message, wParam, lParam);
-}
 
 bool KOSWindow::PollEvents()
 {
@@ -43,20 +73,20 @@ void KOSWindow::CreateWin32(entt::registry& registry)
 {
     entt::entity WindowEntity = registry.create();
 
-    auto& sync = registry.emplace<RENDERER::RenderSync>(WindowEntity);
-
     windowState = true;
 
 	char className[] = "KOSWindowClass";
+    HINSTANCE hInstance = GetModuleHandleA(nullptr);
+
 
     WNDCLASS wc{};
 	wc.lpfnWndProc = WindowProc;
-    wc.hInstance = GetModuleHandle(nullptr);
+    wc.hInstance = hInstance;
     wc.lpszClassName = className;
 
     RegisterClass(&wc);
 
-    windowHandle = CreateWindowExA(
+        windowHandle = CreateWindowExA(
         0,
         className,
         windowTitle,
@@ -67,7 +97,7 @@ void KOSWindow::CreateWin32(entt::registry& registry)
         height,
         NULL,
         NULL,
-       GetModuleHandle(nullptr),
+        hInstance,
         NULL
         );
 
@@ -77,11 +107,25 @@ void KOSWindow::CreateWin32(entt::registry& registry)
         EXIT_FAILURE;
     }
 
-    //Using unique lock for more control.
 
-    //If instance is ready unlock thread
-   
-    registry.emplace<RENDERER::Surface>(WindowEntity, windowHandle);
+    auto& surface = registry.emplace<RENDERER::Surface>(WindowEntity);
+    surface.Win32Surface = VK_NULL_HANDLE;
+    surface.WindowHandle = windowHandle;
+
+    //Check if the render thread is working
+    auto& sync = registry.view<RENDERER::RenderSync>();
+    for (auto& thread : sync)
+    {
+        //if so set surface ready flag to true
+        auto& renderThread = registry.get<RENDERER::RenderSync>(thread);
+        {
+            std::lock_guard<std::mutex> lock(renderThread.state->lock);
+            renderThread.state->surfaceReady = true;
+        }
+
+        //Let the render thread know that the surface is ready
+        renderThread.state->cv.notify_one();
+    }
 
     ShowWindow(windowHandle, 1);     
 }

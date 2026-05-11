@@ -50,7 +50,7 @@ void RenderManager::StartRenderThread(entt::registry& registry)
 
 	{
 		//Locks thread
-		std::unique_lock<std::mutex> lock(sync.state->sharedLock);
+		std::unique_lock<std::mutex> lock(sync.state->lock);
 		
 		//Unlock thread if either the surface is ready or shutdown was called
 		sync.state->cv.wait(lock, [&sync] {
@@ -69,38 +69,6 @@ void RenderManager::StartRenderThread(entt::registry& registry)
 	registry.emplace<RENDERER::VulkanData>(rendererEntity);
 
 
-	try
-	{
-		if (!RENDERER::InitializeRenderer(registry, rendererEntity))
-		{
-			return;
-		}
-
-		//This may cause errors down the line
-		while (true)
-		{
-			{
-				//If out of this scop unlock he thread
-				std::lock_quard<std::mutex> lock(sync.state->sharedLock);
-				
-				//Check for program shutdown
-				if (sync.state->shutdown)
-				{
-					break;
-				}
-			
-			}
-			//Render a frame
-			RENDERER::RenderFrame(registry, rendererEntity);
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		}
-
-		RENDERER::CleanupRenderer(registry, rendererEntity);
-	}
-	catch (const std::exception& error)
-	{
-		std::cerr << "Render thread error: " << error.what() << "\n";
-		RENDERER::CleanupRenderer(registry, rendererEntity);
-	}
+	
 
 }

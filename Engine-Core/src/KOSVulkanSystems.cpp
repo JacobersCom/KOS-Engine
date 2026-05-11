@@ -33,23 +33,6 @@ void Construct_VulkanData(entt::registry& registry, entt::entity entity)
 
 	//Tell the render thread to wait until the surface is ready
 
-	{
-		std::lock_guard<std::mutex> lock(sync->sharedLock);
-		sync->instanceReady = true;
-
-	}
-	
-	//Notify main thread
-	sync->cv.notify_one();
-
-	{
-		std::unique_lock<std::mutex> lock(sync->sharedLock);
-
-		sync->cv.wait(lock, [&sync]
-		{
-				return sync->surfaceReady;
-		});
-	}
 	
 	vkb::PhysicalDeviceSelector selector{ vkbIns };
 	auto& displayView = registry.view<RENDERER::Surface>();
@@ -108,10 +91,10 @@ void Construct_Surface(entt::registry& registry, entt::entity entity)
 		EXIT_FAILURE;
 	}
 
-	sync->surfaceReady = true;
+	
 
 	//Let render thread know the surface is ready
-	sync->cv.notify_one();
+	
 
 }
 

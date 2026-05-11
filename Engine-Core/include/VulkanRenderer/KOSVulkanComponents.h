@@ -40,7 +40,7 @@ namespace RENDERER
 
 	struct RenderState
 	{
-		std::mutex sharedLock;
+		std::mutex lock;
 		std::condition_variable cv;
 
 		bool instanceReady = false;
