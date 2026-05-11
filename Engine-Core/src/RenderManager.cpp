@@ -20,13 +20,7 @@ RenderManager::RenderManager(entt::registry& registry)
 	: registryRef(&registry)
 {
 
-	auto& sync = registry.ctx().emplace<RENDERER::RenderSync>();
-
-
-	auto surfaceView = registry.view<RENDERER::Surface>();
-	
-	//Set render thread surface flag
-	sync.state->surfaceReady = surfaceView.begin() != surfaceView.end();
+	registry.ctx().emplace<RENDERER::RenderSync>();
 
 	/* Creates a new thread that creates the render manager
 	and ensures registry is a & */

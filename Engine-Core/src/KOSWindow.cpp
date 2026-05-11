@@ -64,13 +64,18 @@ KOSWindow::KOSWindow(entt::registry& registry, const char* WindowTitle, int widt
 bool KOSWindow::PollEvents()
 {
     MSG message = {};
-    while (GetMessage(&message, NULL, 0, 0) > 0)
+    while (PeekMessage(&message, NULL, 0, 0,PM_REMOVE))
     {
+        if (message.message == WM_QUIT)
+        {
+            windowState = false;
+            break;
+        }
         TranslateMessage(&message);
         DispatchMessage(&message);
     }
 
-    return windowState = false;
+    return windowState;
 }
 
 void KOSWindow::CreateWin32(entt::registry& registry)
@@ -127,6 +132,7 @@ void KOSWindow::CreateWin32(entt::registry& registry)
     }
     //Let the render thread know that the surface is ready
     sync.state->cv.notify_one();
+
     ShowWindow(windowHandle, SW_SHOW);     
 }
 
