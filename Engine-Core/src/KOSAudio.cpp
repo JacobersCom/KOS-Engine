@@ -30,5 +30,17 @@ KOSAudio::~KOSAudio()
 
 void KOSAudio::CreateAudioStream()
 {
-	
+	HRESULT hr;
+	REFERENCE_TIME RequestedDuration = 10000000;
+	REFERENCE_TIME ActualDuration;
+	IMMDeviceEnumerator* pEnumerator = nullptr;
+	IMMDevice* pDevice = nullptr;
+	IAudioClient* pAudioClient = nullptr;
+	IAudioRenderClient* pAudioRenderer = nullptr;
+	WAVEFORMATEX* pwfx = nullptr;
+	UINT32 bufferFrameCount;
+	UINT32 numFramesAvailable;
+	UINT32 numFramesPadding;
+	BYTE* pData;
+	DWORD flags = 0;
 }
