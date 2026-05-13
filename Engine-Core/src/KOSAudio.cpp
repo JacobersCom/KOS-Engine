@@ -95,10 +95,15 @@ void KOSAudio::CreateAudioStream()
 		(void**)&pEnumerator
 	);
 
-	if (FAILED(hr))
-	{
-		
-	}
+	PrintHResult(hr);
+
+	hr = pEnumerator->GetDefaultAudioEndpoint(
+		eRender,//The data flow to render audio to the end point
+		eConsole,//the role of this audio end point
+		&pDevice //End point
+	);
+	
+	PrintHResult(hr);
 
 
 }
