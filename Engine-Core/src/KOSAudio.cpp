@@ -29,6 +29,35 @@ KOSAudio::~KOSAudio()
 
 }
 
+void KOSAudio::PrintHResult(HRESULT hr)
+{
+
+	DWORD result = HRESULT_CODE(hr);
+
+	LPSTR messageBuffer = NULL;
+	if (FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER //Allocated buffer large enought to hold message
+		| FORMAT_MESSAGE_FROM_SYSTEM, //Functions looks through the message table for the requested message
+		NULL,
+		result,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		messageBuffer,
+		0, NULL
+	))
+	{
+		if (result == FACILITY_WIN32)
+		{
+			wsprintf("Error: %s", messageBuffer);
+			LocalFree(messageBuffer);
+		}
+		else
+		{
+			wsprintf("Result: %s", messageBuffer);
+			LocalFree(messageBuffer);
+		}
+	}
+}
+
 void KOSAudio::CreateAudioStream()
 {
 	HRESULT hr;
@@ -57,4 +86,19 @@ void KOSAudio::CreateAudioStream()
 	UINT32 numFramesPadding;
 	BYTE* pData;
 	DWORD flags = 0;
+
+	hr = CoCreateInstance(
+		CLSID_MMDeviceEnumerator,
+		NULL,
+		CLSCTX_ALL, //activate an object using any server type
+		IID_IMMDeviceEnumerator,
+		(void**)&pEnumerator
+	);
+
+	if (FAILED(hr))
+	{
+		
+	}
+
+
 }

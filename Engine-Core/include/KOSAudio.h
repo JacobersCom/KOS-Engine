@@ -1,5 +1,7 @@
 #pragma once
 
+#include <winerror.h>
+
 
 class KOSAudio
 {
@@ -15,4 +17,6 @@ public:
 private: 
 
 	void CreateAudioStream();
+
+	void PrintHResult(HRESULT hr);
 };
