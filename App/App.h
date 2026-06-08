@@ -15,9 +15,8 @@ public:
 	void run();
 
 private:
-	entt::registry registry;
 	
 	//KOSWindow resource initialization
-	RenderManager renderer{ registry };
-	ENGINE::KOSWindow window{ registry, "TestWindow", 800, 800 };
+	RenderManager renderer{};
+	ENGINE::KOSWindow window{"TestWindow", 800, 800 };
 };

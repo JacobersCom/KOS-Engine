@@ -2,81 +2,73 @@
 #include "VulkanRenderer/KOSVulkanComponents.h"
 
 
-#include <chrono>
 #include <exception>
 #include <iostream>
 #include <mutex>
 #include <thread>
 
-namespace RENDERER
-{
-	bool InitializeRenderer(entt::registry& registry, entt::entity rendererEntity);
-	void RenderFrame(entt::registry& registry, entt::entity rendererEntity);
-	void CleanupRenderer(entt::registry& registry, entt::entity rendererEntity);
-}
 
 
-RenderManager::RenderManager(entt::registry& registry)
-	: registryRef(&registry)
+
+RenderManager::RenderManager()
 {
 
-	registry.ctx().emplace<RENDERER::RenderSync>();
+	//registry.ctx().emplace<RENDERER::RenderSync>();
 
 	/* Creates a new thread that creates the render manager
 	and ensures registry is a & */
-	renderThread = std::thread(&RenderManager::StartRenderThread, this,std::ref(registry));
+	//renderThread = std::thread(&RenderManager::startup);
 }
 
 RenderManager::~RenderManager()
 {
-	RequestShutDown();
+	shutdown();
 
-	if (renderThread.joinable())
-	{
-		renderThread.join();
-	}
+	//if (renderThread.joinable())
+	//{
+	//	renderThread.join();
+	//}
 }
 
-void RenderManager::RequestShutDown()
+void RenderManager::shutdown()
 {
-	if (registryRef == nullptr)
-	{
-		return;
-	}
+	//if (registryRef == nullptr)
+	//{
+	//	return;
+	//}
 
-	//Tell all threads to shutdown and stop working
-	auto sync = registryRef->ctx().get<RENDERER::RenderSync>();
-	{
-		std::lock_guard<std::mutex> lock(sync.state->lock);
-		sync.state->shutdown = true;
-	}
-	sync.state->cv.notify_all();
+	////Tell all threads to shutdown and stop working
+	//auto sync = registryRef->ctx().get<RENDERER::RenderSync>();
+	//{
+	//	std::lock_guard<std::mutex> lock(sync.state->lock);
+	//	sync.state->shutdown = true;
+	//}
+	//sync.state->cv.notify_all();
 }
 
 
-void RenderManager::StartRenderThread(entt::registry& registry)
+void RenderManager::startup()
 {
 
-	//else get the component from the first entity
-	auto& sync = registry.ctx().get<RENDERER::RenderSync>();
+	////else get the component from the first entity
 
-	{
-		//Locks thread
-		std::unique_lock<std::mutex> lock(sync.state->lock);
-		
-		//Unlock thread if either the surface is ready or shutdown was called
-		sync.state->cv.wait(lock, [&sync] {
+	//{
+	//	//Locks thread
+	//	std::unique_lock<std::mutex> lock(renderLock);
+	//	
+	//	//Unlock thread if either the surface is ready or shutdown was called
+	//	cv.wait(lock, [] {
 
-			return sync.state->surfaceReady || sync.state->shutdown;
-		});
-		
-		if (sync.state->shutdown)
-		{
-			return;
-		}
-	}
+	//		return  shutdown;
+	//	});
+	//	
+	//	if (sync.state->shutdown)
+	//	{
+	//		return;
+	//	}
+	//}
 
-	//Create new rendererEntity
-	entt::entity rendererEntity = registry.create();
-	registry.emplace<RENDERER::VulkanData>(rendererEntity);
+	////Create new rendererEntity
+	//entt::entity rendererEntity = registry.create();
+	//registry.emplace<RENDERER::VulkanData>(rendererEntity);
 }

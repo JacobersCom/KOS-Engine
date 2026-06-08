@@ -1,27 +1,27 @@
 #pragma once
 
 
-#include <entt/entt.hpp>
-#include <thread>
+#include <condition_variable>
+
 
 class RenderManager
 {
 public:
 
-	RenderManager(entt::registry& registry);
+	RenderManager();
 	~RenderManager();
 
 	RenderManager(const RenderManager&) = delete;
 	RenderManager& operator=(const RenderManager) = delete;
 
+	void startup();
+	void shutdown();
 
 private:
 
-	void StartRenderThread(entt::registry& registry);
-	void RequestShutDown();
 
-
-	entt::registry* registryRef = nullptr;
 	std::thread renderThread;
+	std::mutex renderLock;
+	std::condition_variable cv;
 	
 };

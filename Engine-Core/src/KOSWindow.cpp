@@ -6,58 +6,18 @@
 //ios
 #include <iostream>
 #include <errno.h>
-namespace
-{
-    LRESULT CALLBACK WindowProc(HWND handle, UINT message, WPARAM wParam, LPARAM lParam)
-    {
-        switch (message)
-        {
-            case WM_DESTROY:
-            {
-                PostQuitMessage(0);
-                return 0;
-            }
-            case WM_CLOSE:
-            {
-                DestroyWindow(handle);
-                return 0;
-            }
-            case WM_SIZE:
-            {
 
-                RECT rect{ 0, 0, 800, 600 };
-                AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
-
-                break;
-            }
-            case WM_PAINT:
-            {
-                PAINTSTRUCT ps;
-                //Create a device context for drawing using the GDI
-                HDC hdc = BeginPaint(handle, &ps);
-
-                //All painting happens here
-
-                //rcPaint contains the client region on call of WM_PAINT
-                HBRUSH windowColor = CreateSolidBrush(0x0000ff);
-
-                FillRect(hdc, &ps.rcPaint, windowColor);
-
-                EndPaint(handle, &ps);
-
-                break;
-            }
-            default:
-                return DefWindowProc(handle, message, wParam, lParam);
-        }
-    }
-}
+#include "SDL3/SDL.h"
 
 
 ENGINE::KOSWindow::KOSWindow(const char* WindowTitle, int width, int height)
 	: windowTitle(WindowTitle), width(width), height(height)
 {
-	
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
+    {
+        printf("Error: %s\n", strerror(errno));
+        EXIT_FAILURE;
+    }
 }
 
 
@@ -86,40 +46,9 @@ void ENGINE::KOSWindow::startup()
 
     windowState = true;
 
-	char className[] = "KOSWindowClass";
-    HINSTANCE hInstance = GetModuleHandleA(nullptr);
+	
 
-
-    WNDCLASS wc{};
-	wc.lpfnWndProc = WindowProc;
-    wc.hInstance = hInstance;
-    wc.lpszClassName = className;
-
-    RegisterClass(&wc);
-
-    RECT rect{ 0, 0, width, height };
-    AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
-
-        windowHandle = CreateWindowExA(
-        0,
-        className,
-        windowTitle,
-        WS_OVERLAPPEDWINDOW, //Window Style
-        CW_USEDEFAULT,
-        CW_USEDEFAULT,
-        width,
-        height,
-        NULL,
-        NULL,
-        hInstance,
-        NULL
-        );
-
-    if (windowHandle == 0)
-    {
-        printf("Error: %s\n", strerror(errno));
-        EXIT_FAILURE;
-    }
+    
 
 
    
@@ -132,6 +61,7 @@ void ENGINE::KOSWindow::startup()
     }*/
     //Let the render thread know that the surface is ready
     //sync.state->cv.notify_one();
-    ShowWindow(windowHandle, SW_SHOW);     
+
+    PollEvents();
 }
 

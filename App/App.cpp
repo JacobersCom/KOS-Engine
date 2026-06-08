@@ -2,11 +2,7 @@
 
 void App::run()
 {
-	while (window.shouldNotClose())
-	{
+	window.startup();
 
-		//read for key strokes, clicks and closing the window
-		window.PollEvents();
-	}
-	registry.clear();
+
 }

@@ -5,6 +5,7 @@
 #include "Windows.h"
 #endif
 
+
 //deps
 
 /*
@@ -32,7 +33,6 @@ namespace ENGINE
 
 		bool windowState = false;
 
-		HWND windowHandle = NULL;
 
 	};
 }
