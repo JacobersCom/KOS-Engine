@@ -1,6 +1,4 @@
-#include "VulkanRenderer/RenderManager.h"
-#include "VulkanRenderer/KOSVulkanComponents.h"
-
+#include "RenderManager.hpp"
 
 #include <exception>
 #include <iostream>

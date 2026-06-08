@@ -3,18 +3,17 @@
 
 find_package(Vulkan QUIET)
 
-add_library(Engine-Core STATIC)
+add_library(KOS STATIC)
+add_library(KOS::KOS ALIAS KOS)
 
-target_sources(Engine-Core
-PRIVATE
+target_sources(KOS
+PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSWindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RenderManager.cpp
     ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.cpp
 
-PUBLIC
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/KOSWindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/VulkanRenderer/RenderManager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSWindow.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/RenderManager.hpp
     ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.h
 )
 
@@ -24,23 +23,21 @@ source_group("deps" FILES
     
 )
 
-target_include_directories(Engine-Core
+
+
+target_include_directories(KOS
 
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/
-
-    PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/
 
-    PRIVATE
     ${PROJECT_SOURCE_DIR}/deps/
 )
 
-target_link_libraries(Engine-Core 
-PRIVATE 
+target_link_libraries(KOS 
+PUBLIC 
     Vulkan::Vulkan
     SDL3::SDL3
 )
 
-target_compile_features(Engine-Core PUBLIC cxx_std_17)
+target_compile_features(KOS PUBLIC cxx_std_17)
 

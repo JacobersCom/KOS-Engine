@@ -1,14 +1,17 @@
-#include "App.h"
+#include "KOSWindow.hpp"
+#include "RenderManager.hpp"
 
 #include <iostream>
 
 int main()
 {
-	App app{};
+	ENGINE::KOSWindow window{ "KOS Engine", 600, 600 };
+	RenderManager render;
+
 
 	try
 	{
-		app.run();
+		window.startup();
 	}
 	catch(const std::exception& error)
 	{
