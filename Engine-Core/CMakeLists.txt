@@ -6,31 +6,29 @@ find_package(Vulkan QUIET)
 add_library(KOS STATIC)
 add_library(KOS::KOS ALIAS KOS)
 
+set(VKBOOT_PATH "${PROJECT_SOURCE_DIR}/vendor/VkBootStrap")
+
 target_sources(KOS
-PUBLIC
+PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSWindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RenderManager.cpp
-    ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.cpp
+    ${VKBOOT_PATH}/VkBootstrap.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSWindow.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RenderManager.hpp
-    ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.h
+   ${VKBOOT_PATH}/VkBootstrap.h
 )
 
-source_group("deps" FILES
-    ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.h
-    ${PROJECT_SOURCE_DIR}/deps/VkBootstrap.cpp
-    
+source_group("vendors" FILES
+  ${VKBOOT_PATH}/VkBootstrap.h
+  ${VKBOOT_PATH}/VkBootstrap.cpp  
 )
-
-
 
 target_include_directories(KOS
 
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/
 
-    ${PROJECT_SOURCE_DIR}/deps/
 )
 
 target_link_libraries(KOS 
