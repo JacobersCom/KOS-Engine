@@ -6,30 +6,33 @@
 #endif
 
 //deps
-#include <entt/entt.hpp>
 
 /*
 KOSVulkanWindow depends on KOSVulkanRenderer to be enabled first
 KOSVulkanWindow handles everything that is presented to the window
 */
-class KOSWindow {
-public:
+namespace ENGINE
+{
+
+	class KOSWindow {
+	public:
 
 
-	KOSWindow(entt::registry& registry, const char* WindowTitle, int width, int height);
-	bool PollEvents(); 
+		KOSWindow(const char* WindowTitle, int width, int height);
+		void startup();
 
-	const bool shouldNotClose() { return windowState; };
+		const bool shouldNotClose() { return windowState; };
 
-private:
+	private:
 
-	void CreateWin32(entt::registry& registry);
+		bool PollEvents();
 
-	const char* windowTitle;
-	int width, height;
+		const char* windowTitle;
+		int width, height;
 
-	bool windowState;
+		bool windowState = false;
 
-	HWND windowHandle;
+		HWND windowHandle = NULL;
 
-};
+	};
+}

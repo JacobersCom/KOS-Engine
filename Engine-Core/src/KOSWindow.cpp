@@ -54,33 +54,35 @@ namespace
 }
 
 
-KOSWindow::KOSWindow(entt::registry& registry, const char* WindowTitle, int width, int height)
+ENGINE::KOSWindow::KOSWindow(const char* WindowTitle, int width, int height)
 	: windowTitle(WindowTitle), width(width), height(height)
 {
-	CreateWin32(registry);
+	
 }
 
 
-bool KOSWindow::PollEvents()
+bool ENGINE::KOSWindow::PollEvents()
 {
     MSG message = {};
-    while (PeekMessage(&message, NULL, 0, 0,PM_REMOVE))
+    //Peek message stop the window thread from waiting until it gets a message
+    while (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE))
     {
         if (message.message == WM_QUIT)
         {
             windowState = false;
-            break;
         }
+
         TranslateMessage(&message);
         DispatchMessage(&message);
     }
 
-    return windowState;
+
+    return windowState = false;
 }
 
-void KOSWindow::CreateWin32(entt::registry& registry)
+void ENGINE::KOSWindow::startup()
 {
-    entt::entity WindowEntity = registry.create();
+    
 
     windowState = true;
 
@@ -113,26 +115,23 @@ void KOSWindow::CreateWin32(entt::registry& registry)
         NULL
         );
 
-    if (NULL == windowHandle)
+    if (windowHandle == 0)
     {
         printf("Error: %s\n", strerror(errno));
         EXIT_FAILURE;
     }
 
 
-    auto& surface = registry.emplace<RENDERER::Surface>(WindowEntity);
-    surface.Win32Surface = VK_NULL_HANDLE;
-    surface.WindowHandle = windowHandle;
+   
 
     //Check if the render thread is working
-    auto& sync = registry.ctx().get<RENDERER::RenderSync>();
+   /* auto& sync = registry.ctx().get<RENDERER::RenderSync>();
     {
         std::lock_guard<std::mutex> lock(sync.state->lock);
         sync.state->surfaceReady = true;
-    }
+    }*/
     //Let the render thread know that the surface is ready
-    sync.state->cv.notify_one();
-
+    //sync.state->cv.notify_one();
     ShowWindow(windowHandle, SW_SHOW);     
 }
 
