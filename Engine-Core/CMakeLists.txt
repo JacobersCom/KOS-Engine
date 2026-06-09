@@ -10,11 +10,11 @@ set(VKBOOT_PATH "${PROJECT_SOURCE_DIR}/vendor/VkBootStrap")
 
 target_sources(KOS
 PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSWindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Window.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RenderManager.cpp
     ${VKBOOT_PATH}/VkBootstrap.cpp
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/KOSWindow.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Window.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RenderManager.hpp
    ${VKBOOT_PATH}/VkBootstrap.h
 )
@@ -32,9 +32,8 @@ target_include_directories(KOS
 )
 
 target_link_libraries(KOS 
-PUBLIC 
-    Vulkan::Vulkan
-    SDL3::SDL3
+PUBLIC Vulkan::Vulkan
+   PUBLIC SDL3::SDL3
 )
 
 target_compile_features(KOS PUBLIC cxx_std_17)
