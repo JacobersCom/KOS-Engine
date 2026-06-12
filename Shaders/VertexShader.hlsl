@@ -1,13 +1,13 @@
 
 
 
-struct VSout
+struct VSoutput
 {
     float4 pos : SV_Position;
     float3 color : COLOR0;
 };
 
-VSout main(uint vertexId : SV_VertexID )
+VSoutput main(uint vertexId : SV_VertexID )
 {
     float2 pos[3] =
     {
@@ -24,7 +24,7 @@ VSout main(uint vertexId : SV_VertexID )
     
     };
     
-    VSout o;
+    VSoutput o;
     o.pos = float4(pos[vertexId], 0.0f, 1.0f);
     o.color = color[vertexId];
     return o;

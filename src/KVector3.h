@@ -3,7 +3,7 @@
 #include <cassert>
 
 
-namespace KE::KOMATH
+namespace Kos::MATH
 {
 
 	struct Vec3D

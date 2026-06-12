@@ -1,7 +1,7 @@
 #include <ostream>
 #include <cassert>
 
-namespace KE::KOMATH
+namespace Kos::KOMATH
 {
 	struct Mat4x4
 	{

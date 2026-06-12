@@ -1,6 +1,6 @@
 
-#include <platform/win32/KWindow.h>
-#include <render/vulkan/KRender.h>
+#include "KWindow.h"
+#include "KRender.h"
 #include "KVector3.h"
 #include "KMat4.h"
 
@@ -8,8 +8,8 @@
 
 int main()
 {
-	KE::SYSTEM::KWindow _win;
-	KE::RENDERER::KRender _render(&_win);
+	Kos::KWindow _win;
+	Kos::KRender _render(&_win);
 
 	_win.SetWindowDesc(L"KOS", L"KOS Engine", 500, 500);
 	_win.Create();
@@ -19,7 +19,6 @@ int main()
 	while (IsRunning)
 	{
 		_render.UpdateLoop();
-		_win.EventDispatcher();
 		
 		if (!IsWindow(_win.GetWindowHandle()))
 		{
@@ -27,10 +26,5 @@ int main()
 		}
 	}
 
-	_render.CleanUp();
 
-
-
-
-	
 }
