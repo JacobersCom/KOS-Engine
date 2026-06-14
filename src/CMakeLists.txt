@@ -7,10 +7,12 @@ target_sources(KOS
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/KRender.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KWindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KMat4.h
     ${CMAKE_CURRENT_SOURCE_DIR}/KVector3.h
     ${CMAKE_CURRENT_SOURCE_DIR}/KRender.h
     ${CMAKE_CURRENT_SOURCE_DIR}/KWindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.h
 )
 
 target_link_libraries(KOS
@@ -70,6 +72,14 @@ source_group("Shaders" FILES
     "${SPV_VERT}"
     "${SPV_FRAG}"
 )
+
+target_sources(KOS PRIVATE
+    "${HLSL_VERT}"
+    "${HLSL_FRAG}"
+    "${SPV_VERT}"
+    "${SPV_FRAG}"
+)
+
 
 set_source_files_properties(
     "${HLSL_VERT}"
