@@ -11,10 +11,6 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/KVector3.h
     ${CMAKE_CURRENT_SOURCE_DIR}/KRender.h
     ${CMAKE_CURRENT_SOURCE_DIR}/KWindow.h
-    "${HLSL_VERT}"
-    "${HLSL_FRAG}"
-    "${SPV_VERT}"
-    "${SPV_FRAG}"
 )
 
 target_link_libraries(KOS
