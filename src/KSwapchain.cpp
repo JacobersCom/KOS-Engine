@@ -10,6 +10,10 @@ Kos::KSwapchain::~KSwapchain()
 
 }
 
+bool Kos::KSwapchain::CreateSwapchain(VkPhysicalDevice)
+{
+	
+}
 
 bool Kos::KSwapchain::GetSwapchainDetails(VkPhysicalDevice device, VkSurfaceKHR surface)
 {

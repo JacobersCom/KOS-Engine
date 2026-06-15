@@ -12,6 +12,8 @@ namespace Kos
 		KSwapchain();
 		~KSwapchain();
 
+		bool CreateSwapchain(VkPhysicalDevice);
+
 		/*
 		Gets all the physical devices information need for the swapchain.
 		Such as surface capabilities, format and present modes
@@ -53,5 +55,8 @@ namespace Kos
 		SwapchainDetails details;
 
 		std::unique_ptr<class KWindow> window;
+
+		std::vector<VkImage> images;
+		std::vector<VkImageView> imageViews;
 	};
 }
