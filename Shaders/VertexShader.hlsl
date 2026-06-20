@@ -1,31 +1,21 @@
 
-
-
-struct VSoutput
+struct VSInput
 {
-    float4 pos : SV_Position;
-    float3 color : COLOR0;
+    float2 inPosition;
+    float3 inColor;
 };
 
-VSoutput main(uint vertexId : SV_VertexID )
+struct VSOutput
 {
-    float2 pos[3] =
-    {
-        float2(0.0f, -0.5),
-	    float2(0.5f, 0.5),
-	    float2(-0.5, 0.5)
-    };
+    float4 outPosition : SV_Position;
+    float3 outColor;
+};
 
-    float3 color[3] =
-    {
-        float3(1.0f, 0.0f, 0.0f),
-        float3(0.0f, 1.0f, 0.0f),
-        float3(0.0f, 0.0f, 1.0f),
+VSOutput main(VSInput input)
+{
     
-    };
-    
-    VSoutput o;
-    o.pos = float4(pos[vertexId], 0.0f, 1.0f);
-    o.color = color[vertexId];
-    return o;
+    VSOutput output;
+    output.outPosition = float4(input.inPosition, 0.0f, 1.0f);
+    output.outColor = input.inColor;
+    return output;
 }

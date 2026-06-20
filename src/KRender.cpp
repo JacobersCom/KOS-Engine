@@ -1,6 +1,6 @@
 
-#include "KWindow.h"
-#include "KRender.h"
+#include "KWindow.hpp"
+#include "KRender.hpp"
 
 namespace Kos
 {

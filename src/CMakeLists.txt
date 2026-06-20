@@ -7,12 +7,11 @@ target_sources(KOS
 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/KRender.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KWindow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KMat4.h
     ${CMAKE_CURRENT_SOURCE_DIR}/KVector3.h
     ${CMAKE_CURRENT_SOURCE_DIR}/KRender.h
     ${CMAKE_CURRENT_SOURCE_DIR}/KWindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.h
+
 )
 
 target_link_libraries(KOS

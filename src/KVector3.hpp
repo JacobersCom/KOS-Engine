@@ -3,7 +3,7 @@
 #include <cassert>
 
 
-namespace Kos::MATH
+namespace Kos
 {
 
 	struct Vec3D

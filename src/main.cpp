@@ -1,8 +1,8 @@
 
-#include "KWindow.h"
-#include "KRender.h"
-#include "KVector3.h"
-#include "KMat4.h"
+#include "KWindow.hpp"
+#include "KRender.hpp"
+#include "KVector3.hpp"
+#include "KMat4.hpp"
 
 #include <iostream>
 
