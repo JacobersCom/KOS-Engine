@@ -31,8 +31,17 @@ namespace Kos
 	private:
 		
 		void createVertexBuffer(const std::vector<Vertex>& vertices);
-
-		VkDevice& Kdevice;
+		/*
+		* Finds a suitable type of memory by iterating the memory types and finding which bit field is set to 1
+		* And
+		* the suitable heap and property for the choosen memeory type
+		* @param
+		* typeFilter - used to specify a bit field for a suitable memory type
+		*/
+		uint32_t findMemeoryType(uint32_t typeFilter, VkMemoryPropertyFlags propertyFlags);
+		
+		VkPhysicalDevice kPhyDevice;
+		VkDevice& kDevice;
 		VkBuffer vertexBuffer;
 		VkDeviceMemory vertexBufferMemory;
 		uint32_t vertexCount;
