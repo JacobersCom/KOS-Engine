@@ -8,6 +8,7 @@ namespace Kos
 	namespace
 	{
 		std::string logFileName = "KLog.txt";
+		bool logToFile = false;
 
 		void WriteToFile(const LogType type, std::string msg)
 		{
@@ -32,21 +33,30 @@ namespace Kos
 			}
 
 		}
-		void WriteToOutput(const LogType type, std::string msg)
+		//Change this to use a typename for writing a log
+		void WriteToOutput(const LogType type, std::string msg, ...)
 		{
+
+
 			const std::string preFix = (type == LogType::Info) ? "Info:" : (type == LogType::Warning) ? "Warning:" : "Error:";
-			msg = preFix + " " + msg;
+			msg = preFix + " " + __FUNCTION__ + " " + msg + " " + "{}";
+
 
 			std::print(msg);
 		}
 	}
 
-	void KLog::WriteLog(const LogType type, std::string msg)
+	void KLog::WriteLog(const LogType type, std::string msg, ...)
 	{
 		if (logToFile)
 		{
 			WriteToFile(type, msg);
 		}
 		WriteToOutput(type, msg);
+	}
+
+	void Kos::KLog::SetLogToFile(const bool log)
+	{
+		logToFile = log;
 	}
 }

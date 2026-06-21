@@ -4,7 +4,7 @@
 
 namespace Kos
 {
-	enum LogType
+	enum class LogType
 	{
 		Info,
 		Warning,
@@ -24,12 +24,7 @@ namespace Kos
 		KLog() {};
 
 		//void Initialize();
-		bool SetLogToFile(const bool log);
-		void WriteLog(LogType type, std::string msg);
-	private:
-
-		bool logToFile = false;
-
-
+		static void SetLogToFile(const bool log);
+		static void WriteLog(LogType type, std::string msg, ...);
 	};
 }

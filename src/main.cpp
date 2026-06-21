@@ -2,6 +2,7 @@
 #include "KWindow.hpp"
 #include "KVector3.hpp"
 #include "KMat4.hpp"
+#include "KLog.hpp"
 
 #include <iostream>
 
@@ -11,7 +12,7 @@ int main()
 
 	_win.Create("KOS", 800, 800);
 	
-	
+	Kos::KLog::WriteLog(Kos::LogType::Info, "Does my logger work?");
 
 	while (true)
 	{
