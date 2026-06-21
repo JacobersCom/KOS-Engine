@@ -34,34 +34,6 @@ namespace Kos
 		MSG msg{};
 
 
-		while (msg.message != WM_QUIT)
-		{
-
-			// Check if interval has passed
-
-			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			static ULONGLONG frameCount = 0; ++frameCount;
-			static ULONGLONG framesPast = frameCount;
-			static ULONGLONG prevCount = GetTickCount();
-
-			//This can be reworked to be a bit cleaner.
-			if (GetTickCount64() - prevCount > 1000) // only update every second
-			{
-				char buffer[256];
-				sprintf_s(buffer, "%s FPS: %d", _win->GetWindowName(),static_cast<int>(frameCount - framesPast));
-				SetWindowTextA(_win->GetWindowHandle(), buffer);
-				framesPast = frameCount;
-				prevCount = GetTickCount64();
-			}
-			//Update/draw things here
-			DrawFrame();
-		}
-
-		CleanUp();
 	}
 	
 
