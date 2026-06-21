@@ -1,11 +1,17 @@
 #pragma once
 
-
-#include <fstream>
-#include <print>
+#include <string>
 
 namespace Kos
 {
+	enum LogType
+	{
+		Info,
+		Warning,
+		Error
+	};
+
+
 	/*
 	* The standard logging class for KOS
 	* 
@@ -15,15 +21,15 @@ namespace Kos
 	{
 	public:
 
-		KLog() = default;
+		KLog() {};
 
-		void Initialize();
+		//void Initialize();
 		bool SetLogToFile(const bool log);
-		void WriteCmd();
+		void WriteLog(LogType type, std::string msg);
 	private:
 
-		std::fstream logFile;
-		bool logToFile;
+		bool logToFile = false;
+
 
 	};
 }
