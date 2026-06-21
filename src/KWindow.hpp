@@ -35,7 +35,7 @@ namespace Kos
 		
 	private:
 
-		//ptr to where the DLL is held
+		
 		HINSTANCE instance;
 
 		//Handle to the window

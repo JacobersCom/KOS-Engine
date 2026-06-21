@@ -1,6 +1,5 @@
 
 #include "KWindow.hpp"
-#include "KRender.hpp"
 #include "KVector3.hpp"
 #include "KMat4.hpp"
 
@@ -9,20 +8,18 @@
 int main()
 {
 	Kos::KWindow _win;
-	Kos::KRender _render(&_win);
 
-	_win.SetWindowDesc(L"KOS", L"KOS Engine", 500, 500);
-	_win.Create();
+	_win.Create("KOS", 800, 800);
 	
-	bool IsRunning = _render.InitVulkan();
+	
 
-	while (IsRunning)
+	while (true)
 	{
-		_render.UpdateLoop();
+		_win.ProcessMessages();
 		
 		if (!IsWindow(_win.GetWindowHandle()))
 		{
-			IsRunning = false;
+			break;
 		}
 	}
 
