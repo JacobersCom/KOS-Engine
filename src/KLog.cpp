@@ -42,7 +42,7 @@ namespace Kos
 			msg = preFix + " " + __FUNCTION__ + " " + msg + " " + "{}";
 
 
-			std::print(msg);
+			//std::print(msg);
 		}
 	}
 

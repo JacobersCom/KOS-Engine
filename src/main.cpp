@@ -12,7 +12,14 @@ int main()
 
 	_win.Create("KOS", 800, 800);
 	
-	Kos::KLog::WriteLog(Kos::LogType::Info, "Does my logger work?");
+	Kos::math::KVector3 vec(2.0f, 0.0f, 0.0f);
+	std::cout << vec << "\n";
+
+	std::cout << Kos::math::KVector3::unit_vector << "\n";
+
+
+
+	//Kos::KLog::WriteLog(Kos::LogType::Info, "Does my logger work?");
 
 	while (true)
 	{

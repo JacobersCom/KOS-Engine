@@ -926,22 +926,22 @@ namespace Kos
 	*/
 	void KRender::CreatePipeline()
 	{
-		auto VertShaderCode = LoadShader(std::filesystem::path(KENGINE_SHADER_DIR) / "VertShader.spv");
-		auto PixelShaderCode = LoadShader(std::filesystem::path(KENGINE_SHADER_DIR) / "FragShader.spv");
+		//auto VertShaderCode = LoadShader(std::filesystem::path(KENGINE_SHADER_DIR) / "VertShader.spv");
+		//auto PixelShaderCode = LoadShader(std::filesystem::path(KENGINE_SHADER_DIR) / "FragShader.spv");
 		
-		VkShaderModule VertModule = CreateShaderModule(VertShaderCode);
-		VkShaderModule PixelModule = CreateShaderModule(PixelShaderCode);
+		//VkShaderModule VertModule = CreateShaderModule(VertShaderCode);
+		//VkShaderModule PixelModule = CreateShaderModule(PixelShaderCode);
 
 		VkPipelineShaderStageCreateInfo VertexStage{};
 		VertexStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		VertexStage.stage = VK_SHADER_STAGE_VERTEX_BIT;
-		VertexStage.module = VertModule;
-		VertexStage.pName = "main";
+		//VertexStage.module = VertModule;
+		//VertexStage.pName = "main";
 
 		VkPipelineShaderStageCreateInfo PixelStage{};
 		PixelStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		PixelStage.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-		PixelStage.module = PixelModule;
+		//PixelStage.module = PixelModule;
 		PixelStage.pName = "main";
 
 		VkPipelineShaderStageCreateInfo ShaderStages[] = { VertexStage, PixelStage };
@@ -1004,8 +1004,8 @@ namespace Kos
 		}
 
 		//Clean up
-		vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
-		vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
+		//vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
+		//vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
 	}
 		
 
