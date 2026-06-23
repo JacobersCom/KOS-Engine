@@ -1,5 +1,69 @@
 #include "KDevice.hpp"
+#include "KWindow.hpp"
 
+namespace
+{
+	/*
+	Checks the end users GPU for
+		- swapchain support
+		- Graphics Queue
+		- Present Queue
+	*/
+	bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
+	{
+		Kos::QueueFamilyIndices Indices = FindQueueFamilies(_VkPhyscialDevice);
+
+		bool extensionsSupported = CheckDeviceExtensionSupport(_VkPhyscialDevice);
+
+		//Is the SwapChain supported
+		bool SwapChainAdequate = false;
+		if (extensionsSupported)
+		{
+			Kos::SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails(_VkPhyscialDevice);
+			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && !SwapChainSupportDetails.PresentMode.empty();
+		}
+
+		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
+	}
+
+	/*
+	 Ensures the end users has the support vaildation layers
+	 
+	 The current layers used by KOS is
+			- "VK_LAYER_KHRONOS_validation"
+			- "VK_EXT_debug_utils"
+	*/
+	bool CheckVaildationLayersSupport(std::vector<const char*> layers)
+	{
+		uint32_t LayerCount;
+		vkEnumerateInstanceLayerProperties(&LayerCount, nullptr);
+
+		std::vector<VkLayerProperties> availableLayers(LayerCount);
+		vkEnumerateInstanceLayerProperties(&LayerCount, availableLayers.data());
+
+		for (const auto* LayerName : layers)
+		{
+			bool LayerFound = false;
+
+			for (const auto& LayerProperties : availableLayers)
+			{
+				if (strcmp(LayerName, LayerProperties.layerName) == 0)
+				{
+					LayerFound = true;
+					break;
+				}
+			}
+
+			if (!LayerFound)
+				return false;
+		}
+		return true;
+	}
+}
+
+/*
+* Creates a instace of the vulkan API with validation layers if in debug mode
+*/
 void Kos::KDevice::CreateInstance()
 {
 	VkApplicationInfo AppInfo{};
@@ -36,35 +100,39 @@ void Kos::KDevice::CreateInstance()
 	}
 #endif // !NDEBUG
 
-	if (vkCreateInstance(&InstanceInfo, nullptr, &mInstance) != VK_SUCCESS)
+	if (vkCreateInstance(&InstanceInfo, nullptr, &m_instance) != VK_SUCCESS)
 	{
-		throw std::runtime_error("Failed to create VkInstance");
+		//Replace with a KLog
 	}
 }
 
-bool Kos::KDevice::CheckVaildationLayersSupport(std::vector<const char*> layers)
+/*
+* Creates a surface for a win32 OS
+* Currently only supports windows
+* 
+* uses a unqiue pointer to get access to the window handle and instance
+*/
+void Kos::KDevice::CreateSurface()
 {
-	uint32_t LayerCount;
-	vkEnumerateInstanceLayerProperties(&LayerCount, nullptr);
 
-	std::vector<VkLayerProperties> availableLayers(LayerCount);
-	vkEnumerateInstanceLayerProperties(&LayerCount, availableLayers.data());
+	m_window = std::make_unique<KWindow>();
 
-	for (const auto* LayerName : layers)
+	VkWin32SurfaceCreateInfoKHR surface_info{};
+
+	surface_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	surface_info.hwnd = m_window->GetWindowHandle(); //Handle to win32 window
+	surface_info.hinstance = m_window->GetWindowInstance();//Instance of the win32 window
+
+	if (vkCreateWin32SurfaceKHR(m_instance, &surface_info, nullptr, &m_surface) != VK_SUCCESS)
 	{
-		bool LayerFound = false;
-
-		for (const auto& LayerProperties : availableLayers)
-		{
-			if (strcmp(LayerName, LayerProperties.layerName) == 0)
-			{
-				LayerFound = true;
-				break;
-			}
-		}
-
-		if (!LayerFound)
-			return false;
+		//Replace with a KLog
 	}
-	return true;
+}
+
+/*
+* Finds the end user GPU to than ensure it supports all the capabilites of the engine
+*/
+void Kos::KDevice::FindUsersGPU()
+{
+
 }

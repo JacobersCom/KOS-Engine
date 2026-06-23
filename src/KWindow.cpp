@@ -5,17 +5,39 @@
 
 namespace Kos
 {
+	namespace
+	{
+		LRESULT CALLBACK WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam)
+		{
+			switch (message)
+			{
+			case WM_DESTROY:
+			{
+				PostQuitMessage(0);
+				break;
+			}
+			case WM_CLOSE:
+			{
+				DestroyWindow(Window);
+				break;
+			}
+			}
+			return DefWindowProc(Window, message, wParam, lParam);
+		}
+
+	}
+
 	void KWindow::Create(const char* title, int w, int h)
 	{
-		instance = GetModuleHandle(NULL);
+		m_win_instance = GetModuleHandle(NULL);
 		WNDCLASS wc = {};
-		wc.hInstance = instance;
+		wc.hInstance = m_win_instance;
 		wc.lpszClassName = "KWindow";
-		wc.lpfnWndProc = Kos::KWindow::WindowProc;
+		wc.lpfnWndProc = WindowProc;
 
 		RegisterClass(&wc);
 
-		handle = CreateWindowEx(0,
+		m_window_handle = CreateWindowEx(0,
 			"KWindow",
 			title,
 			WS_OVERLAPPEDWINDOW,
@@ -25,19 +47,19 @@ namespace Kos
 			h,
 			NULL,
 			NULL,
-			instance,
+			m_win_instance,
 			NULL);
 
-		if (handle != nullptr)
+		if (m_window_handle != nullptr)
 		{
-			ShowWindow(handle, SW_SHOW);
+			ShowWindow(m_window_handle, SW_SHOW);
 		}
 	}
 
 	void Kos::KWindow::ProcessMessages()  
 	{
 		MSG msg;
-		if (PeekMessage(&msg, handle, 0, 0, PM_REMOVE))
+		if (PeekMessage(&msg, m_window_handle, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessageA(&msg);
@@ -53,13 +75,18 @@ namespace Kos
 		{
 			char buffer[256];
 			sprintf_s(buffer, "%s FPS: %d", "KOS", static_cast<int> (frameCount - framesPasted));
-			SetWindowText(handle, buffer);
+			SetWindowText(m_window_handle, buffer);
 			framesPasted = frameCount;
 			preCount = GetTickCount64();
 		}
 
 	}
 
+	/*
+	GetFrameBufferSize is used when handling the vulkan swapchain.
+
+	this function has DPI support for all VkImages so they are scale appropriately
+	*/
 	void KWindow::GetFrameBufferSize(HWND handle, int& w, int& h)
 	{
 		RECT rect{};
@@ -78,24 +105,6 @@ namespace Kos
 		h = (int)(logicalH * scaleY);
 	}
 
-	LRESULT CALLBACK KWindow::WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam)
-	{
-		switch (message)
-		{
-			case WM_DESTROY:
-			{
-				PostQuitMessage(0);
-				break;
-			}
-			case WM_CLOSE:
-			{
-				DestroyWindow(Window);
-				break;
-			}
-		}
-		return DefWindowProc(Window, message, wParam, lParam);
-	}
-	
 }
 
 
