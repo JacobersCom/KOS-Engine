@@ -9,22 +9,22 @@ namespace
 		- Graphics Queue
 		- Present Queue
 	*/
-	bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
-	{
-		Kos::QueueFamilyIndices Indices = FindQueueFamilies(_VkPhyscialDevice);
+	//bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
+	//{
+	//	Kos::QueueFamilyIndices Indices = FindQueueFamilies(_VkPhyscialDevice);
 
-		bool extensionsSupported = CheckDeviceExtensionSupport(_VkPhyscialDevice);
+	//	bool extensionsSupported = CheckDeviceExtensionSupport(_VkPhyscialDevice);
 
-		//Is the SwapChain supported
-		bool SwapChainAdequate = false;
-		if (extensionsSupported)
-		{
-			Kos::SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails(_VkPhyscialDevice);
-			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && !SwapChainSupportDetails.PresentMode.empty();
-		}
+	//	//Is the SwapChain supported
+	//	bool SwapChainAdequate = false;
+	//	if (extensionsSupported)
+	//	{
+	//		Kos::SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails(_VkPhyscialDevice);
+	//		SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && !SwapChainSupportDetails.PresentMode.empty();
+	//	}
 
-		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
-	}
+	//	return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
+	//}
 
 	/*
 	 Ensures the end users has the support vaildation layers

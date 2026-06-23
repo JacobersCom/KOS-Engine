@@ -10,6 +10,7 @@
 
 //ios
 #include <memory>
+#include <optional>
 
 
 namespace Kos
