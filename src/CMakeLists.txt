@@ -9,6 +9,8 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/KWindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KDevice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KLog.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.cpp
+
 	
 	
     ${CMAKE_CURRENT_SOURCE_DIR}/KMat4.hpp
@@ -19,6 +21,8 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/KLog.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KDevice.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pch.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.hpp
+
 	
 	
 

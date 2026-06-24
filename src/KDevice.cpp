@@ -3,28 +3,48 @@
 
 namespace
 {
+
+	/*
+	* Stores a unsigned value of the different queue families
+	*
+	* Mainly used in ChooseUserGPU to ensure that the end users has the needed QueueFamilys on his GPU
+	*/
+	struct QueueFamilyIndices {
+
+		std::optional<uint32_t>GraphicsFamily;
+		std::optional<uint32_t>PresentFamily;
+
+
+		bool isComplete()
+		{
+			return GraphicsFamily.has_value() && PresentFamily.has_value();
+		}
+	};
+
 	/*
 	Checks the end users GPU for
 		- swapchain support
 		- Graphics Queue
 		- Present Queue
+
+		TODO: Instead of picking the first GPU implment a rating system for them
 	*/
-	//bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
-	//{
-	//	Kos::QueueFamilyIndices Indices = FindQueueFamilies(_VkPhyscialDevice);
+	bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
+	{
+		QueueFamilyIndices Indices = FindQueueFamilies(phy_device, surface);
 
-	//	bool extensionsSupported = CheckDeviceExtensionSupport(_VkPhyscialDevice);
+		bool extensionsSupported = CheckDeviceExtensionSupport(phy_device);
 
-	//	//Is the SwapChain supported
-	//	bool SwapChainAdequate = false;
-	//	if (extensionsSupported)
-	//	{
-	//		Kos::SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails(_VkPhyscialDevice);
-	//		SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && !SwapChainSupportDetails.PresentMode.empty();
-	//	}
+		//Is the SwapChain supported
+		bool SwapChainAdequate = false;
+		if (extensionsSupported)
+		{
+			Kos::SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails(phy_device);
+			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && !SwapChainSupportDetails.PresentMode.empty();
+		}
 
-	//	return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
-	//}
+		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
+	}
 
 	/*
 	 Ensures the end users has the support vaildation layers
@@ -58,6 +78,83 @@ namespace
 				return false;
 		}
 		return true;
+	}
+
+	/*
+	* Ensure that the GPU has swapchain support
+	*/
+	bool CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)
+	{
+		uint32_t extensionCount;
+
+		vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, availableExtensions.data());
+
+		std::vector<const char* > wantedExtensions
+		{
+			 VK_KHR_SWAPCHAIN_EXTENSION_NAME
+		};
+
+		for (const auto& ae : availableExtensions)
+		{
+			bool extensionsFound = false;
+			
+			for (const auto& we : wantedExtensions)
+			{
+				if (strcmp(ae.extensionName, we) == 0)
+				{
+					extensionsFound = true;
+					break;
+				}
+			}
+			if (!extensionsFound)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/*
+	* Finds all the needed queue familys for rendering and presenting the rendered image
+	*/
+	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
+	{
+		QueueFamilyIndices indices;
+
+		//Get the properties count
+		uint32_t queueFamilyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(phy_device, &queueFamilyCount, nullptr);
+
+		//Get the properties data
+		std::vector<VkQueueFamilyProperties> queueFamilys(queueFamilyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(phy_device, &queueFamilyCount, queueFamilys.data());
+
+		//Find the graphics bit queue family
+		int i = 0;
+		VkBool32 presentSupport = false;
+		for (const auto& queueFamily : queueFamilys)
+		{
+			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+			{
+				indices.GraphicsFamily = i;
+			}
+
+			vkGetPhysicalDeviceSurfaceSupportKHR(phy_device, i,surface, &presentSupport);
+
+			if (presentSupport)
+			{
+				indices.PresentFamily = i;
+			}
+
+			if (indices.isComplete()) break;
+			i++;
+		}
+
+		return indices;
 	}
 }
 

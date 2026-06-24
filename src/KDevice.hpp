@@ -15,34 +15,6 @@
 
 namespace Kos
 {
-	/*
-	* Stores a unsigned value of the different queue families
-	* 
-	* Mainly used in ChooseUserGPU to ensure that the end users has the needed QueueFamilys on his GPU
-	*/
-	struct QueueFamilyIndices {
-
-		std::optional<uint32_t>GraphicsFamily;
-		std::optional<uint32_t>PresentFamily;
-
-
-		bool isComplete()
-		{
-			return GraphicsFamily.has_value() && PresentFamily.has_value();
-		}
-	};
-
-	/*
-	* Stores all the needed details of the swapchain
-	* 
-	* Mainly used in ChooseUserGPU to ensure that the end users has the needed swapchain cabailities
-	*/
-	struct SwapChainSupportDetails
-	{
-		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
-		std::vector<VkSurfaceFormatKHR> ImageFormats;
-		std::vector<VkPresentModeKHR> PresentMode;
-	};
 
 	/*
 	* Handles the startup of the vulkan instance

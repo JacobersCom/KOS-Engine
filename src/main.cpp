@@ -18,9 +18,7 @@ int main()
 
 	std::cout << Kos::math::KVector3::unit_vector << "\n";
 
-	Kos::KOptional<uint32_t> value;
 
-	std::cout << value.HasValue() << std::endl;
 
 
 	//Kos::KLog::WriteLog(Kos::LogType::Info, "Does my logger work?");
