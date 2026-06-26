@@ -2,6 +2,8 @@
 
 #include "pch.hpp"
 
+#include <vulkan/vulkan.hpp>
+
 namespace Kos
 {
 
@@ -19,6 +21,15 @@ namespace Kos
 
 	class KSwapchain
 	{
+	public:
 
+		KSwapchain();
+
+		void CreateSwapchain();
+		SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
+
+		std::vector<VkImage> _VkSwapchainImages;
+		std::vector<VkImageView> _VkSwapchainImageViews;
+		std::vector<VkFramebuffer> _VkFramebuffers;
 	};
 }

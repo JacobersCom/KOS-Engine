@@ -22,7 +22,7 @@ namespace Kos
 
 		//Abstruction for CreateWin32
 		void Create(const char* title, int w, int h);
-		void GetFrameBufferSize(HWND WindowHandle, int& Width, int& Height);
+		void GetFrameBufferSize(int& Width, int& Height);
 
 		//Update loop
 		void ProcessMessages();

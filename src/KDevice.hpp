@@ -17,6 +17,23 @@ namespace Kos
 {
 
 	/*
+	* Stores a unsigned value of the different queue families
+	*
+	* Mainly used in ChooseUserGPU to ensure that the end users has the needed QueueFamilys on his GPU
+	*/
+	struct QueueFamilyIndices {
+
+		std::optional<uint32_t>GraphicsFamily;
+		std::optional<uint32_t>PresentFamily;
+
+
+		bool isComplete()
+		{
+			return GraphicsFamily.has_value() && PresentFamily.has_value();
+		}
+	};
+
+	/*
 	* Handles the startup of the vulkan instance
 	*/
 	class KDevice
@@ -29,10 +46,15 @@ namespace Kos
 		void CreateSurface();
 		void FindUsersGPU();
 
+		//Helper functions
+		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
+
 		//Member variables
 		VkInstance m_instance;
 		VkSurfaceKHR m_surface;
 		VkPhysicalDevice m_physical_device;
+	
+	private:
 
 		//Pointers to classes
 		std::unique_ptr<class KWindow> m_window;

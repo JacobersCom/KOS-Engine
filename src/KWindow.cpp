@@ -87,19 +87,19 @@ namespace Kos
 
 	this function has DPI support for all VkImages so they are scale appropriately
 	*/
-	void KWindow::GetFrameBufferSize(HWND handle, int& w, int& h)
+	void KWindow::GetFrameBufferSize(int& w, int& h)
 	{
 		RECT rect{};
-		GetClientRect(handle, &rect);
+		GetClientRect(m_window_handle, &rect);
 
-		int dpiX = GetDpiForWindow(handle);
+		int dpiX = GetDpiForWindow(m_window_handle);
 		float dpiScale = dpiX / USER_DEFAULT_SCREEN_DPI;
 
 		int logicalW = rect.left - rect.right;
 		int logicalH = rect.top - rect.bottom;
 
 		float scaleX = dpiX / dpiScale;
-		float scaleY = (float)GetDpiForWindow(handle) / dpiScale;
+		float scaleY = (float)GetDpiForWindow(m_window_handle) / dpiScale;
 
 		w = (int)(logicalW * scaleX);
 		h = (int)(logicalH * scaleY);
