@@ -42,9 +42,9 @@ namespace Kos
 		}
 
 		/*
-		* Ensure that the GPU has swapchain support
+		* Ensure that the GPU has swapchain support. And returns the required extension names
 		*/
-		bool CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)
+		std::vector<const char*> CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)
 		{
 			uint32_t extensionCount;
 
@@ -72,11 +72,11 @@ namespace Kos
 				}
 				if (!extensionsFound)
 				{
-					return false;
+					throw std::runtime_error("Failed to find required device extensions");
 				}
 			}
 
-			return true;
+			return wantedExtensions;
 		}
 
 
@@ -89,20 +89,14 @@ namespace Kos
 		- Present Queue
 
 		TODO: Instead of picking the first GPU implment a rating system for them
+		TODO: Find a different way of checking for device extensions
 	*/
 	bool KDevice::RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
 	{
 		QueueFamilyIndices Indices = FindQueueFamilies(phy_device, surface);
-
-		bool extensionsSupported = CheckDeviceExtensionSupport(phy_device);
-
 		
-		if (extensionsSupported)
-		{
-			return false;
-		}
 
-		return Indices.isComplete() && extensionsSupported;
+		return Indices.isComplete();
 	}
 
 	/*
@@ -243,6 +237,68 @@ namespace Kos
 		{
 			throw std::runtime_error("Failed to find Suitable GPU");
 		}
+	}
+
+	void Kos::KDevice::CreateLogicDevice()
+	{
+		//Ranges between 0.0 - 1.0
+		float QueuePriority = 1.0f;
+
+		std::vector<const char*> extentions = GetRequiredInstanceExtensions();
+		QueueFamilyIndices indices = GetQueueFamilyIndices(_VkPhysicalDevice);
+
+		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+		std::set<uint32_t> uniqueQueueFamilies = { indices.GraphicsFamily.value(), indices.PresentFamily.value() };
+
+		for (uint32_t queueFamily : uniqueQueueFamilies)
+		{
+			VkDeviceQueueCreateInfo DeviceQueueInfo{};
+			DeviceQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			DeviceQueueInfo.pNext = VK_NULL_HANDLE;
+			DeviceQueueInfo.queueCount = 1;
+			DeviceQueueInfo.queueFamilyIndex = queueFamily;
+			DeviceQueueInfo.pQueuePriorities = &QueuePriority;
+			queueCreateInfos.push_back(DeviceQueueInfo);
+		}
+
+
+		VkPhysicalDeviceFeatures DeviceFeaturesInfo{};
+
+		//Enabled to allow VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL
+		VkPhysicalDeviceSynchronization2FeaturesKHR PhysicalDeviceSync{};
+		PhysicalDeviceSync.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR;
+		PhysicalDeviceSync.synchronization2 = VK_TRUE;
+
+		VkDeviceCreateInfo DeviceInfo{};
+		DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		DeviceInfo.pNext = &PhysicalDeviceSync;
+
+		DeviceInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+		DeviceInfo.pQueueCreateInfos = queueCreateInfos.data();
+		DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
+
+		_VkDeviceExtensions = GetRequiredDeviceExtensions();
+		DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(_VkDeviceExtensions.size());
+		DeviceInfo.ppEnabledExtensionNames = _VkDeviceExtensions.data();
+
+		if (enableValidationLayers)
+		{
+			DeviceInfo.enabledLayerCount = static_cast<uint32_t>(_VkValidationLayers.size());
+			DeviceInfo.ppEnabledLayerNames = _VkValidationLayers.data();
+		}
+		else
+		{
+			DeviceInfo.enabledLayerCount = 0;
+		}
+
+
+		if (vkCreateDevice(_VkPhysicalDevice, &DeviceInfo, nullptr, &_VkDevice) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create logical device!");
+		}
+
+		vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &m_graphics_queue);
+		vkGetDeviceQueue(_VkDevice, indices.PresentFamily.value(), 0, &m_present_queue);
 	}
 
 }

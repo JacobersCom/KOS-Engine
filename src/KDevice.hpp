@@ -45,6 +45,7 @@ namespace Kos
 		void CreateInstance();
 		void CreateSurface();
 		void FindUsersGPU();
+		void CreateLogicDevice();
 
 		//Helper functions
 		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
@@ -54,6 +55,10 @@ namespace Kos
 		VkInstance m_instance;
 		VkSurfaceKHR m_surface;
 		VkPhysicalDevice m_physical_device;
+
+		//Queue familys
+		VkQueue m_graphics_queue;
+		VkQueue m_present_queue;
 	
 	private:
 
