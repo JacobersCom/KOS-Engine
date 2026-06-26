@@ -83,6 +83,29 @@ namespace Kos
 	}
 
 	/*
+	Checks the end users GPU for
+		- swapchain support
+		- Graphics Queue
+		- Present Queue
+
+		TODO: Instead of picking the first GPU implment a rating system for them
+	*/
+	bool KDevice::RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
+	{
+		QueueFamilyIndices Indices = FindQueueFamilies(phy_device, surface);
+
+		bool extensionsSupported = CheckDeviceExtensionSupport(phy_device);
+
+		
+		if (extensionsSupported)
+		{
+			return false;
+		}
+
+		return Indices.isComplete() && extensionsSupported;
+	}
+
+	/*
 	* Finds all the needed queue familys for rendering and presenting the rendered image
 	*/
 	QueueFamilyIndices KDevice::FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
@@ -174,13 +197,11 @@ namespace Kos
 	void Kos::KDevice::CreateSurface()
 	{
 
-		m_window = std::make_unique<KWindow>();
-
 		VkWin32SurfaceCreateInfoKHR surface_info{};
 
 		surface_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		surface_info.hwnd = m_window->GetWindowHandle(); //Handle to win32 window
-		surface_info.hinstance = m_window->GetWindowInstance();//Instance of the win32 window
+		surface_info.hwnd = m_window.GetWindowHandle(); //Handle to win32 window
+		surface_info.hinstance = m_window.GetWindowInstance();//Instance of the win32 window
 
 		if (vkCreateWin32SurfaceKHR(m_instance, &surface_info, nullptr, &m_surface) != VK_SUCCESS)
 		{
@@ -190,34 +211,38 @@ namespace Kos
 
 	/*
 	* Finds the end user GPU to than ensure it supports all the capabilites of the engine
+	* 
+	* TODO: change error handling to using KLog
 	*/
-	void Kos::KDevice::FindUsersGPU()
+	void KDevice::FindUsersGPU()
 	{
+		//Get device count
+		uint32_t deviceCount = 0;
+		vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
 
-	}
-
-	/*
-	Checks the end users GPU for
-		- swapchain support
-		- Graphics Queue
-		- Present Queue
-
-		TODO: Instead of picking the first GPU implment a rating system for them
-	*/
-	bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
-	{
-		Kos::QueueFamilyIndices Indices = FindQueueFamilies(phy_device, surface);
-
-		bool extensionsSupported = CheckDeviceExtensionSupport(phy_device);
-
-		//Is the SwapChain supported
-		bool SwapChainAdequate = false;
-		if (extensionsSupported)
+		if (deviceCount == 0)
 		{
-			Kos::SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails(phy_device);
-			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && !SwapChainSupportDetails.PresentMode.empty();
+			throw std::runtime_error("No device with vulkan support found!");
 		}
 
-		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
+		//Get device information
+		std::vector<VkPhysicalDevice> physical_devices(deviceCount);
+		vkEnumeratePhysicalDevices(m_instance, &deviceCount, physical_devices.data());
+
+		//Find a suitable device with vulkan support
+		for (const auto physical_device : physical_devices)
+		{
+			if (RateDeviceSuitable(physical_device, m_surface))
+			{
+				m_physical_device = physical_device;
+				break;
+			}
+		}
+
+		if (m_physical_device == VK_NULL_HANDLE)
+		{
+			throw std::runtime_error("Failed to find Suitable GPU");
+		}
 	}
+
 }

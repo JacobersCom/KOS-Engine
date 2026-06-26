@@ -23,13 +23,21 @@ namespace Kos
 	{
 	public:
 
-		KSwapchain();
+		KSwapchain(class KDevice& device, class KWindow& window) : m_device(device), m_window(window){};
 
-		void CreateSwapchain();
+		
+		void CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
+
+		//Helper functions
 		SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 
 		std::vector<VkImage> _VkSwapchainImages;
 		std::vector<VkImageView> _VkSwapchainImageViews;
 		std::vector<VkFramebuffer> _VkFramebuffers;
+
+	private:
+
+		KDevice& m_device;
+		KWindow& m_window;
 	};
 }

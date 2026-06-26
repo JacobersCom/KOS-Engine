@@ -39,7 +39,7 @@ namespace Kos
 	class KDevice
 	{
 	public:
-		KDevice() : m_instance(0), m_surface(0), m_physical_device(0){}
+		KDevice(class KWindow& window) : m_window(window), m_instance(0), m_surface(0), m_physical_device(0){}
 
 		//Vulkan start up functions
 		void CreateInstance();
@@ -47,6 +47,7 @@ namespace Kos
 		void FindUsersGPU();
 
 		//Helper functions
+		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 
 		//Member variables
@@ -57,7 +58,7 @@ namespace Kos
 	private:
 
 		//Pointers to classes
-		std::unique_ptr<class KWindow> m_window;
+		KWindow& m_window;
 
 	};
 }
