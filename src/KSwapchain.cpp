@@ -7,37 +7,9 @@ namespace Kos
 	namespace
 	{
 
-		/*
-		*/
-		Kos::SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
-		{
-			SwapChainSupportDetails swapchain_details;
-
-			//Surface Capabilities
-			vkGetPhysicalDeviceSurfaceCapabilitiesKHR(phy_device, surface, &swapchain_details.SurfaceCapabilities);
-
-			//Format count
-			uint32_t format_count;
-			vkGetPhysicalDeviceSurfaceFormatsKHR(phy_device, surface, &format_count, nullptr);
-
-			if (format_count != 0)
-			{
-				swapchain_details.ImageFormats.resize(format_count);
-				vkGetPhysicalDeviceSurfaceFormatsKHR(phy_device, surface, &format_count, swapchain_details.ImageFormats.data());
-			}
-
-			//Presentation modes
-			uint32_t present_count;
-			vkGetPhysicalDeviceSurfacePresentModesKHR(phy_device, surface, &present_count, nullptr);
-
-			if (present_count != 0)
-			{
-				swapchain_details.PresentMode.resize(present_count);
-				vkGetPhysicalDeviceSurfacePresentModesKHR(phy_device, surface, &present_count, swapchain_details.PresentMode.data());
-			}
-
-			return swapchain_details;
-		}
+		std::vector<VkImage> arr_images;
+		std::vector<VkImageView> arr_image_views;
+		std::vector<VkFramebuffer> arr_frame_buffers;
 
 		/*
 		Finds a format SRGB to eliminates the need for manual gramma correction.
@@ -105,6 +77,13 @@ namespace Kos
 
 			}
 		}
+
+		/*
+		* Uses all other helpers to gather swapchain details such
+		* - Surface capabilities
+		* - Image formats
+		* - Present modes
+		*/
 		Kos::SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
 		{
 			SwapChainSupportDetails swapchain_details;
@@ -134,8 +113,39 @@ namespace Kos
 
 			return swapchain_details;
 		}
+
 	}
 
+	void KSwapchain::CreateImageViews()
+	{
+		arr_image_views.resize(arr_images.size());
+
+		for (int i = 0; i < arr_images.size(); i++)
+		{
+			VkImageViewCreateInfo ImageViewInfo{};
+			ImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			ImageViewInfo.image = arr_images[i];
+			ImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			ImageViewInfo.format = m_format;
+			ImageViewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+			ImageViewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+			ImageViewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+			ImageViewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+			ImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			ImageViewInfo.subresourceRange.baseMipLevel = 0;
+			ImageViewInfo.subresourceRange.levelCount = 1;
+			ImageViewInfo.subresourceRange.baseArrayLayer = 0;
+			ImageViewInfo.subresourceRange.layerCount = 1;
+
+			VkResult result = vkCreateImageView(k_device.m_device, &ImageViewInfo, nullptr, &arr_image_views[i]);
+
+			if (result != VK_SUCCESS)
+			{
+				throw std::runtime_error("Failed to create image views for swapchain");
+			}
+		}
+	}
 
 	void KSwapchain::CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
 	{
@@ -166,7 +176,7 @@ namespace Kos
 		swapchain_Info.imageArrayLayers = 1;
 		swapchain_Info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		QueueFamilyIndices Indices = m_Kdevice.FindQueueFamilies(phy_device, surface);
+		QueueFamilyIndices Indices = k_device.FindQueueFamilies(phy_device, surface);
 		uint32_t queueFamilyIndices[] = { Indices.GraphicsFamily.value(), Indices.PresentFamily.value() };
 
 		if (Indices.GraphicsFamily != Indices.PresentFamily)
@@ -188,20 +198,22 @@ namespace Kos
 		swapchain_Info.clipped = VK_TRUE; // Dont care about covered pixels
 		swapchain_Info.oldSwapchain = VK_NULL_HANDLE;
 
-		VkResult result = vkCreateSwapchainKHR(m_Kdevice.m_device, &swapchain_Info, nullptr, &m_swapchain);
+		VkResult result = vkCreateSwapchainKHR(k_device.m_device, &swapchain_Info, nullptr, &m_swapchain);
 
 		if (result != VK_SUCCESS)
 		{
 			printf("Failed to create SwapChain");
 		}
 
-		vkGetSwapchainImagesKHR(m_Kdevice.m_device, m_swapchain, &image_count, nullptr);
-		m_images_arr.resize(image_count);
-		vkGetSwapchainImagesKHR(m_Kdevice.m_device, m_swapchain, &image_count, m_images_arr.data());
+		vkGetSwapchainImagesKHR(k_device.m_device, m_swapchain, &image_count, nullptr);
+		arr_images.resize(image_count);
+		vkGetSwapchainImagesKHR(k_device.m_device, m_swapchain, &image_count, arr_images.data());
 
 		m_format = surface_format.format;
 		m_extent = extent;
 
 		//Call Create image views
+
+		CreateImageViews();
 	}
 }

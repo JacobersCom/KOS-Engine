@@ -61,7 +61,6 @@ namespace Kos
 	
 	private:
 
-		//Pointers to classes
 		KWindow& m_window;
 
 	};

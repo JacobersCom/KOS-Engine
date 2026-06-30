@@ -18,7 +18,7 @@ namespace Kos
 		//Kos::KRender::PickPhysicalDevice();
 		//Kos::KRender::CreateLogicalDevice();
 		//Kos::KRender::CreateSwapChain();
-		Kos::KRender::CreateImageViews();
+		//Kos::KRender::CreateImageViews();
 		Kos::KRender::CreateRenderPassInfo();
 		Kos::KRender::CreatePipeline();
 		Kos::KRender::CreateFramebuffers();
