@@ -80,7 +80,7 @@ namespace Kos
 		* @param
 		* - VkSurfaceCapabilitiesKHR defines the capapbilities for a surface by queuing the vkGetPhysicalDeviceSurfaceCapabilitiesKHR.
 		*/
-		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities, KWindow* window)
+		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities, KWindow window)
 		{
 			if (capabilities.currentExtent.width != UINT32_MAX)
 			{
@@ -89,7 +89,7 @@ namespace Kos
 			else
 			{
 				int width, height;
-				window->GetFrameBufferSize(width, height);
+				window.GetFrameBufferSize(width, height);
 
 				VkExtent2D actual_extent =
 				{
@@ -105,37 +105,37 @@ namespace Kos
 
 			}
 		}
+		Kos::SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
+		{
+			SwapChainSupportDetails swapchain_details;
+
+			//Surface Capabilities
+			vkGetPhysicalDeviceSurfaceCapabilitiesKHR(phy_device, surface, &swapchain_details.SurfaceCapabilities);
+
+			//Format count
+			uint32_t format_count;
+			vkGetPhysicalDeviceSurfaceFormatsKHR(phy_device, surface, &format_count, nullptr);
+
+			if (format_count != 0)
+			{
+				swapchain_details.ImageFormats.resize(format_count);
+				vkGetPhysicalDeviceSurfaceFormatsKHR(phy_device, surface, &format_count, swapchain_details.ImageFormats.data());
+			}
+
+			//Presentation modes
+			uint32_t present_count;
+			vkGetPhysicalDeviceSurfacePresentModesKHR(phy_device, surface, &present_count, nullptr);
+
+			if (present_count != 0)
+			{
+				swapchain_details.PresentMode.resize(present_count);
+				vkGetPhysicalDeviceSurfacePresentModesKHR(phy_device, surface, &present_count, swapchain_details.PresentMode.data());
+			}
+
+			return swapchain_details;
+		}
 	}
 
-	Kos::SwapChainSupportDetails KSwapchain::GetSwapChainDetails(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
-	{
-		SwapChainSupportDetails swapchain_details;
-
-		//Surface Capabilities
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(phy_device, surface, &swapchain_details.SurfaceCapabilities);
-
-		//Format count
-		uint32_t format_count;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(phy_device, surface, &format_count, nullptr);
-
-		if (format_count != 0)
-		{
-			swapchain_details.ImageFormats.resize(format_count);
-			vkGetPhysicalDeviceSurfaceFormatsKHR(phy_device, surface, &format_count, swapchain_details.ImageFormats.data());
-		}
-
-		//Presentation modes
-		uint32_t present_count;
-		vkGetPhysicalDeviceSurfacePresentModesKHR(phy_device, surface, &present_count, nullptr);
-
-		if (present_count != 0)
-		{
-			swapchain_details.PresentMode.resize(present_count);
-			vkGetPhysicalDeviceSurfacePresentModesKHR(phy_device, surface, &present_count, swapchain_details.PresentMode.data());
-		}
-
-		return swapchain_details;
-	}
 
 	void KSwapchain::CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
 	{
@@ -147,7 +147,7 @@ namespace Kos
 
 		VkSurfaceFormatKHR surface_format = ChooseSwapChainFormat(swapchain_details.ImageFormats);
 		VkPresentModeKHR present_mode = ChooseSwapChainPresentMode(swapchain_details.PresentMode);
-		VkExtent2D extent = ChooseSwapExtent(swapchain_details.SurfaceCapabilities);
+		VkExtent2D extent = ChooseSwapExtent(swapchain_details.SurfaceCapabilities, m_window);
 
 		uint32_t image_count = swapchain_details.SurfaceCapabilities.minImageCount + 1;
 
@@ -166,7 +166,7 @@ namespace Kos
 		swapchain_Info.imageArrayLayers = 1;
 		swapchain_Info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		QueueFamilyIndices Indices = m_device.FindQueueFamilies(phy_device);
+		QueueFamilyIndices Indices = m_Kdevice.FindQueueFamilies(phy_device, surface);
 		uint32_t queueFamilyIndices[] = { Indices.GraphicsFamily.value(), Indices.PresentFamily.value() };
 
 		if (Indices.GraphicsFamily != Indices.PresentFamily)
@@ -188,20 +188,20 @@ namespace Kos
 		swapchain_Info.clipped = VK_TRUE; // Dont care about covered pixels
 		swapchain_Info.oldSwapchain = VK_NULL_HANDLE;
 
-		VkResult result = vkCreateSwapchainKHR(_VkDevice, &swapchain_Info, nullptr, m_swapchain);
+		VkResult result = vkCreateSwapchainKHR(m_Kdevice.m_device, &swapchain_Info, nullptr, &m_swapchain);
 
 		if (result != VK_SUCCESS)
 		{
 			printf("Failed to create SwapChain");
 		}
 
-		vkGetSwapchainImagesKHR(_VkDevice, _VkSwapchain, &image_count, nullptr);
-		_VkSwapchainImages.resize(image_count);
-		vkGetSwapchainImagesKHR(_VkDevice, _VkSwapchain, &image_count, _VkSwapchainImages.data());
+		vkGetSwapchainImagesKHR(m_Kdevice.m_device, m_swapchain, &image_count, nullptr);
+		m_images_arr.resize(image_count);
+		vkGetSwapchainImagesKHR(m_Kdevice.m_device, m_swapchain, &image_count, m_images_arr.data());
 
-		
+		m_format = surface_format.format;
+		m_extent = extent;
 
-		_VkSwapchainFormat = surface_format.format;
-		_VkSwapchainExtent = extent;
+		//Call Create image views
 	}
 }
