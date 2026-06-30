@@ -13,10 +13,10 @@ namespace Kos
 
 	bool KRender::InitVulkan() 
 	{
-		Kos::KRender::CreateVkInstance();
-		Kos::KRender::CreateWin32Surface();
-		Kos::KRender::PickPhysicalDevice();
-		Kos::KRender::CreateLogicalDevice();
+		//Kos::KRender::CreateVkInstance();
+		//Kos::KRender::CreateWin32Surface();
+		//Kos::KRender::PickPhysicalDevice();
+		//Kos::KRender::CreateLogicalDevice();
 		Kos::KRender::CreateSwapChain();
 		Kos::KRender::CreateImageViews();
 		Kos::KRender::CreateRenderPassInfo();

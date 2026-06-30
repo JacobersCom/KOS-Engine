@@ -6,6 +6,15 @@ namespace Kos
 {
 	namespace
 	{
+		/*These variables are not needed by any another class or file*/
+		VkQueue m_graphics_queue;
+		VkQueue m_present_queue;
+
+		std::vector<const char*> layers =
+		{
+			"VK_LAYER_KHRONOS_validation"
+			"VK_EXT_debug_utils"
+		};
 
 		/*
 			Ensures the end users has the support vaildation layers
@@ -78,7 +87,47 @@ namespace Kos
 
 			return wantedExtensions;
 		}
+		Kos::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
+		{
+			QueueFamilyIndices indices;
 
+			//Get the properties count
+			uint32_t queueFamilyCount = 0;
+			vkGetPhysicalDeviceQueueFamilyProperties(phy_device, &queueFamilyCount, nullptr);
+
+			//Get the properties data
+			std::vector<VkQueueFamilyProperties> queueFamilys(queueFamilyCount);
+			vkGetPhysicalDeviceQueueFamilyProperties(phy_device, &queueFamilyCount, queueFamilys.data());
+
+			//Find the graphics bit queue family
+			int i = 0;
+			VkBool32 presentSupport = false;
+			for (const auto& queueFamily : queueFamilys)
+			{
+				if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+				{
+					indices.GraphicsFamily = i;
+				}
+
+				vkGetPhysicalDeviceSurfaceSupportKHR(phy_device, i, surface, &presentSupport);
+
+				if (presentSupport)
+				{
+					indices.PresentFamily = i;
+				}
+
+				if (indices.isComplete()) break;
+				i++;
+			}
+
+			return indices;
+		}
+
+		Kos::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
+		{
+			QueueFamilyIndices indices = FindQueueFamilies(phy_device, surface);
+			return indices;
+		}
 
 	}
 
@@ -156,11 +205,6 @@ namespace Kos
 		//The parameters for the newly created vulkan instance
 		VkInstanceCreateInfo InstanceInfo{};
 
-		std::vector<const char*> layers =
-		{
-			"VK_LAYER_KHRONOS_validation"
-			"VK_EXT_debug_utils"
-		};
 
 		InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		InstanceInfo.pApplicationInfo = &AppInfo;
@@ -244,8 +288,16 @@ namespace Kos
 		//Ranges between 0.0 - 1.0
 		float QueuePriority = 1.0f;
 
-		std::vector<const char*> extentions = GetRequiredInstanceExtensions();
-		QueueFamilyIndices indices = GetQueueFamilyIndices(_VkPhysicalDevice);
+		std::vector<const char*> instance_ext =
+		{
+			VK_KHR_SURFACE_EXTENSION_NAME,
+			VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+		};
+#ifdef _DEBUG
+		instance_ext.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif // _DEBUG
+
+		QueueFamilyIndices indices = GetQueueFamilyIndices(m_physical_device, m_surface);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 		std::set<uint32_t> uniqueQueueFamilies = { indices.GraphicsFamily.value(), indices.PresentFamily.value() };
@@ -277,28 +329,27 @@ namespace Kos
 		DeviceInfo.pQueueCreateInfos = queueCreateInfos.data();
 		DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
 
-		_VkDeviceExtensions = GetRequiredDeviceExtensions();
-		DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(_VkDeviceExtensions.size());
-		DeviceInfo.ppEnabledExtensionNames = _VkDeviceExtensions.data();
-
-		if (enableValidationLayers)
+		std::vector<const char*> device_ext =
 		{
-			DeviceInfo.enabledLayerCount = static_cast<uint32_t>(_VkValidationLayers.size());
-			DeviceInfo.ppEnabledLayerNames = _VkValidationLayers.data();
-		}
-		else
-		{
-			DeviceInfo.enabledLayerCount = 0;
-		}
+			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+			VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME
+		};
+		DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(device_ext.size());
+		DeviceInfo.ppEnabledExtensionNames = device_ext.data();
+#ifdef _DEBUG
+		DeviceInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
+		DeviceInfo.ppEnabledLayerNames = layers.data();
+#else
+	DeviceInfo.enabledLayerCount = 0;
+#endif // _DEBUG
 
-
-		if (vkCreateDevice(_VkPhysicalDevice, &DeviceInfo, nullptr, &_VkDevice) != VK_SUCCESS)
+		if (vkCreateDevice(m_physical_device, &DeviceInfo, nullptr, &m_device) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create logical device!");
 		}
 
-		vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &m_graphics_queue);
-		vkGetDeviceQueue(_VkDevice, indices.PresentFamily.value(), 0, &m_present_queue);
+		vkGetDeviceQueue(m_device, indices.GraphicsFamily.value(), 0, &m_graphics_queue);
+		vkGetDeviceQueue(m_device, indices.PresentFamily.value(), 0, &m_present_queue);
 	}
 
 }

@@ -11,6 +11,7 @@
 //ios
 #include <memory>
 #include <optional>
+#include <set>
 
 
 namespace Kos
@@ -55,10 +56,8 @@ namespace Kos
 		VkInstance m_instance;
 		VkSurfaceKHR m_surface;
 		VkPhysicalDevice m_physical_device;
+		VkDevice m_device;
 
-		//Queue familys
-		VkQueue m_graphics_queue;
-		VkQueue m_present_queue;
 	
 	private:
 
