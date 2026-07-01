@@ -51,9 +51,137 @@ namespace Kos
 
 			return _VkShaderModule;
 		}
+
+		VkPipelineVertexInputStateCreateInfo CreateVertexInputStateInfo(int vertex_attribute_count, int vertex_binding_count)
+		{
+			VkPipelineVertexInputStateCreateInfo VertexStateInfo{};
+			VertexStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+			VertexStateInfo.pVertexAttributeDescriptions = nullptr;
+			VertexStateInfo.pVertexBindingDescriptions = nullptr;
+			VertexStateInfo.vertexAttributeDescriptionCount = vertex_attribute_count;
+			VertexStateInfo.vertexBindingDescriptionCount = vertex_binding_count;
+			return VertexStateInfo;
+		}
+
+		VkPipelineInputAssemblyStateCreateInfo CreateAssemblyInputStateInfo(VkPrimitiveTopology topology)
+		{
+			VkPipelineInputAssemblyStateCreateInfo AssemblyStateInfo{};
+			AssemblyStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+			AssemblyStateInfo.topology = topology;
+			AssemblyStateInfo.primitiveRestartEnable = VK_FALSE;
+
+			return AssemblyStateInfo;
+		}
+
+		VkViewport CreateViewportAndScissor(VkViewport viewport, VkRect2D scissor, VkExtent2D extent)
+		{
+			VkViewport viewport_info{};
+			viewport_info.x = 0.0f;
+			viewport_info.y = 0.0f;
+			viewport_info.width = static_cast<float>(extent.width);
+			viewport_info.height = static_cast<float>(extent.height);
+			viewport_info.minDepth = 0.0f;
+			viewport_info.maxDepth = 1.0f;
+
+			return viewport_info;
+			
+			VkRect2D _VkScissor{};
+
+			_VkScissor.offset = { 0, 0 };
+			_VkScissor.extent = extent;
+		}
+
+		VkPipelineViewportStateCreateInfo CreateViewPortStateInfo(VkViewport& viewport, VkRect2D& scissor,
+			uint32_t viewport_count, uint32_t scissor_count)
+		{
+			VkPipelineViewportStateCreateInfo ViewPortInfo{};
+			ViewPortInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+			ViewPortInfo.viewportCount = viewport_count;
+			ViewPortInfo.pViewports = &viewport;
+			ViewPortInfo.scissorCount = scissor_count;
+			ViewPortInfo.pScissors = &scissor;
+
+			return ViewPortInfo;
+		}
+
+		VkPipelineRasterizationStateCreateInfo CreateRasterizationState()
+		{
+			VkPipelineRasterizationStateCreateInfo RasterStateInfo{};
+			RasterStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+			RasterStateInfo.depthClampEnable = VK_FALSE; // Using this requires enabling VkPipelineRasterizationDepthClipStateCreateInfoEXT within the pipeline
+			RasterStateInfo.rasterizerDiscardEnable = VK_FALSE; // if true it stops everything from reaching the frame buffer
+			RasterStateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+			RasterStateInfo.lineWidth = 1.f; //Anything thicker than 1.f requries a gpu feature
+
+			//Determines the type of face culling to use
+			RasterStateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+			RasterStateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+
+			RasterStateInfo.depthBiasEnable = VK_FALSE;
+			RasterStateInfo.depthBiasConstantFactor = 0.0f;
+			RasterStateInfo.depthBiasClamp = 0.0f;
+			RasterStateInfo.depthBiasSlopeFactor = 0.0f;
+
+			return RasterStateInfo;
+		}
+
+		VkPipelineColorBlendAttachmentState CreateColorBlendInfo()
+		{
+			VkPipelineColorBlendAttachmentState ColorblendAttachmentInfo{};
+
+			ColorblendAttachmentInfo.colorWriteMask =
+				VK_COLOR_COMPONENT_R_BIT |
+				VK_COLOR_COMPONENT_G_BIT |
+				VK_COLOR_COMPONENT_B_BIT |
+				VK_COLOR_COMPONENT_A_BIT;
+
+			return ColorblendAttachmentInfo;
+		}
+
+		VkPipelineColorBlendStateCreateInfo CreatePipelineColorBlendStateInfo(
+			VkPipelineColorBlendAttachmentState& ColorBlendAttachmentInfo)
+		{
+
+			VkPipelineColorBlendStateCreateInfo ColorblendingStateInfo{};
+			ColorblendingStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+			ColorblendingStateInfo.logicOpEnable = VK_FALSE;
+			ColorblendingStateInfo.logicOp = VK_LOGIC_OP_COPY; // Optional
+			ColorblendingStateInfo.attachmentCount = 1;
+			ColorblendingStateInfo.pAttachments = &ColorBlendAttachmentInfo;
+			ColorblendingStateInfo.blendConstants[0] = 0.0f; // Optional
+			ColorblendingStateInfo.blendConstants[1] = 0.0f; // Optional
+			ColorblendingStateInfo.blendConstants[2] = 0.0f; // Optional
+			ColorblendingStateInfo.blendConstants[3] = 0.0f; // Optional
+
+			return  ColorblendingStateInfo;
+		}
+
+		VkPipelineDynamicStateCreateInfo CreateDynaminceStateInfo(int DynamicStateCount, VkDynamicState* DynamicStateData)
+		{
+			VkPipelineDynamicStateCreateInfo DynamicStateInfo{};
+			DynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+			DynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(DynamicStateCount);
+			DynamicStateInfo.pDynamicStates = DynamicStateData;
+
+			return DynamicStateInfo;
+		}
+
+		VkPipelineMultisampleStateCreateInfo CreatePipelineMultisampleStateInfo()
+		{
+			VkPipelineMultisampleStateCreateInfo MultiSampleInfo{};
+			MultiSampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+			MultiSampleInfo.sampleShadingEnable = VK_FALSE; //allows the pixel shader to be evaulated for each sample within a pixel instead of one fragment
+			MultiSampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT; //Number of samples used in rasterzation
+			MultiSampleInfo.minSampleShading = 1.0f; //The minmum number of sample shading
+			MultiSampleInfo.alphaToCoverageEnable = VK_FALSE; //Creates a temp value based off the color of the fragments first output
+			MultiSampleInfo.alphaToOneEnable = VK_FALSE; //Controls wither the aphla value of the first color is replaced on one
+
+			return MultiSampleInfo;
+		}
+
 	}
 
-	void KPipeline::CreatePipeline(VkDevice device, VkRenderPass renderpass)
+	void KPipeline::CreatePipeline(VkDevice device, VkRenderPass renderpass, VkExtent2D extents)
 	{
 		auto VertShaderCode = LoadShader(std::filesystem::path(KENGINE_SHADER_DIR) / "VertShader.spv");
 		auto PixelShaderCode = LoadShader(std::filesystem::path(KENGINE_SHADER_DIR) / "FragShader.spv");
@@ -75,14 +203,13 @@ namespace Kos
 
 		VkPipelineShaderStageCreateInfo ShaderStages[] = { VertexStage, PixelStage };
 
-		VkPipelineVertexInputStateCreateInfo VertexInput = CreateVertexInputStateInfo();
+		VkPipelineVertexInputStateCreateInfo VertexInput = CreateVertexInputStateInfo(0,0);
 
-		VkPipelineInputAssemblyStateCreateInfo AssemblyInput = CreateAssemblyInputStateInfo();
+		VkPipelineInputAssemblyStateCreateInfo AssemblyInput = CreateAssemblyInputStateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 
-		_VkViewport = CreateViewportInfo();
-		_VkScissor = CreateScissorInfo();
+		CreateViewportAndScissor(m_viewport, m_scissor, extents);
 
-		VkPipelineViewportStateCreateInfo ViewPortInfo = CreateViewPortStateInfo(_VkViewport, _VkScissor, 1, 1);
+		VkPipelineViewportStateCreateInfo ViewPortInfo = CreateViewPortStateInfo(m_viewport, m_scissor, 1, 1);
 
 		VkPipelineRasterizationStateCreateInfo RasterizationInfo = CreateRasterizationState();
 
@@ -90,7 +217,8 @@ namespace Kos
 
 		VkPipelineColorBlendStateCreateInfo ColorBlendInfo = CreatePipelineColorBlendStateInfo(ColorBlendAttachment);
 
-		std::vector<VkDynamicState> States = CreateDynamicStates();
+		std::vector<VkDynamicState> States = { VK_DYNAMIC_STATE_SCISSOR,VK_DYNAMIC_STATE_VIEWPORT};
+
 		VkPipelineDynamicStateCreateInfo DynamicStateInfo = CreateDynaminceStateInfo(States.size(), States.data());
 
 		VkPipelineMultisampleStateCreateInfo MultiSampleInfo = CreatePipelineMultisampleStateInfo();

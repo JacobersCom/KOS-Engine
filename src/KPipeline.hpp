@@ -17,10 +17,13 @@ namespace Kos
 		bool startup();
 		bool shutdown();
 
-		void CreatePipeline(VkDevice device, VkRenderPass renderpass);
+		void CreatePipeline(VkDevice device, VkRenderPass renderpass, VkExtent2D extents);
 
 		VkPipeline m_pipeline;
 		VkPipelineLayout m_pipeline_layout;
+
+		VkViewport m_viewport;
+		VkRect2D m_scissor;
 
 	private:
 
