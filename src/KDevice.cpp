@@ -421,4 +421,42 @@ namespace Kos
 		return renderpass_info;
 	}
 
+	/*
+	Creates a FrameBuffer for all the images that correspond to
+	the retrieved image at drawing time.
+
+	Framebuffers are references to VkImageView objects that
+	represent attachments
+	*/
+	void KDevice::CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent)
+	{
+
+		arr_frame_buffers.resize(image_views.size());
+
+		//Iterate through the Imageviews to create a framebuffer form them
+		for (int i = 0; i < image_views.size(); i++)
+		{
+			//Lists of attachements for each _VkSawpchainImageview
+			VkImageView attachments[] = {
+				image_views[i]
+			};
+
+			VkFramebufferCreateInfo FramebufferInfo{};
+			FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+			FramebufferInfo.renderPass = m_renderpass;
+			FramebufferInfo.attachmentCount = 1;
+			FramebufferInfo.pAttachments = attachments;
+			FramebufferInfo.height = extent.height;
+			FramebufferInfo.width = extent.width;
+			FramebufferInfo.layers = 1; //the total sides of an image
+
+			if (vkCreateFramebuffer(m_device, &FramebufferInfo, nullptr, &arr_frame_buffers[i]) != VK_SUCCESS)
+			{
+				throw std::runtime_error("Failed to create Framebuffer for Swapchain Image view");
+			}
+		}
+
+	}
+
+
 }

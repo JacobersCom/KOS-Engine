@@ -20,8 +20,8 @@ namespace Kos
 		//Kos::KRender::CreateSwapChain();
 		//Kos::KRender::CreateImageViews();
 		//Kos::KRender::CreateRenderPassInfo();
-		Kos::KRender::CreatePipeline();
-		Kos::KRender::CreateFramebuffers();
+		//Kos::KRender::CreatePipeline();
+		//Kos::KRender::CreateFramebuffers();
 		Kos::KRender::CreateCommandPool();
 		Kos::KRender::CreateCommandBuffer();
 		Kos::KRender::CreateSyncObjects();

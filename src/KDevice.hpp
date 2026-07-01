@@ -51,6 +51,7 @@ namespace Kos
 		void FindUsersGPU();
 		void CreateLogicDevice();
 		VkRenderPassCreateInfo CreateRenderPassInfo(VkFormat format);
+		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
 
 		//Helper functions
 		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
@@ -62,6 +63,7 @@ namespace Kos
 		VkPhysicalDevice m_physical_device;
 		VkDevice m_device;
 		VkRenderPass m_renderpass;
+		std::vector<VkFramebuffer> arr_frame_buffers;
 
 	
 	private:
