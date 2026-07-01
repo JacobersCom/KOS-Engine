@@ -42,11 +42,15 @@ namespace Kos
 	public:
 		KDevice(class KWindow& window) : m_window(window), m_instance(0), m_surface(0), m_physical_device(0){}
 
+		bool startup();
+		bool shutdown();
+
 		//Vulkan start up functions
 		void CreateInstance();
 		void CreateSurface();
 		void FindUsersGPU();
 		void CreateLogicDevice();
+		VkRenderPassCreateInfo CreateRenderPassInfo(VkFormat format);
 
 		//Helper functions
 		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
@@ -57,6 +61,7 @@ namespace Kos
 		VkSurfaceKHR m_surface;
 		VkPhysicalDevice m_physical_device;
 		VkDevice m_device;
+		VkRenderPass m_renderpass;
 
 	
 	private:

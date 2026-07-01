@@ -24,7 +24,9 @@ namespace Kos
 	public:
 
 		KSwapchain(class KDevice& device, class KWindow& window) : k_device(device), m_window(window){};
-
+		
+		bool startup();
+		bool shutdown();
 		
 		void CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 
