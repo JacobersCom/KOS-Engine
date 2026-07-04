@@ -1,4 +1,5 @@
 #include "KPipeline.hpp"
+#include "KModel.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -54,12 +55,15 @@ namespace Kos
 
 		VkPipelineVertexInputStateCreateInfo CreateVertexInputStateInfo(int vertex_attribute_count, int vertex_binding_count)
 		{
+			auto binding_descriptions = KModel::Vertex::getBindingDescriptions();
+			auto attribute_descriptions = KModel::Vertex::getAttributeDescriptions();
+
 			VkPipelineVertexInputStateCreateInfo VertexStateInfo{};
 			VertexStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-			VertexStateInfo.pVertexAttributeDescriptions = nullptr;
-			VertexStateInfo.pVertexBindingDescriptions = nullptr;
-			VertexStateInfo.vertexAttributeDescriptionCount = vertex_attribute_count;
-			VertexStateInfo.vertexBindingDescriptionCount = vertex_binding_count;
+			VertexStateInfo.pVertexAttributeDescriptions = attribute_descriptions.data();
+			VertexStateInfo.pVertexBindingDescriptions = binding_descriptions.data();
+			VertexStateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size());
+			VertexStateInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(binding_descriptions.size());
 			return VertexStateInfo;
 		}
 

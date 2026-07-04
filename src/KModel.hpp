@@ -17,8 +17,8 @@ namespace Kos
 		{
 			Kos::math::KVector3 position;
 
-			std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
-			std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
+			static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
+			static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
 		};
 
 		KModel(KDevice& device, const std::vector<Vertex>& vertices);
