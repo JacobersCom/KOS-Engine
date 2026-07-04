@@ -52,6 +52,8 @@ namespace Kos
 		void CreateLogicDevice();
 		VkRenderPassCreateInfo CreateRenderPassInfo(VkFormat format);
 		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
+		void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags useage, VkMemoryPropertyFlags properties
+			,VkBuffer& buffer, VkDeviceMemory& buffer_memeory);
 
 		//Helper functions
 		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);

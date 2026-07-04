@@ -458,5 +458,23 @@ namespace Kos
 
 	}
 
+	void Kos::KDevice::CreateBuffer(VkDeviceSize size,
+		VkBufferUsageFlags useage,
+		VkMemoryPropertyFlags properties,
+		VkBuffer& buffer,
+		VkDeviceMemory& buffer_memeory)
+	{
+		VkBufferCreateInfo buffer_info{};
+		buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		buffer_info.flags = useage;
+		buffer_info.size = size;
+		buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE; //access to any resource will be exclusvie to one queue family at a time
+
+		if (vkCreateBuffer(k_logical_device, &buffer_info, nullptr, &buffer) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create vertexbuffer");
+		}
+	}
+
 
 }
