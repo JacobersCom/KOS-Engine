@@ -60,10 +60,10 @@ namespace Kos
 
 			VkPipelineVertexInputStateCreateInfo VertexStateInfo{};
 			VertexStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-			VertexStateInfo.pVertexAttributeDescriptions = attribute_descriptions.data();
-			VertexStateInfo.pVertexBindingDescriptions = binding_descriptions.data();
 			VertexStateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size());
 			VertexStateInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(binding_descriptions.size());
+			VertexStateInfo.pVertexAttributeDescriptions = attribute_descriptions.data();
+			VertexStateInfo.pVertexBindingDescriptions = binding_descriptions.data();
 			return VertexStateInfo;
 		}
 
