@@ -129,7 +129,22 @@ namespace Kos
 			return indices;
 		}
 
-		uin32_t
+		uint32_t FindMemoryType(VkPhysicalDevice physical_device,uint32_t type_filter, VkMemoryPropertyFlags properties)
+		{
+			VkPhysicalDeviceMemoryProperties mem_properties{};
+			vkGetPhysicalDeviceMemoryProperties(physical_device, &mem_properties);
+
+			for (uint32_t i = 0; i < mem_properties.memoryTypeCount; i++)
+			{
+				if (type_filter & (1 << i) && (mem_properties.memoryTypes[i].propertyFlags & properties)
+					== properties)
+				{
+					return i;
+				}
+			}
+
+			throw std::runtime_error("failed to find suitable memory type!");
+		}
 
 	}
 
@@ -460,6 +475,10 @@ namespace Kos
 
 	}
 
+
+	/*
+	Will need a rewrite once a memory allocater is being used
+	*/
 	void Kos::KDevice::CreateBuffer(VkDeviceSize size,
 		VkBufferUsageFlags useage,
 		VkMemoryPropertyFlags properties,
@@ -483,7 +502,15 @@ namespace Kos
 		VkMemoryAllocateInfo alloc_info{};
 		alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		alloc_info.allocationSize = mem_requirememnts.size;
-		alloc_info.memoryTypeIndex = 
+		alloc_info.memoryTypeIndex = FindMemoryType(k_physical_device, 
+			mem_requirememnts.memoryTypeBits, properties);
+
+		if (vkAllocateMemory(k_logical_device, &alloc_info, nullptr, &buffer_memeory) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to allocate vertex buffer memory");
+		}
+
+		vkBindBufferMemory(k_logical_device, buffer, buffer_memeory, 0);
 	}
 
 
