@@ -40,7 +40,7 @@ namespace Kos
 	class KDevice
 	{
 	public:
-		KDevice(class KWindow& window) : m_window(window), m_instance(0), m_surface(0), m_physical_device(0){}
+		KDevice(class KWindow& window) : k_window(window), k_instance(0), k_surface(0), k_physical_device(0){}
 
 		bool startup();
 		bool shutdown();
@@ -58,17 +58,17 @@ namespace Kos
 		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 
 		//Member variables
-		VkInstance m_instance;
-		VkSurfaceKHR m_surface;
-		VkPhysicalDevice m_physical_device;
-		VkDevice m_device;
+		VkInstance k_instance;
+		VkSurfaceKHR k_surface;
+		VkPhysicalDevice k_physical_device;
+		VkDevice k_logical_device;
 		VkRenderPass m_renderpass;
 		std::vector<VkFramebuffer> arr_frame_buffers;
 
 	
 	private:
 
-		KWindow& m_window;
+		KWindow& k_window;
 
 	};
 }

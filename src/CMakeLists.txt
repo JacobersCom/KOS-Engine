@@ -11,6 +11,8 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/KLog.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KPipeline.cpp
+    ##${CMAKE_CURRENT_SOURCE_DIR}/KModel.cpp
+
 
 	
 	
@@ -24,6 +26,8 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/pch.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KPipeline.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/KModel.hpp
+
 
 
 	

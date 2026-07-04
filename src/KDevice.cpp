@@ -7,8 +7,8 @@ namespace Kos
 	namespace
 	{
 		/*These variables are not needed by any another class or file*/
-		VkQueue m_graphics_queue;
-		VkQueue m_present_queue;
+		VkQueue k_graphics_queue;
+		VkQueue k_present_queue;
 
 		std::vector<const char*> layers =
 		{
@@ -220,7 +220,7 @@ namespace Kos
 		}
 	#endif // !NDEBUG
 
-		if (vkCreateInstance(&InstanceInfo, nullptr, &m_instance) != VK_SUCCESS)
+		if (vkCreateInstance(&InstanceInfo, nullptr, &k_instance) != VK_SUCCESS)
 		{
 			//Replace with a KLog
 		}
@@ -238,10 +238,10 @@ namespace Kos
 		VkWin32SurfaceCreateInfoKHR surface_info{};
 
 		surface_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		surface_info.hwnd = m_window.GetWindowHandle(); //Handle to win32 window
-		surface_info.hinstance = m_window.GetWindowInstance();//Instance of the win32 window
+		surface_info.hwnd = k_window.GetWindowHandle(); //Handle to win32 window
+		surface_info.hinstance = k_window.GetWindowInstance();//Instance of the win32 window
 
-		if (vkCreateWin32SurfaceKHR(m_instance, &surface_info, nullptr, &m_surface) != VK_SUCCESS)
+		if (vkCreateWin32SurfaceKHR(k_instance, &surface_info, nullptr, &k_surface) != VK_SUCCESS)
 		{
 			//Replace with a KLog
 		}
@@ -256,7 +256,7 @@ namespace Kos
 	{
 		//Get device count
 		uint32_t deviceCount = 0;
-		vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
+		vkEnumeratePhysicalDevices(k_instance, &deviceCount, nullptr);
 
 		if (deviceCount == 0)
 		{
@@ -265,19 +265,19 @@ namespace Kos
 
 		//Get device information
 		std::vector<VkPhysicalDevice> physical_devices(deviceCount);
-		vkEnumeratePhysicalDevices(m_instance, &deviceCount, physical_devices.data());
+		vkEnumeratePhysicalDevices(k_instance, &deviceCount, physical_devices.data());
 
 		//Find a suitable device with vulkan support
 		for (const auto physical_device : physical_devices)
 		{
-			if (RateDeviceSuitable(physical_device, m_surface))
+			if (RateDeviceSuitable(physical_device, k_surface))
 			{
-				m_physical_device = physical_device;
+				k_physical_device = physical_device;
 				break;
 			}
 		}
 
-		if (m_physical_device == VK_NULL_HANDLE)
+		if (k_physical_device == VK_NULL_HANDLE)
 		{
 			throw std::runtime_error("Failed to find Suitable GPU");
 		}
@@ -297,7 +297,7 @@ namespace Kos
 		instance_ext.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif // _DEBUG
 
-		QueueFamilyIndices indices = GetQueueFamilyIndices(m_physical_device, m_surface);
+		QueueFamilyIndices indices = GetQueueFamilyIndices(k_physical_device, k_surface);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 		std::set<uint32_t> uniqueQueueFamilies = { indices.GraphicsFamily.value(), indices.PresentFamily.value() };
@@ -343,13 +343,13 @@ namespace Kos
 	DeviceInfo.enabledLayerCount = 0;
 #endif // _DEBUG
 
-		if (vkCreateDevice(m_physical_device, &DeviceInfo, nullptr, &m_device) != VK_SUCCESS)
+		if (vkCreateDevice(k_physical_device, &DeviceInfo, nullptr, &k_logical_device) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create logical device!");
 		}
 
-		vkGetDeviceQueue(m_device, indices.GraphicsFamily.value(), 0, &m_graphics_queue);
-		vkGetDeviceQueue(m_device, indices.PresentFamily.value(), 0, &m_present_queue);
+		vkGetDeviceQueue(k_logical_device, indices.GraphicsFamily.value(), 0, &k_graphics_queue);
+		vkGetDeviceQueue(k_logical_device, indices.PresentFamily.value(), 0, &k_present_queue);
 	}
 
 	/*
@@ -412,7 +412,7 @@ namespace Kos
 		renderpass_info.dependencyCount = 1;
 		renderpass_info.pDependencies = &subpass_deps;
 
-		VkResult result = vkCreateRenderPass(m_device, &renderpass_info, nullptr, &m_renderpass);
+		VkResult result = vkCreateRenderPass(k_logical_device, &renderpass_info, nullptr, &m_renderpass);
 		if (result != VK_SUCCESS)
 		{
 			printf("Failed to create RenderPass");
@@ -450,7 +450,7 @@ namespace Kos
 			FramebufferInfo.width = extent.width;
 			FramebufferInfo.layers = 1; //the total sides of an image
 
-			if (vkCreateFramebuffer(m_device, &FramebufferInfo, nullptr, &arr_frame_buffers[i]) != VK_SUCCESS)
+			if (vkCreateFramebuffer(k_logical_device, &FramebufferInfo, nullptr, &arr_frame_buffers[i]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to create Framebuffer for Swapchain Image view");
 			}
