@@ -129,6 +129,8 @@ namespace Kos
 			return indices;
 		}
 
+		uin32_t
+
 	}
 
 	/*
@@ -474,6 +476,14 @@ namespace Kos
 		{
 			throw std::runtime_error("failed to create vertexbuffer");
 		}
+
+		VkMemoryRequirements mem_requirememnts{};
+		vkGetBufferMemoryRequirements(k_logical_device, buffer, &mem_requirememnts);
+
+		VkMemoryAllocateInfo alloc_info{};
+		alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		alloc_info.allocationSize = mem_requirememnts.size;
+		alloc_info.memoryTypeIndex = 
 	}
 
 
