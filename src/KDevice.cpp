@@ -1,5 +1,6 @@
 #include "KDevice.hpp"
 #include "KSwapchain.hpp"
+#include "KPipeline.hpp"
 #include "KWindow.hpp"
 
 namespace Kos
@@ -7,8 +8,8 @@ namespace Kos
 	namespace
 	{
 		/*These variables are not needed by any another class or file*/
-		VkQueue k_graphics_queue;
-		VkQueue k_present_queue;
+		VkQueue m_graphics_queue;
+		VkQueue m_present_queue;
 
 		std::vector<const char*> layers =
 		{
@@ -106,14 +107,14 @@ namespace Kos
 			{
 				if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 				{
-					indices.GraphicsFamily = i;
+					indices.m_graphics_family = i;
 				}
 
 				vkGetPhysicalDeviceSurfaceSupportKHR(phy_device, i, surface, &presentSupport);
 
 				if (presentSupport)
 				{
-					indices.PresentFamily = i;
+					indices.m_present_family = i;
 				}
 
 				if (indices.isComplete()) break;
@@ -187,14 +188,14 @@ namespace Kos
 		{
 			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 			{
-				indices.GraphicsFamily = i;
+				indices.m_graphics_family = i;
 			}
 
 			vkGetPhysicalDeviceSurfaceSupportKHR(phy_device, i,surface, &presentSupport);
 
 			if (presentSupport)
 			{
-				indices.PresentFamily = i;
+				indices.m_present_family = i;
 			}
 
 			if (indices.isComplete()) break;
@@ -203,6 +204,7 @@ namespace Kos
 
 		return indices;
 	}
+	
 	/*
 	* Creates a instace of the vulkan API with validation layers if in debug mode
 	*/
@@ -255,8 +257,8 @@ namespace Kos
 		VkWin32SurfaceCreateInfoKHR surface_info{};
 
 		surface_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		surface_info.hwnd = k_window.GetWindowHandle(); //Handle to win32 window
-		surface_info.hinstance = k_window.GetWindowInstance();//Instance of the win32 window
+		surface_info.hwnd = m_window.GetWindowHandle(); //Handle to win32 window
+		surface_info.hinstance = m_window.GetWindowInstance();//Instance of the win32 window
 
 		if (vkCreateWin32SurfaceKHR(m_instance, &surface_info, nullptr, &m_surface) != VK_SUCCESS)
 		{
@@ -317,7 +319,7 @@ namespace Kos
 		QueueFamilyIndices indices = GetQueueFamilyIndices(m_physical_device, m_surface);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-		std::set<uint32_t> uniqueQueueFamilies = { indices.GraphicsFamily.value(), indices.PresentFamily.value() };
+		std::set<uint32_t> uniqueQueueFamilies = { indices.m_graphics_family.value(), indices.m_present_family.value() };
 
 		for (uint32_t queueFamily : uniqueQueueFamilies)
 		{
@@ -365,8 +367,8 @@ namespace Kos
 			throw std::runtime_error("Failed to create logical device!");
 		}
 
-		vkGetDeviceQueue(m_device, indices.GraphicsFamily.value(), 0, &k_graphics_queue);
-		vkGetDeviceQueue(m_device, indices.PresentFamily.value(), 0, &k_present_queue);
+		vkGetDeviceQueue(m_device, indices.m_graphics_family.value(), 0, &m_graphics_queue);
+		vkGetDeviceQueue(m_device, indices.m_present_family.value(), 0, &m_present_queue);
 	}
 
 	/*
@@ -515,14 +517,14 @@ namespace Kos
 
 	void KDevice::CreateCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool)
 	{
-		QueueFamilyIndices Indices = GetQueueFamilyIndices(physical_device);
+		QueueFamilyIndices Indices = GetQueueFamilyIndices(physical_device, m_surface);
 
 		VkCommandPoolCreateInfo CommandPoolInfo{};
 		CommandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 
 		//allows the command buffer to record all the commands but if a reset happens it will have to rerecord all the commands
 		CommandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-		CommandPoolInfo.queueFamilyIndex = Indices.GraphicsFamily.value();
+		CommandPoolInfo.queueFamilyIndex = Indices.m_graphics_family.value();
 
 		if (vkCreateCommandPool(device, &CommandPoolInfo, nullptr, &command_pool) != VK_SUCCESS)
 		{
@@ -563,6 +565,114 @@ namespace Kos
 		{
 			throw std::runtime_error("Failed to create semaphores and fence!");
 		}
+	}
+
+	void Kos::KDevice::RecordCommandBuffers(VkCommandBuffer, uint32_t image_index)
+	{
+		VkCommandBufferBeginInfo BeginInfo{};
+		BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+		if (vkBeginCommandBuffer(m_command_buffer, &BeginInfo) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to write to commandbuffer");
+		}
+
+		VkRenderPassBeginInfo RenderPassBeginInfo{};
+		RenderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		RenderPassBeginInfo.renderPass = m_renderpass;
+		RenderPassBeginInfo.framebuffer = m_frame_buffers[image_index]; //The framebuffer and the attachements 
+		//Affected area of the render pass
+		RenderPassBeginInfo.renderArea.offset = { 0,0 };
+		RenderPassBeginInfo.renderArea.extent = m_swapchain.m_extent;
+
+		VkClearValue ClearValues = { {{0.0f, 0.0f, 0.0f, 1.0f}} }; //Clear color used for VK_ATTACHMENT_LOAD_OP_CLEAR
+		RenderPassBeginInfo.clearValueCount = 1;
+		RenderPassBeginInfo.pClearValues = &ClearValues;
+
+		//The commands being recorded will be stored here and VK_SUBPASS_CONTENTS_INLINE means the commands
+		//will be embedded in the primary command buffer
+		vkCmdBeginRenderPass(m_command_buffer, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline.m_pipeline);
+
+		//Because the viewport and scissor is dynmic so they must be set in the command buffer before drawing
+
+		vkCmdSetViewport(m_command_buffer, 0, 1, &m_pipeline.m_viewport);
+		vkCmdSetScissor(m_command_buffer, 0, 1, &m_pipeline.m_scissor);
+
+		//Now we can draw
+		vkCmdDraw(m_command_buffer, 3, 1, 0, 0);
+
+		vkCmdEndRenderPass(m_command_buffer);
+
+		if (vkEndCommandBuffer(m_command_buffer) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to record to command buffer");
+		}
+	}
+
+	void KDevice::DrawFrame()
+	{
+		//Waits for all fences to be signed before returning and disables a time out.
+		//All fences start off signed so this is oki
+		vkWaitForFences(m_device, 1, &m_frames_in_flight, VK_TRUE, UINT64_MAX);
+		vkResetFences(m_device, 1, &m_frames_in_flight);
+
+		uint32_t ImageIndex;
+
+		//imageavailablesemaphore signeds when the presentation engine is finish
+		vkAcquireNextImageKHR(m_device, m_swapchain.m_swapchain, UINT64_MAX,
+			m_image_available, VK_NULL_HANDLE, &ImageIndex);
+
+
+		//Ensures the buffer is able to record commands
+		vkResetCommandBuffer(m_command_buffer, 0);
+
+		//Record info to submit it
+		RecordCommandBuffers(m_command_buffer, ImageIndex);
+
+		VkSubmitInfo SubmittedInfo{};
+		SubmittedInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+		//The Semaphore upon which to wait on before exe the commandbuffer
+		VkSemaphore WaitSemaphore[] = { m_image_available };
+		SubmittedInfo.waitSemaphoreCount = 1;
+		SubmittedInfo.pWaitSemaphores = WaitSemaphore;
+
+		//Where each semaphore will wait for occur. In this case is when the pipeline writes color
+		VkPipelineStageFlags Stage[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+		SubmittedInfo.pWaitDstStageMask = Stage;
+
+		SubmittedInfo.commandBufferCount = 1;
+		SubmittedInfo.pCommandBuffers = &m_command_buffer;
+
+		//Which semaphore to sign once the commandbuffer is finished
+		VkSemaphore SingleSemaphore[] = { m_render_finished };
+		SubmittedInfo.signalSemaphoreCount = 1;
+		SubmittedInfo.pSignalSemaphores = SingleSemaphore;
+
+		//All commands will be submitted to the queue. The fence Will singal when it is finished
+		if (vkQueueSubmit(m_graphics_queue, 1, &SubmittedInfo, m_frames_in_flight) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to submit commands to queue");
+		}
+
+
+		VkPresentInfoKHR PresentInfo{};
+		PresentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+		//Program waits on these before presenting
+		PresentInfo.waitSemaphoreCount = 1;
+		PresentInfo.pWaitSemaphores = SingleSemaphore;
+
+		PresentInfo.swapchainCount = 1;
+		PresentInfo.pSwapchains = &m_swapchain.m_swapchain;
+		PresentInfo.pImageIndices = &ImageIndex;
+
+		vkQueuePresentKHR(m_present_queue, &PresentInfo);
+
+		vkDeviceWaitIdle(m_device);
+
 	}
 
 

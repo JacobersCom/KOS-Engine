@@ -11,6 +11,8 @@ namespace Kos
 	{
 	public:
 		RenderCore(class KDevice& device) : m_device(device) {}
+
+		void DrawFrame();
 	private:
 
 		KDevice& m_device;

@@ -177,9 +177,9 @@ namespace Kos
 		swapchain_Info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
 		QueueFamilyIndices Indices = k_device.FindQueueFamilies(phy_device, surface);
-		uint32_t queueFamilyIndices[] = { Indices.GraphicsFamily.value(), Indices.PresentFamily.value() };
+		uint32_t queueFamilyIndices[] = { Indices.m_graphics_family.value(), Indices.m_present_family.value() };
 
-		if (Indices.GraphicsFamily != Indices.PresentFamily)
+		if (Indices.m_graphics_family != Indices.m_present_family)
 		{
 			swapchain_Info.imageSharingMode = VK_SHARING_MODE_CONCURRENT; // Image can be used by muiltple queues
 			swapchain_Info.queueFamilyIndexCount = 2;

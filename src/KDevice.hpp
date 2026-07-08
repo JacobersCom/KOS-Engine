@@ -24,13 +24,13 @@ namespace Kos
 	*/
 	struct QueueFamilyIndices {
 
-		std::optional<uint32_t>GraphicsFamily;
-		std::optional<uint32_t>PresentFamily;
+		std::optional<uint32_t>m_graphics_family;
+		std::optional<uint32_t>m_present_family;
 
 
 		bool isComplete()
 		{
-			return GraphicsFamily.has_value() && PresentFamily.has_value();
+			return m_graphics_family.has_value() && m_present_family.has_value();
 		}
 	};
 
@@ -40,10 +40,16 @@ namespace Kos
 	class KDevice
 	{
 	public:
-		KDevice(class KWindow& window) : k_window(window), m_instance(0), m_surface(0), m_physical_device(0){}
+		KDevice(class KWindow& window, class KSwapchain& swapchain, class KPipeline& pipeline) : m_window(window),m_swapchain(swapchain), m_pipeline(pipeline),
+			m_instance(0), m_surface(0), m_physical_device(0){}
+
+
 
 		bool startup();
 		bool shutdown();
+
+		//Where art is formed
+		void DrawFrame();
 
 		//Vulkan start up functions
 		void CreateInstance();
@@ -64,6 +70,8 @@ namespace Kos
 		void CreatePrimaryCommandBuffer();
 
 		void SyncObjects();
+
+		void RecordCommandBuffers(VkCommandBuffer, uint32_t image_index);
 
 		//Helper functions
 		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
@@ -87,7 +95,9 @@ namespace Kos
 	
 	private:
 
-		KWindow& k_window;
+		KWindow& m_window;
+		KSwapchain& m_swapchain;
+		KPipeline& m_pipeline;
 
 	};
 }
