@@ -513,7 +513,7 @@ namespace Kos
 		vkBindBufferMemory(m_device, buffer, buffer_memeory, 0);
 	}
 
-	void KDevice::CreateHostCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool)
+	void KDevice::CreateCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool)
 	{
 		QueueFamilyIndices Indices = GetQueueFamilyIndices(physical_device);
 
@@ -529,6 +529,40 @@ namespace Kos
 			throw std::runtime_error("Failed to create command pool");
 		}
 
+	}
+
+	void KDevice::CreatePrimaryCommandBuffer()
+	{
+		VkCommandBufferAllocateInfo AllocateInfo{};
+		AllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		AllocateInfo.commandPool = m_command_pool;
+		AllocateInfo.commandBufferCount = 1;
+
+		//Can be submitted to queue but not to another command buffer
+		AllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+		if (vkAllocateCommandBuffers(m_device, &AllocateInfo, &m_command_buffer))
+		{
+			throw std::runtime_error("Failed to create primary command buffer");
+		}
+	}
+
+	void KDevice::SyncObjects()
+	{
+		VkSemaphoreCreateInfo SemaphoreInfo{};
+		SemaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+		VkFenceCreateInfo FenceInfo{};
+		FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		FenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; //fences start signed
+
+		if (vkCreateSemaphore(m_device, &SemaphoreInfo, nullptr, &m_image_available) != VK_SUCCESS
+			|| vkCreateSemaphore(m_device, &SemaphoreInfo, nullptr, &m_render_finished) != VK_SUCCESS
+			|| vkCreateFence(m_device, &FenceInfo, nullptr, &m_frames_in_flight) != VK_SUCCESS
+			)
+		{
+			throw std::runtime_error("Failed to create semaphores and fence!");
+		}
 	}
 
 

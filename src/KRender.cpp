@@ -22,8 +22,8 @@ namespace Kos
 		//Kos::KRender::CreateRenderPassInfo();
 		//Kos::KRender::CreatePipeline();
 		//Kos::KRender::CreateFramebuffers();
-		Kos::KRender::CreateCommandPool();
-		Kos::KRender::CreateCommandBuffer();
+		//Kos::KRender::CreateCommandPool();
+		//Kos::KRender::CreateCommandBuffer();
 		Kos::KRender::CreateSyncObjects();
 
 		return true;

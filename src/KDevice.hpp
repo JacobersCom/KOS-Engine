@@ -54,7 +54,16 @@ namespace Kos
 		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
 		void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags useage, VkMemoryPropertyFlags properties
 			,VkBuffer& buffer, VkDeviceMemory& buffer_memeory);
-		void CreateHostCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool);
+		/*
+		Creates a command pool on the CPU to record commands to be passed into the GPU queue
+		*/
+		void CreateCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool);
+		/*
+		Creates a buffer that sends commands to the GPU such as draw , state change, memory  transfers
+		*/
+		void CreatePrimaryCommandBuffer();
+
+		void SyncObjects();
 
 		//Helper functions
 		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
@@ -67,6 +76,10 @@ namespace Kos
 		VkDevice m_device;
 		VkRenderPass m_renderpass;
 		VkCommandPool m_command_pool;
+		VkCommandBuffer m_command_buffer;
+		VkSemaphore m_image_available;
+		VkSemaphore m_render_finished;
+		VkFence m_frames_in_flight;
 		
 		std::vector<VkFramebuffer> m_frame_buffers;
 
