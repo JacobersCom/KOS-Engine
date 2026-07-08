@@ -237,7 +237,7 @@ namespace Kos
 		}
 	#endif // !NDEBUG
 
-		if (vkCreateInstance(&InstanceInfo, nullptr, &k_instance) != VK_SUCCESS)
+		if (vkCreateInstance(&InstanceInfo, nullptr, &m_instance) != VK_SUCCESS)
 		{
 			//Replace with a KLog
 		}
@@ -258,7 +258,7 @@ namespace Kos
 		surface_info.hwnd = k_window.GetWindowHandle(); //Handle to win32 window
 		surface_info.hinstance = k_window.GetWindowInstance();//Instance of the win32 window
 
-		if (vkCreateWin32SurfaceKHR(k_instance, &surface_info, nullptr, &k_surface) != VK_SUCCESS)
+		if (vkCreateWin32SurfaceKHR(m_instance, &surface_info, nullptr, &m_surface) != VK_SUCCESS)
 		{
 			//Replace with a KLog
 		}
@@ -273,7 +273,7 @@ namespace Kos
 	{
 		//Get device count
 		uint32_t deviceCount = 0;
-		vkEnumeratePhysicalDevices(k_instance, &deviceCount, nullptr);
+		vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
 
 		if (deviceCount == 0)
 		{
@@ -282,19 +282,19 @@ namespace Kos
 
 		//Get device information
 		std::vector<VkPhysicalDevice> physical_devices(deviceCount);
-		vkEnumeratePhysicalDevices(k_instance, &deviceCount, physical_devices.data());
+		vkEnumeratePhysicalDevices(m_instance, &deviceCount, physical_devices.data());
 
 		//Find a suitable device with vulkan support
 		for (const auto physical_device : physical_devices)
 		{
-			if (RateDeviceSuitable(physical_device, k_surface))
+			if (RateDeviceSuitable(physical_device, m_surface))
 			{
-				k_physical_device = physical_device;
+				m_physical_device = physical_device;
 				break;
 			}
 		}
 
-		if (k_physical_device == VK_NULL_HANDLE)
+		if (m_physical_device == VK_NULL_HANDLE)
 		{
 			throw std::runtime_error("Failed to find Suitable GPU");
 		}
@@ -314,7 +314,7 @@ namespace Kos
 		instance_ext.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif // _DEBUG
 
-		QueueFamilyIndices indices = GetQueueFamilyIndices(k_physical_device, k_surface);
+		QueueFamilyIndices indices = GetQueueFamilyIndices(m_physical_device, m_surface);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 		std::set<uint32_t> uniqueQueueFamilies = { indices.GraphicsFamily.value(), indices.PresentFamily.value() };
@@ -360,13 +360,13 @@ namespace Kos
 	DeviceInfo.enabledLayerCount = 0;
 #endif // _DEBUG
 
-		if (vkCreateDevice(k_physical_device, &DeviceInfo, nullptr, &k_logical_device) != VK_SUCCESS)
+		if (vkCreateDevice(m_physical_device, &DeviceInfo, nullptr, &m_device) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create logical device!");
 		}
 
-		vkGetDeviceQueue(k_logical_device, indices.GraphicsFamily.value(), 0, &k_graphics_queue);
-		vkGetDeviceQueue(k_logical_device, indices.PresentFamily.value(), 0, &k_present_queue);
+		vkGetDeviceQueue(m_device, indices.GraphicsFamily.value(), 0, &k_graphics_queue);
+		vkGetDeviceQueue(m_device, indices.PresentFamily.value(), 0, &k_present_queue);
 	}
 
 	/*
@@ -429,7 +429,7 @@ namespace Kos
 		renderpass_info.dependencyCount = 1;
 		renderpass_info.pDependencies = &subpass_deps;
 
-		VkResult result = vkCreateRenderPass(k_logical_device, &renderpass_info, nullptr, &m_renderpass);
+		VkResult result = vkCreateRenderPass(m_device, &renderpass_info, nullptr, &m_renderpass);
 		if (result != VK_SUCCESS)
 		{
 			printf("Failed to create RenderPass");
@@ -448,7 +448,7 @@ namespace Kos
 	void KDevice::CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent)
 	{
 
-		arr_frame_buffers.resize(image_views.size());
+		m_frame_buffers.resize(image_views.size());
 
 		//Iterate through the Imageviews to create a framebuffer form them
 		for (int i = 0; i < image_views.size(); i++)
@@ -467,7 +467,7 @@ namespace Kos
 			FramebufferInfo.width = extent.width;
 			FramebufferInfo.layers = 1; //the total sides of an image
 
-			if (vkCreateFramebuffer(k_logical_device, &FramebufferInfo, nullptr, &arr_frame_buffers[i]) != VK_SUCCESS)
+			if (vkCreateFramebuffer(m_device, &FramebufferInfo, nullptr, &m_frame_buffers[i]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to create Framebuffer for Swapchain Image view");
 			}
@@ -491,26 +491,44 @@ namespace Kos
 		buffer_info.size = size;
 		buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE; //access to any resource will be exclusvie to one queue family at a time
 
-		if (vkCreateBuffer(k_logical_device, &buffer_info, nullptr, &buffer) != VK_SUCCESS)
+		if (vkCreateBuffer(m_device, &buffer_info, nullptr, &buffer) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create vertexbuffer");
 		}
 
 		VkMemoryRequirements mem_requirememnts{};
-		vkGetBufferMemoryRequirements(k_logical_device, buffer, &mem_requirememnts);
+		vkGetBufferMemoryRequirements(m_device, buffer, &mem_requirememnts);
 
 		VkMemoryAllocateInfo alloc_info{};
 		alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		alloc_info.allocationSize = mem_requirememnts.size;
-		alloc_info.memoryTypeIndex = FindMemoryType(k_physical_device, 
+		alloc_info.memoryTypeIndex = FindMemoryType(m_physical_device, 
 			mem_requirememnts.memoryTypeBits, properties);
 
-		if (vkAllocateMemory(k_logical_device, &alloc_info, nullptr, &buffer_memeory) != VK_SUCCESS)
+		if (vkAllocateMemory(m_device, &alloc_info, nullptr, &buffer_memeory) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to allocate vertex buffer memory");
 		}
 
-		vkBindBufferMemory(k_logical_device, buffer, buffer_memeory, 0);
+		vkBindBufferMemory(m_device, buffer, buffer_memeory, 0);
+	}
+
+	void KDevice::CreateHostCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool)
+	{
+		QueueFamilyIndices Indices = GetQueueFamilyIndices(physical_device);
+
+		VkCommandPoolCreateInfo CommandPoolInfo{};
+		CommandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+
+		//allows the command buffer to record all the commands but if a reset happens it will have to rerecord all the commands
+		CommandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+		CommandPoolInfo.queueFamilyIndex = Indices.GraphicsFamily.value();
+
+		if (vkCreateCommandPool(device, &CommandPoolInfo, nullptr, &command_pool) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create command pool");
+		}
+
 	}
 
 

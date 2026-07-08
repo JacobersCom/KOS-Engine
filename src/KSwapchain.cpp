@@ -138,7 +138,7 @@ namespace Kos
 			ImageViewInfo.subresourceRange.baseArrayLayer = 0;
 			ImageViewInfo.subresourceRange.layerCount = 1;
 
-			VkResult result = vkCreateImageView(k_device.k_logical_device, &ImageViewInfo, nullptr, &arr_image_views[i]);
+			VkResult result = vkCreateImageView(k_device.m_device, &ImageViewInfo, nullptr, &arr_image_views[i]);
 
 			if (result != VK_SUCCESS)
 			{
@@ -198,16 +198,16 @@ namespace Kos
 		swapchain_Info.clipped = VK_TRUE; // Dont care about covered pixels
 		swapchain_Info.oldSwapchain = VK_NULL_HANDLE;
 
-		VkResult result = vkCreateSwapchainKHR(k_device.k_logical_device, &swapchain_Info, nullptr, &m_swapchain);
+		VkResult result = vkCreateSwapchainKHR(k_device.m_device, &swapchain_Info, nullptr, &m_swapchain);
 
 		if (result != VK_SUCCESS)
 		{
 			printf("Failed to create SwapChain");
 		}
 
-		vkGetSwapchainImagesKHR(k_device.k_logical_device, m_swapchain, &image_count, nullptr);
+		vkGetSwapchainImagesKHR(k_device.m_device, m_swapchain, &image_count, nullptr);
 		arr_images.resize(image_count);
-		vkGetSwapchainImagesKHR(k_device.k_logical_device, m_swapchain, &image_count, arr_images.data());
+		vkGetSwapchainImagesKHR(k_device.m_device, m_swapchain, &image_count, arr_images.data());
 
 		m_format = surface_format.format;
 		m_extent = extent;

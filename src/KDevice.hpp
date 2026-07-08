@@ -40,7 +40,7 @@ namespace Kos
 	class KDevice
 	{
 	public:
-		KDevice(class KWindow& window) : k_window(window), k_instance(0), k_surface(0), k_physical_device(0){}
+		KDevice(class KWindow& window) : k_window(window), m_instance(0), m_surface(0), m_physical_device(0){}
 
 		bool startup();
 		bool shutdown();
@@ -54,18 +54,22 @@ namespace Kos
 		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
 		void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags useage, VkMemoryPropertyFlags properties
 			,VkBuffer& buffer, VkDeviceMemory& buffer_memeory);
+		void CreateHostCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool);
 
 		//Helper functions
 		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 
 		//Member variables
-		VkInstance k_instance;
-		VkSurfaceKHR k_surface;
-		VkPhysicalDevice k_physical_device;
-		VkDevice k_logical_device;
+		VkInstance m_instance;
+		VkSurfaceKHR m_surface;
+		VkPhysicalDevice m_physical_device;
+		VkDevice m_device;
 		VkRenderPass m_renderpass;
-		std::vector<VkFramebuffer> arr_frame_buffers;
+		VkCommandPool m_command_pool;
+		
+		std::vector<VkFramebuffer> m_frame_buffers;
+
 
 	
 	private:

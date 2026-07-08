@@ -12,8 +12,8 @@ namespace Kos
 
 	KModel::~KModel()
 	{
-		vkDestroyBuffer(k_device.k_logical_device, k_vertex_buffer, nullptr);
-		vkFreeMemory(k_device.k_logical_device, k_vertex_buffer_memory, nullptr);
+		vkDestroyBuffer(k_device.m_device, k_vertex_buffer, nullptr);
+		vkFreeMemory(k_device.m_device, k_vertex_buffer_memory, nullptr);
 	}
 
 	void KModel::bind(VkCommandBuffer commandBuffer)
@@ -42,12 +42,12 @@ namespace Kos
 		void* data;
 		//creates a region of host memory mapped to device memory
 		// and sets data to point to the mapped memory range
-		vkMapMemory(k_device.k_logical_device, k_vertex_buffer_memory, 0, buffer_size, 0, &data);
+		vkMapMemory(k_device.m_device, k_vertex_buffer_memory, 0, buffer_size, 0, &data);
 		//memcpy sends the data from the CPU to the GPU because of VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 		//Without it we would need to use flush to send the data over, but we dont need to because
 		//the memory is mapped to the GPU from the CPU
 		memcpy(data, vertices.data(), static_cast<size_t>(buffer_size));
-		vkUnmapMemory(k_device.k_logical_device, k_vertex_buffer_memory);
+		vkUnmapMemory(k_device.m_device, k_vertex_buffer_memory);
 	}
 
 	std::vector<VkVertexInputBindingDescription> Kos::KModel::Vertex::getBindingDescriptions()
