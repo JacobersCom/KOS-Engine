@@ -5,7 +5,6 @@ add_executable(KOS main.cpp)
 
 target_sources(KOS
 PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/KRender.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KWindow.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KDevice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KLog.cpp
@@ -18,7 +17,6 @@ PUBLIC
 	
     ${CMAKE_CURRENT_SOURCE_DIR}/KMat4.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KVector3.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KRender.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KWindow.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KObject.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KLog.hpp

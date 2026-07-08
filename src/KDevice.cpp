@@ -205,6 +205,18 @@ namespace Kos
 		return indices;
 	}
 	
+	bool Kos::KDevice::startup()
+	{
+		
+		CreateInstance();
+		CreateSurface();
+		FindUsersGPU();
+		CreateLogicDevice();
+
+		//All other calls will wait till the swapchain and pipeline create successfully created
+
+	}
+
 	/*
 	* Creates a instace of the vulkan API with validation layers if in debug mode
 	*/

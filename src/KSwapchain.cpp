@@ -147,6 +147,11 @@ namespace Kos
 		}
 	}
 
+	bool KSwapchain::startup(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
+	{
+		CreateSwapchain(phy_device, surface);
+	}
+
 	void KSwapchain::CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
 	{
 		//Get SwapChain details
@@ -211,8 +216,6 @@ namespace Kos
 
 		m_format = surface_format.format;
 		m_extent = extent;
-
-		//Call Create image views
 
 		CreateImageViews();
 	}
