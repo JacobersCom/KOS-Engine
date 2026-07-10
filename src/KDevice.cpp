@@ -212,9 +212,6 @@ namespace Kos
 		CreateSurface();
 		FindUsersGPU();
 		CreateLogicDevice();
-
-		//All other calls will wait till the swapchain and pipeline create successfully created
-
 	}
 
 	/*
@@ -269,8 +266,8 @@ namespace Kos
 		VkWin32SurfaceCreateInfoKHR surface_info{};
 
 		surface_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		surface_info.hwnd = m_window.GetWindowHandle(); //Handle to win32 window
-		surface_info.hinstance = m_window.GetWindowInstance();//Instance of the win32 window
+		surface_info.hwnd = m_window->GetWindowHandle(); //Handle to win32 window
+		surface_info.hinstance = m_window->GetWindowInstance();//Instance of the win32 window
 
 		if (vkCreateWin32SurfaceKHR(m_instance, &surface_info, nullptr, &m_surface) != VK_SUCCESS)
 		{
@@ -601,7 +598,7 @@ namespace Kos
 		RenderPassBeginInfo.framebuffer = m_frame_buffers[image_index]; //The framebuffer and the attachements 
 		//Affected area of the render pass
 		RenderPassBeginInfo.renderArea.offset = { 0,0 };
-		RenderPassBeginInfo.renderArea.extent = m_swapchain.m_extent;
+		RenderPassBeginInfo.renderArea.extent = m_swapchain->m_extent;
 
 		VkClearValue ClearValues = { {{0.0f, 0.0f, 0.0f, 1.0f}} }; //Clear color used for VK_ATTACHMENT_LOAD_OP_CLEAR
 		RenderPassBeginInfo.clearValueCount = 1;
@@ -611,12 +608,12 @@ namespace Kos
 		//will be embedded in the primary command buffer
 		vkCmdBeginRenderPass(m_command_buffer, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-		vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline.m_pipeline);
+		vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->GetPipline());
 
 		//Because the viewport and scissor is dynmic so they must be set in the command buffer before drawing
 
-		vkCmdSetViewport(m_command_buffer, 0, 1, &m_pipeline.m_viewport);
-		vkCmdSetScissor(m_command_buffer, 0, 1, &m_pipeline.m_scissor);
+		vkCmdSetViewport(m_command_buffer, 0, 1, &m_pipeline->GetViewport());
+		vkCmdSetScissor(m_command_buffer, 0, 1, &m_pipeline->GetScissor());
 
 		//Now we can draw
 		vkCmdDraw(m_command_buffer, 3, 1, 0, 0);
@@ -639,7 +636,7 @@ namespace Kos
 		uint32_t ImageIndex;
 
 		//imageavailablesemaphore signeds when the presentation engine is finish
-		vkAcquireNextImageKHR(m_device, m_swapchain.m_swapchain, UINT64_MAX,
+		vkAcquireNextImageKHR(m_device, m_swapchain->GetSwapchain(), UINT64_MAX,
 			m_image_available, VK_NULL_HANDLE, &ImageIndex);
 
 
@@ -684,7 +681,7 @@ namespace Kos
 		PresentInfo.pWaitSemaphores = SingleSemaphore;
 
 		PresentInfo.swapchainCount = 1;
-		PresentInfo.pSwapchains = &m_swapchain.m_swapchain;
+		PresentInfo.pSwapchains = m_swapchain->GetSwapchain();
 		PresentInfo.pImageIndices = &ImageIndex;
 
 		vkQueuePresentKHR(m_present_queue, &PresentInfo);

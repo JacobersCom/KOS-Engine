@@ -59,25 +59,26 @@ namespace Kos
 	void Kos::KWindow::ProcessMessages()  
 	{
 		MSG msg;
-		if (PeekMessage(&msg, m_window_handle, 0, 0, PM_REMOVE))
+		if (PeekMessage(&msg, m_window_handle, 0, 0, PM_REMOVE) != 0)
 		{
 			TranslateMessage(&msg);
 			DispatchMessageA(&msg);
-		}
+			
+			unsigned int frameCount = 0;
+			++frameCount;
+			unsigned int framesPasted = frameCount;
+			unsigned int  preCount = GetTickCount64();
 
-		unsigned int frameCount = 0;
-		++frameCount;
-		unsigned int framesPasted = frameCount;
-		unsigned int  preCount = GetTickCount64();
+			//Updated every second
+			if (GetTickCount64() - preCount > 1000)
+			{
+				char buffer[256];
+				sprintf_s(buffer, "%s FPS: %d", "KOS", static_cast<int> (frameCount - framesPasted));
+				SetWindowText(m_window_handle, buffer);
+				framesPasted = frameCount;
+				preCount = GetTickCount64();
+			}
 
-		//Updated every second
-		if (GetTickCount64() - preCount > 1000)
-		{
-			char buffer[256];
-			sprintf_s(buffer, "%s FPS: %d", "KOS", static_cast<int> (frameCount - framesPasted));
-			SetWindowText(m_window_handle, buffer);
-			framesPasted = frameCount;
-			preCount = GetTickCount64();
 		}
 
 	}

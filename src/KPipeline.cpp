@@ -227,39 +227,39 @@ namespace Kos
 
 		VkPipelineMultisampleStateCreateInfo MultiSampleInfo = CreatePipelineMultisampleStateInfo();
 
-		VkPipelineLayoutCreateInfo PipelinelayoutInfo{};
-		PipelinelayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		PipelinelayoutInfo.setLayoutCount = 0;
-		PipelinelayoutInfo.pSetLayouts = nullptr;
-		PipelinelayoutInfo.pushConstantRangeCount = 0;
-		PipelinelayoutInfo.pPushConstantRanges = nullptr;
+		VkPipelineLayoutCreateInfo pipe_line_layout_Info{};
+		pipe_line_layout_Info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		pipe_line_layout_Info.setLayoutCount = 0;
+		pipe_line_layout_Info.pSetLayouts = nullptr;
+		pipe_line_layout_Info.pushConstantRangeCount = 0;
+		pipe_line_layout_Info.pPushConstantRanges = nullptr;
 
-		VkResult result = vkCreatePipelineLayout(device, &PipelinelayoutInfo, nullptr, &m_pipeline_layout);
+		VkResult result = vkCreatePipelineLayout(device, &pipe_line_layout_Info, nullptr, &m_pipeline_layout);
 
 		if (result != VK_SUCCESS)
 		{
 			printf("Failed to create pipeline layout");
 		}
 
-		VkGraphicsPipelineCreateInfo PipelineInfo{};
-		PipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-		PipelineInfo.stageCount = 2;
-		PipelineInfo.pStages = ShaderStages;
-		PipelineInfo.pVertexInputState = &VertexInput;
-		PipelineInfo.pInputAssemblyState = &AssemblyInput;
-		PipelineInfo.pViewportState = &ViewPortInfo;
-		PipelineInfo.pRasterizationState = &RasterizationInfo;
-		PipelineInfo.pColorBlendState = &ColorBlendInfo;
-		PipelineInfo.pMultisampleState = &MultiSampleInfo;
-		PipelineInfo.pDynamicState = &DynamicStateInfo;
-		PipelineInfo.layout = m_pipeline_layout;
-		PipelineInfo.renderPass = renderpass;
-		PipelineInfo.subpass = 0; //Index of subpass where this pipeline will be used
-		PipelineInfo.basePipelineHandle = VK_NULL_HANDLE; //Ref to another pipeline
-		PipelineInfo.basePipelineIndex = 0; //Index of pipeline
+		VkGraphicsPipelineCreateInfo pipe_line_info{};
+		pipe_line_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+		pipe_line_info.stageCount = 2;
+		pipe_line_info.pStages = ShaderStages;
+		pipe_line_info.pVertexInputState = &VertexInput;
+		pipe_line_info.pInputAssemblyState = &AssemblyInput;
+		pipe_line_info.pViewportState = &ViewPortInfo;
+		pipe_line_info.pRasterizationState = &RasterizationInfo;
+		pipe_line_info.pColorBlendState = &ColorBlendInfo;
+		pipe_line_info.pMultisampleState = &MultiSampleInfo;
+		pipe_line_info.pDynamicState = &DynamicStateInfo;
+		pipe_line_info.layout = m_pipeline_layout;
+		pipe_line_info.renderPass = renderpass;
+		pipe_line_info.subpass = 0; //Index of subpass where this pipeline will be used
+		pipe_line_info.basePipelineHandle = VK_NULL_HANDLE; //Ref to another pipeline
+		pipe_line_info.basePipelineIndex = 0; //Index of pipeline
 
 		if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1,
-			&PipelineInfo, nullptr, &m_pipeline) != VK_SUCCESS) {
+			&pipe_line_info, nullptr, &m_pipeline) != VK_SUCCESS) {
 
 			throw std::runtime_error("Failed to create GraphicsPipeLine");
 		}

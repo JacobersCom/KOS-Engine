@@ -138,7 +138,7 @@ namespace Kos
 			ImageViewInfo.subresourceRange.baseArrayLayer = 0;
 			ImageViewInfo.subresourceRange.layerCount = 1;
 
-			VkResult result = vkCreateImageView(k_device.m_device, &ImageViewInfo, nullptr, &arr_image_views[i]);
+			VkResult result = vkCreateImageView(m_device->GetDevice(), &ImageViewInfo, nullptr, &arr_image_views[i]);
 
 			if (result != VK_SUCCESS)
 			{
@@ -150,6 +150,7 @@ namespace Kos
 	bool KSwapchain::startup(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
 	{
 		CreateSwapchain(phy_device, surface);
+		return true;
 	}
 
 	void KSwapchain::CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
@@ -162,7 +163,7 @@ namespace Kos
 
 		VkSurfaceFormatKHR surface_format = ChooseSwapChainFormat(swapchain_details.ImageFormats);
 		VkPresentModeKHR present_mode = ChooseSwapChainPresentMode(swapchain_details.PresentMode);
-		VkExtent2D extent = ChooseSwapExtent(swapchain_details.SurfaceCapabilities, m_window);
+		VkExtent2D extent = ChooseSwapExtent(swapchain_details.SurfaceCapabilities, *m_window);
 
 		uint32_t image_count = swapchain_details.SurfaceCapabilities.minImageCount + 1;
 
@@ -181,7 +182,7 @@ namespace Kos
 		swapchain_Info.imageArrayLayers = 1;
 		swapchain_Info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		QueueFamilyIndices Indices = k_device.FindQueueFamilies(phy_device, surface);
+		QueueFamilyIndices Indices = m_device->FindQueueFamilies(phy_device, surface);
 		uint32_t queueFamilyIndices[] = { Indices.m_graphics_family.value(), Indices.m_present_family.value() };
 
 		if (Indices.m_graphics_family != Indices.m_present_family)
@@ -203,20 +204,21 @@ namespace Kos
 		swapchain_Info.clipped = VK_TRUE; // Dont care about covered pixels
 		swapchain_Info.oldSwapchain = VK_NULL_HANDLE;
 
-		VkResult result = vkCreateSwapchainKHR(k_device.m_device, &swapchain_Info, nullptr, &m_swapchain);
+		VkResult result = vkCreateSwapchainKHR(m_device->GetDevice(), &swapchain_Info, nullptr, &m_swapchain);
 
 		if (result != VK_SUCCESS)
 		{
 			printf("Failed to create SwapChain");
 		}
 
-		vkGetSwapchainImagesKHR(k_device.m_device, m_swapchain, &image_count, nullptr);
+		vkGetSwapchainImagesKHR(m_device->GetDevice(), m_swapchain, &image_count, nullptr);
 		arr_images.resize(image_count);
-		vkGetSwapchainImagesKHR(k_device.m_device, m_swapchain, &image_count, arr_images.data());
+		vkGetSwapchainImagesKHR(m_device->GetDevice(), m_swapchain, &image_count, arr_images.data());
 
 		m_format = surface_format.format;
 		m_extent = extent;
 
 		CreateImageViews();
+
 	}
 }

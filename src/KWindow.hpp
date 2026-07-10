@@ -6,7 +6,6 @@
 #include <shlobj_core.h>
 #include <string>
 
-#define ID_BTN_OK 1
 
 
 namespace Kos

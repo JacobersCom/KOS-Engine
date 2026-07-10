@@ -5,15 +5,15 @@
 
 namespace Kos
 {
-	Kos::KModel::KModel(KDevice& device, const std::vector<Vertex>& vertices) : k_device(device)
+	Kos::KModel::KModel(KDevice* device, const std::vector<Vertex>& vertices) : m_device(device)
 	{
 		createVertexBuffers(vertices);
 	}
 
 	KModel::~KModel()
 	{
-		vkDestroyBuffer(k_device.m_device, k_vertex_buffer, nullptr);
-		vkFreeMemory(k_device.m_device, k_vertex_buffer_memory, nullptr);
+		vkDestroyBuffer(m_device->GetDevice(), k_vertex_buffer, nullptr);
+		vkFreeMemory(m_device->GetDevice(), k_vertex_buffer_memory, nullptr);
 	}
 
 	void KModel::bind(VkCommandBuffer commandBuffer)
@@ -34,7 +34,7 @@ namespace Kos
 		assert(vertexCount >= 3 && "Vertex count must be at least 3!");
 		VkDeviceSize buffer_size = sizeof(vertices[0]) * vertexCount;
 
-		k_device.CreateBuffer(buffer_size,
+		m_device->CreateBuffer(buffer_size,
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, // allows the host(cpu) to write to the device(gpu) memory and keeps the GPU and CPU memory consiston with one another
 			k_vertex_buffer, k_vertex_buffer_memory);
@@ -42,12 +42,12 @@ namespace Kos
 		void* data;
 		//creates a region of host memory mapped to device memory
 		// and sets data to point to the mapped memory range
-		vkMapMemory(k_device.m_device, k_vertex_buffer_memory, 0, buffer_size, 0, &data);
+		vkMapMemory(m_device->GetDevice(), k_vertex_buffer_memory, 0, buffer_size, 0, &data);
 		//memcpy sends the data from the CPU to the GPU because of VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 		//Without it we would need to use flush to send the data over, but we dont need to because
 		//the memory is mapped to the GPU from the CPU
 		memcpy(data, vertices.data(), static_cast<size_t>(buffer_size));
-		vkUnmapMemory(k_device.m_device, k_vertex_buffer_memory);
+		vkUnmapMemory(m_device->GetDevice(), k_vertex_buffer_memory);
 	}
 
 	std::vector<VkVertexInputBindingDescription> Kos::KModel::Vertex::getBindingDescriptions()
@@ -67,5 +67,7 @@ namespace Kos
 		attribute_description[0].location = 0;
 		attribute_description[0].format = VK_FORMAT_R32G32_SFLOAT;
 		attribute_description[0].offset = 0;
+
+		return attribute_description;
 	}
 }

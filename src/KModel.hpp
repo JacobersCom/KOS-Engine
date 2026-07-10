@@ -3,7 +3,7 @@
 #include "KVector3.hpp"
 #include "pch.hpp"
 
-#include "vulkan/vulkan.h"
+#include "vulkan/vulkan.hpp"
 
 namespace Kos
 {
@@ -21,7 +21,7 @@ namespace Kos
 			static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
 		};
 
-		KModel(KDevice& device, const std::vector<Vertex>& vertices);
+		KModel(KDevice* device, const std::vector<Vertex>& vertices);
 		~KModel();
 
 		KModel(const KModel&) = delete;
@@ -34,7 +34,7 @@ namespace Kos
 		
 		void createVertexBuffers(const std::vector<Vertex>& vertices);
 
-		KDevice& k_device;
+		KDevice* m_device;
 
 		VkBuffer k_vertex_buffer;
 		VkDeviceMemory k_vertex_buffer_memory;

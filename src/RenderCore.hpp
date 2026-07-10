@@ -10,14 +10,20 @@ namespace Kos
 	class RenderCore
 	{
 	public:
-		RenderCore(class KDevice& device) : m_device(device) {}
+		RenderCore();
 
 		bool startup();
+
+		void update();
+
 		void shutdown();
 
 	private:
 
-		KDevice& m_device;
+		class KWindow* m_window = nullptr;
+		class KDevice* m_device = nullptr;
+		class KSwapchain* m_swapchain = nullptr;
+		class KPipeline* m_pipeline = nullptr;
 
 	};
 }

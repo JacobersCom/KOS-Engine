@@ -40,7 +40,7 @@ namespace Kos
 	{
 	public:
 		
-		KDevice(class KWindow& window, class KSwapchain& swapchain, class KPipeline& pipeline) : m_window(window),m_swapchain(swapchain), m_pipeline(pipeline){}
+		KDevice(class KWindow* window, class KSwapchain* swapchain, class KPipeline* pipeline) : m_window(window),m_swapchain(swapchain), m_pipeline(pipeline){}
 
 
 
@@ -53,6 +53,9 @@ namespace Kos
 		VkSurfaceKHR GetSurface() const { return m_surface; };
 		VkPhysicalDevice GetPhysicalDevice() const { return m_physical_device; };
 		VkDevice GetDevice() const { return m_device; };
+		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
+		void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags useage, VkMemoryPropertyFlags properties
+			,VkBuffer& buffer, VkDeviceMemory& buffer_memeory);
 
 
 	private:
@@ -66,8 +69,6 @@ namespace Kos
 		VkRenderPassCreateInfo CreateRenderPassInfo(VkFormat format);
 		
 		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
-		void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags useage, VkMemoryPropertyFlags properties
-			,VkBuffer& buffer, VkDeviceMemory& buffer_memeory);
 		
 		void CreateCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool);
 		void CreatePrimaryCommandBuffer();
@@ -77,13 +78,12 @@ namespace Kos
 
 		//Helper functions
 		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
-		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 
 	private:
 
-		KWindow& m_window;
-		KSwapchain& m_swapchain;
-		KPipeline& m_pipeline;
+		KWindow* m_window;
+		KSwapchain* m_swapchain;
+		KPipeline* m_pipeline;
 
 		VkInstance m_instance = 0;
 		VkSurfaceKHR m_surface = 0;

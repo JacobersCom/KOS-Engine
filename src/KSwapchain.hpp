@@ -23,17 +23,19 @@ namespace Kos
 	{
 	public:
 
-		KSwapchain(class KDevice& device, class KWindow& window) : k_device(device), m_window(window){};
+		KSwapchain(class KDevice* device, class KWindow* window) : m_device(device), m_window(window){};
 		
 		bool startup(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 		bool shutdown();
 		
+		VkSwapchainKHR* GetSwapchain() const { return &m_swapchain; };
+
 		void CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 
 		void CreateImageViews();
 
 
-		VkSwapchainKHR m_swapchain;
+		VkSwapchainKHR& m_swapchain;
 
 		std::vector<VkImage> arr_images;
 		std::vector<VkImageView> arr_image_views;
@@ -44,7 +46,7 @@ namespace Kos
 
 	private:
 
-		KDevice& k_device;
-		KWindow& m_window;
+		KDevice* m_device;
+		KWindow* m_window;
 	};
 }
