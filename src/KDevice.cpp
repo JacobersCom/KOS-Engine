@@ -527,6 +527,9 @@ namespace Kos
 		vkBindBufferMemory(m_device, buffer, buffer_memeory, 0);
 	}
 
+	/*
+	Creates a command pool on the CPU to record commands to be passed into the GPU queue
+	*/
 	void KDevice::CreateCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool)
 	{
 		QueueFamilyIndices Indices = GetQueueFamilyIndices(physical_device, m_surface);
@@ -545,6 +548,9 @@ namespace Kos
 
 	}
 
+	/*
+	Creates a buffer that sends commands to the GPU such as draw , state change, memory  transfers
+	*/
 	void KDevice::CreatePrimaryCommandBuffer()
 	{
 		VkCommandBufferAllocateInfo AllocateInfo{};
