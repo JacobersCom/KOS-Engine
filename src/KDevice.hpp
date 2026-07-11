@@ -40,9 +40,8 @@ namespace Kos
 	{
 	public:
 		
-		KDevice(class KWindow* window, class KSwapchain* swapchain, class KPipeline* pipeline) : m_window(window),m_swapchain(swapchain), m_pipeline(pipeline){}
-
-
+		KDevice(class KWindow& window) : m_window(window){}
+		~KDevice();
 
 		bool startup();
 		bool shutdown();
@@ -54,6 +53,7 @@ namespace Kos
 		VkPhysicalDevice GetPhysicalDevice() const { return m_physical_device; };
 		VkDevice GetDevice() const { return m_device; };
 		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
+		
 		void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags useage, VkMemoryPropertyFlags properties
 			,VkBuffer& buffer, VkDeviceMemory& buffer_memeory);
 
@@ -81,23 +81,11 @@ namespace Kos
 
 	private:
 
-		KWindow* m_window;
-		KSwapchain* m_swapchain;
-		KPipeline* m_pipeline;
+		KWindow& m_window;
 
 		VkInstance m_instance = 0;
 		VkSurfaceKHR m_surface = 0;
 		VkPhysicalDevice m_physical_device = 0;
 		VkDevice m_device = 0;
-		VkRenderPass m_renderpass = 0;
-		
-		VkCommandPool m_command_pool = 0;
-		VkCommandBuffer m_command_buffer = 0;
-		
-		VkSemaphore m_image_available = 0; 
-		VkSemaphore m_render_finished = 0;
-		VkFence m_frames_in_flight = 0;
-
-		std::vector<VkFramebuffer> m_frame_buffers;
 	};
 }
