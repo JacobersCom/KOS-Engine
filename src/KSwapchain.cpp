@@ -118,7 +118,7 @@ namespace Kos
 
 	void KSwapchain::CreateImageViews()
 	{
-		arr_image_views.resize(arr_images.size());
+		image_views.resize(arr_images.size());
 
 		for (int i = 0; i < arr_images.size(); i++)
 		{
@@ -138,7 +138,7 @@ namespace Kos
 			ImageViewInfo.subresourceRange.baseArrayLayer = 0;
 			ImageViewInfo.subresourceRange.layerCount = 1;
 
-			VkResult result = vkCreateImageView(m_device->GetDevice(), &ImageViewInfo, nullptr, &arr_image_views[i]);
+			VkResult result = vkCreateImageView(m_device->GetDevice(), &ImageViewInfo, nullptr, &image_views[i]);
 
 			if (result != VK_SUCCESS)
 			{

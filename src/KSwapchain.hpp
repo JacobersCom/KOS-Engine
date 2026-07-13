@@ -6,6 +6,13 @@
 
 namespace Kos
 {
+		
+	struct SwapChainSupportDetails
+	{
+		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
+		std::vector<VkSurfaceFormatKHR> ImageFormats;
+		std::vector<VkPresentModeKHR> PresentMode;
+	};
 
 
 	class KSwapchain
@@ -18,6 +25,10 @@ namespace Kos
 		bool shutdown();
 		
 		VkSwapchainKHR* GetSwapchain() const { return &m_swapchain; };
+		std::vector<VkImageView> GetImageViews() const { return image_views; };
+		VkExtent2D GetExtent() const { return m_extent; };
+		VkFormat GetFormat() const { return m_format; };
+
 
 	private:
 
@@ -32,17 +43,11 @@ namespace Kos
 		*
 		* Mainly used in ChooseUserGPU to ensure that the end users has the needed swapchain cabailities
 		*/
-		struct SwapChainSupportDetails
-		{
-			VkSurfaceCapabilitiesKHR SurfaceCapabilities;
-			std::vector<VkSurfaceFormatKHR> ImageFormats;
-			std::vector<VkPresentModeKHR> PresentMode;
-		};
 
 		VkSwapchainKHR& m_swapchain;
 
 		std::vector<VkImage> arr_images;
-		std::vector<VkImageView> arr_image_views;
+		std::vector<VkImageView> image_views;
 		std::vector<VkFramebuffer> arr_frame_buffers;
 
 		VkFormat m_format;

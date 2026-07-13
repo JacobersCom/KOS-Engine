@@ -1,6 +1,7 @@
 #include "KRenderpass.hpp"
 
 #include "KDevice.hpp"
+#include "KSwapchain.hpp"
 
 namespace Kos
 {
@@ -9,6 +10,12 @@ namespace Kos
 
 	}
 
+
+	void KRenderpass::startup()
+	{
+		CreateRenderPassInfo(m_swapchain->GetFormat());
+		CreateFrameBuffers(m_swapchain->GetImageViews(), m_swapchain->GetExtent());
+	}
 
 	/*
 	RenderPassInfo is need to discarible how many depth, color buffers there will be and how

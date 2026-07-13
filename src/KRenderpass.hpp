@@ -6,8 +6,12 @@ namespace Kos
 	{
 	public:
 
-		KRenderpass(class KDevice* device) : m_device(device) {};
+		KRenderpass(class KDevice* device, class KSwapchain* swapchain) : m_device(device), m_swapchain(swapchain) {};
 		~KRenderpass();
+
+		void startup();
+		void shutdown();
+
 
 		VkRenderPassCreateInfo CreateRenderPassInfo(VkFormat format);
 		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
@@ -24,5 +28,7 @@ namespace Kos
 	private:
 
 		KDevice* m_device;
+		KSwapchain* m_swapchain;
+
 	};
 }
