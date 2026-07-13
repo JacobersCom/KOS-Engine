@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+
+//Fixed error logging to only use KLog
 int main()
 {
 	Kos::RenderCore m_render_core;
