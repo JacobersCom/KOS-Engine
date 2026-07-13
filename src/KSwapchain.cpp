@@ -147,13 +147,13 @@ namespace Kos
 		}
 	}
 
-	bool KSwapchain::startup(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
+	bool KSwapchain::startup()
 	{
-		CreateSwapchain(phy_device, surface);
+		CreateSwapchain(m_device->GetPhysicalDevice(), m_device->GetSurface(), m_device->GetDevice());
 		return true;
 	}
 
-	void KSwapchain::CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
+	void KSwapchain::CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface, VkDevice device)
 	{
 		//Get SwapChain details
 		SwapChainSupportDetails swapchain_details = GetSwapChainDetails(phy_device, surface);
@@ -211,9 +211,9 @@ namespace Kos
 			printf("Failed to create SwapChain");
 		}
 
-		vkGetSwapchainImagesKHR(m_device->GetDevice(), m_swapchain, &image_count, nullptr);
+		vkGetSwapchainImagesKHR(device, m_swapchain, &image_count, nullptr);
 		arr_images.resize(image_count);
-		vkGetSwapchainImagesKHR(m_device->GetDevice(), m_swapchain, &image_count, arr_images.data());
+		vkGetSwapchainImagesKHR(device, m_swapchain, &image_count, arr_images.data());
 
 		m_format = surface_format.format;
 		m_extent = extent;

@@ -15,9 +15,9 @@ namespace Kos
 	RenderCore::RenderCore()
 	{
 		m_window = new KWindow();
-		m_device = new KDevice(m_window, m_swapchain, m_pipeline);
+		m_device = new KDevice(m_window);
 		m_swapchain = new KSwapchain(m_device, m_window);
-		m_pipeline = new KPipeline(m_device);
+		m_pipeline = new KPipeline();
 
 	}
 
@@ -25,7 +25,7 @@ namespace Kos
 	{
 		m_window->Create("KOS-Engine", 800, 800);
 		m_device->startup();
-		m_swapchain->startup(m_device->GetPhysicalDevice(), m_device->GetSurface());
+		m_swapchain->startup();
 		m_pipeline->startup();
 
 		return true;

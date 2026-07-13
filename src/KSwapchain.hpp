@@ -7,17 +7,6 @@
 namespace Kos
 {
 
-	/*
-	* Stores all the needed details of the swapchain
-	*
-	* Mainly used in ChooseUserGPU to ensure that the end users has the needed swapchain cabailities
-	*/
-	struct SwapChainSupportDetails
-	{
-		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
-		std::vector<VkSurfaceFormatKHR> ImageFormats;
-		std::vector<VkPresentModeKHR> PresentMode;
-	};
 
 	class KSwapchain
 	{
@@ -25,15 +14,30 @@ namespace Kos
 
 		KSwapchain(class KDevice* device, class KWindow* window) : m_device(device), m_window(window){};
 		
-		bool startup(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
+		bool startup();
 		bool shutdown();
 		
 		VkSwapchainKHR* GetSwapchain() const { return &m_swapchain; };
 
-		void CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
+	private:
+
+		void CreateSwapchain(VkPhysicalDevice phy_device, VkSurfaceKHR surface, VkDevice device);
 
 		void CreateImageViews();
 
+	private:
+		
+		/*
+		* Stores all the needed details of the swapchain
+		*
+		* Mainly used in ChooseUserGPU to ensure that the end users has the needed swapchain cabailities
+		*/
+		struct SwapChainSupportDetails
+		{
+			VkSurfaceCapabilitiesKHR SurfaceCapabilities;
+			std::vector<VkSurfaceFormatKHR> ImageFormats;
+			std::vector<VkPresentModeKHR> PresentMode;
+		};
 
 		VkSwapchainKHR& m_swapchain;
 

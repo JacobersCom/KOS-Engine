@@ -10,6 +10,7 @@
 
 //ios
 #include <optional>
+#include <set>
 
 
 namespace Kos
@@ -39,7 +40,7 @@ namespace Kos
 	{
 	public:
 		
-		KDevice(class KWindow& window) : m_window(window){}
+		KDevice(class KWindow* window) : m_window(window){}
 		~KDevice();
 
 		bool startup();
@@ -65,6 +66,7 @@ namespace Kos
 		void FindUsersGPU();
 		
 		void CreateLogicDevice();
+		
 		VkRenderPassCreateInfo CreateRenderPassInfo(VkFormat format);
 		
 		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
@@ -80,7 +82,7 @@ namespace Kos
 
 	private:
 
-		KWindow& m_window;
+		KWindow* m_window;
 
 		VkInstance m_instance = 0;
 		VkSurfaceKHR m_surface = 0;
