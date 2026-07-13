@@ -9,6 +9,14 @@ namespace Kos
 
 	}
 
+
+	/*
+	RenderPassInfo is need to discarible how many depth, color buffers there will be and how
+	many samples to use for each of them and how there contents should be handle during the
+	rendering process
+
+	A RenderPass allows for operations to be performed on a image to improve the quaitily of the final image
+	*/
 	VkRenderPassCreateInfo KRenderpass::CreateRenderPassInfo(VkFormat format)
 	{
 		//The description of an color attachment
@@ -69,5 +77,42 @@ namespace Kos
 		}
 
 		return renderpass_info;
+	}
+
+	/*
+	Creates a FrameBuffer for all the images that correspond to
+	the retrieved image at drawing time.
+
+	Framebuffers are references to VkImageView objects that
+	represent attachments
+	*/
+	void KRenderpass::CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent)
+	{
+
+		m_frame_buffer.resize(image_views.size());
+
+		//Iterate through the Imageviews to create a framebuffer form them
+		for (int i = 0; i < image_views.size(); i++)
+		{
+			//Lists of attachements for each _VkSawpchainImageview
+			VkImageView attachments[] = {
+				image_views[i]
+			};
+
+			VkFramebufferCreateInfo FramebufferInfo{};
+			FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+			FramebufferInfo.renderPass = m_renderpass;
+			FramebufferInfo.attachmentCount = 1;
+			FramebufferInfo.pAttachments = attachments;
+			FramebufferInfo.height = extent.height;
+			FramebufferInfo.width = extent.width;
+			FramebufferInfo.layers = 1; //the total sides of an image
+
+			if (vkCreateFramebuffer(m_device->GetDevice(), &FramebufferInfo, nullptr, &m_frame_buffer[i]) != VK_SUCCESS)
+			{
+				throw std::runtime_error("Failed to create Framebuffer for Swapchain Image view");
+			}
+		}
+
 	}
 }

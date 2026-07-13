@@ -64,21 +64,19 @@ namespace Kos
 		void CreateInstance();
 		void CreateSurface();
 		void FindUsersGPU();
-		
 		void CreateLogicDevice();
 		
-		VkRenderPassCreateInfo CreateRenderPassInfo(VkFormat format);
+		//Helper functions
+		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
+
 		
-		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
+		
 		
 		void CreateCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool);
 		void CreatePrimaryCommandBuffer();
 		
 		void SyncObjects();
 		void RecordCommandBuffers(VkCommandBuffer, uint32_t image_index);
-
-		//Helper functions
-		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 
 	private:
 
