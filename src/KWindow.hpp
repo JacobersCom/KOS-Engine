@@ -1,57 +1,39 @@
 #pragma once
 
 #include <Windows.h>
+#include "KObject.hpp"
 #include <ShObjIdl.h>
 #include <shlobj_core.h>
 #include <string>
 
-#define ID_BTN_OK 1
 
 
 namespace Kos
 {
-	struct WindowDesc
-	{
-		const WCHAR* ClassName;
-		const WCHAR* WindowTitle;
-		int WindowWidth;
-		int WindowHeight;
-	};
 	
 	//Class holds functions and private memebers for class
-	class KWindow
+	class KWindow : public KObject
 	{
 	public:
 
-		void Create();
-		void SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle,
-			const int WindowWidth, const int WindowHeight);
-		void GetFrameBufferSize(HWND WindowHandle, int& Width, int& Height);
-		void OpenDialogBox();
+		KWindow() : m_window_handle(0),  m_win_instance(0){}
+		~KWindow() = default;
 
-		const HWND GetWindowHandle() { return WindowHandle; }
-		const HINSTANCE GetWindowInstance() { return PtrLoader; }
-		const WCHAR* GetWindowName() { return _WindowDesc.ClassName; };
+		//Abstruction for CreateWin32
+		void Create(const char* title, int w, int h);
+		void GetFrameBufferSize(int& Width, int& Height);
 
-	private:
+		//Update loop
+		void ProcessMessages();
 
-		static LRESULT CALLBACK WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam);
-		
-		void CreateWin32Window(WindowDesc& desc);
-		void CreateWin32Button();
-		
+		//Accessors
+		const HWND GetWindowHandle() { return m_window_handle; }
+		const HINSTANCE GetWindowInstance() { return m_win_instance; }
 
 	private:
 
-		//ptr to where the DLL is held
-		HINSTANCE PtrLoader;
-
-		//Handle to the window
-		HWND WindowHandle;
-		
-
-		WindowDesc _WindowDesc;
-
+		HINSTANCE m_win_instance;
+		HWND m_window_handle;
 	};
 
 };

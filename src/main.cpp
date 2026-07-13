@@ -1,30 +1,29 @@
 
-#include "KWindow.hpp"
-#include "KRender.hpp"
-#include "KVector3.hpp"
-#include "KMat4.hpp"
+#include "RenderCore.hpp"
+#include "KLog.hpp"
 
 #include <iostream>
 
+
+//Fixed error logging to only use KLog
 int main()
 {
-	Kos::KWindow _win;
-	Kos::KRender _render(&_win);
+	Kos::RenderCore m_render_core;
+	m_render_core.startup();
+	m_render_core.update();
 
-	_win.SetWindowDesc(L"KOS", L"KOS Engine", 500, 500);
-	_win.Create();
-	
-	bool IsRunning = _render.InitVulkan();
 
-	while (IsRunning)
+
+
+	/*while (true)
 	{
-		_render.UpdateLoop();
+		_win.ProcessMessages();
 		
 		if (!IsWindow(_win.GetWindowHandle()))
 		{
-			IsRunning = false;
+			break;
 		}
-	}
+	}*/
 
 
 }

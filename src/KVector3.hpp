@@ -3,86 +3,83 @@
 #include <cassert>
 
 
-namespace Kos
+namespace Kos::math
 {
-
-	struct Vec3D
+	
+	struct KVector3
 	{
-		float Vec3[3];
 
 		//Constructers
-		inline Vec3D() = default;
-		inline Vec3D(float x, float y, float z) : Vec3{ x,y,z } {};
+		inline KVector3() = default;
 
-		inline const float& x() const { return Vec3[0]; }
-		inline const float& y() const { return Vec3[1]; }
-		inline const float& z() const { return Vec3[2]; }
 
-		
-		inline float& operator[](int i)
+		inline KVector3(float x, float y, float z) 
 		{
-			assert(i < 3 && i >= 0);
-			return Vec3[i];
-		}
+			this->x = x;
+			this->y = y;
+			this->z = z;
+		};
 
-		inline const float& operator[](int i) const
+		inline KVector3 operator *=(float s)
 		{
-			assert(i < 3 && i >= 0);
-			return Vec3[i];
-		}
-
-		inline Vec3D operator *=(float s)
-		{
-			Vec3[0] *= s;
-			Vec3[1] *= s;
-			Vec3[2] *= s;
+			this->x *= s;
+			this->y *= s;
+			this->z *= s;
 
 			return *this;
 		}
 
-		inline Vec3D operator /=(float s)
+		inline KVector3 operator /=(float s)
 		{
 			//reciprocal of s
 			s = 1.0f / s;
 
-			Vec3[0] /= s;
-			Vec3[1] /= s;
-			Vec3[2] /= s;
+			this->x *= s;
+			this->y *= s;
+			this->z *= s;
 
 			return *this;
 		}
 
-		inline Vec3D operator *(float s)
+		inline KVector3 operator *(float s)
 		{
-			Vec3[0] * s;
-			Vec3[1] * s;
-			Vec3[2] * s;
+			this->x* s;
+			this->y* s;
+			this->z* s;
 
 			return *this;
 		}
 
-		inline Vec3D operator +=(float s)
+		inline KVector3 operator +=(float s)
 		{
-			Vec3[0] += s;
-			Vec3[1] += s;
-			Vec3[2] += s;
+			this->x += s;
+			this->y += s;
+			this->z += s;
 
 			return *this;
 		}
 
-		inline Vec3D operator -=(float s)
+		inline KVector3 operator -=(float s)
 		{
-			Vec3[0] -= s;
-			Vec3[1] -= s;
-			Vec3[2] -= s;
+			this->x -= s;
+			this->y -= s;
+			this->z -= s;
 
 			return *this;
 		}
+
+		//Allows vector data to be treated like an array of floats
+		inline float* Data() { return &x; };
+
+		float x, y, z;
+
+		static const KVector3 unit_vector;
+		static const KVector3 zero_vector;
 	};
 	
-	inline std::ostream& operator<<(std::ostream& os, const Vec3D& a)
+	inline std::ostream& operator<<(std::ostream& os, const KVector3& a)
 	{
-		return os << "(" << a.x() << ", " << a.y() << ", " << a.z() << ")" << "\n";
+		return os << "(" << a.x << ", " << a.y << ", " << a.z << ")" << "\n";
 	}
 	
 }
