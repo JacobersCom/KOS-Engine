@@ -1,4 +1,8 @@
 #include "KPipeline.hpp"
+
+#include "KDevice.hpp"
+#include "KRenderpass.hpp"
+#include "KSwapchain.hpp"
 #include "KModel.hpp"
 
 #include <filesystem>
@@ -31,7 +35,6 @@ namespace Kos
 			file.close();
 			return buffer;
 		}
-
 
 		/*
 		*/
@@ -182,6 +185,16 @@ namespace Kos
 
 			return MultiSampleInfo;
 		}
+
+	}
+
+	void KPipeline::startup()
+	{
+		CreatePipeline(m_device->GetDevice(), m_renderpass->GetRenderpass(), m_swapchain->GetExtent());
+	}
+
+	void KPipeline::shutdown()
+	{
 
 	}
 

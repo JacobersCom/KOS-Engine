@@ -12,10 +12,11 @@ namespace Kos
 	{
 	public:
 
-		KPipeline() {};
+		KPipeline(class KDevice* device, class KRenderpass* renderpass, class KSwapchain* swapchain) : 
+			m_device(device),  m_renderpass(renderpass),m_swapchain(swapchain) {};
 
-		bool startup();
-		bool shutdown();
+		void startup();
+		void shutdown();
 		
 		VkPipeline GetPipline() const { return m_pipeline; };
 		VkPipelineLayout GetPipelineLayout() const { return m_pipeline_layout; };
@@ -35,5 +36,11 @@ namespace Kos
 
 		VkViewport m_viewport;
 		VkRect2D m_scissor;
+
+	private:
+
+		KDevice* m_device;
+		KRenderpass* m_renderpass;
+		KSwapchain* m_swapchain;
 	};
 }

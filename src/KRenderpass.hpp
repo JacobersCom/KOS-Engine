@@ -17,7 +17,7 @@ namespace Kos
 		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
 
 
-		VkRenderPass GetRenderpassInfo() const { return m_renderpass; };
+		VkRenderPass GetRenderpass() const { return m_renderpass; };
 
 	private:
 

@@ -23,6 +23,7 @@ namespace Kos
 		class KWindow* m_window = nullptr;
 		class KDevice* m_device = nullptr;
 		class KSwapchain* m_swapchain = nullptr;
+		class KRenderpass* m_renderpass = nullptr;
 		class KPipeline* m_pipeline = nullptr;
 
 	};
