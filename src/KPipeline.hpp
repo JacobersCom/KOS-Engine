@@ -12,7 +12,7 @@ namespace Kos
 	{
 	public:
 
-		KPipeline(class KDevice* device) : m_device(device){};
+		KPipeline() {};
 
 		bool startup();
 		bool shutdown();
@@ -29,7 +29,6 @@ namespace Kos
 
 	private:
 
-		class KDevice* m_device;
 		
 		VkPipeline m_pipeline;
 		VkPipelineLayout m_pipeline_layout;
