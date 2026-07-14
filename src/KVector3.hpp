@@ -10,7 +10,7 @@ namespace Kos::math
 	{
 
 		//Constructers
-		inline KVector3() = default;
+		inline KVector3() = delete;
 
 
 		inline KVector3(float x, float y, float z) 

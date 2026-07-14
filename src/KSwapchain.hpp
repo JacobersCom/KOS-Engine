@@ -24,7 +24,7 @@ namespace Kos
 		bool startup();
 		bool shutdown();
 		
-		VkSwapchainKHR* GetSwapchain() const { return &m_swapchain; };
+		VkSwapchainKHR GetSwapchain() const { return m_swapchain; };
 		std::vector<VkImageView> GetImageViews() const { return image_views; };
 		VkExtent2D GetExtent() const { return m_extent; };
 		VkFormat GetFormat() const { return m_format; };

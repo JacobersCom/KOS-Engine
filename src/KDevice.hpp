@@ -69,15 +69,6 @@ namespace Kos
 		//Helper functions
 		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 
-		
-		
-		
-		void CreateCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool);
-		void CreatePrimaryCommandBuffer();
-		
-		void SyncObjects();
-		void RecordCommandBuffers(VkCommandBuffer, uint32_t image_index);
-
 	private:
 
 		KWindow* m_window;
