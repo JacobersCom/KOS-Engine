@@ -24,6 +24,9 @@ namespace Kos
 		bool startup();
 		bool shutdown();
 		
+		VkResult AcquireNextImage(uint32_t* image_index);
+		VkResult SubmitCommandBuffers(const VkCommandBuffer buffer, uint32_t* image_index);
+
 		VkSwapchainKHR GetSwapchain() const { return m_swapchain; };
 		std::vector<VkImageView> GetImageViews() const { return image_views; };
 		VkExtent2D GetExtent() const { return m_extent; };
@@ -49,6 +52,10 @@ namespace Kos
 		std::vector<VkImage> arr_images;
 		std::vector<VkImageView> image_views;
 		std::vector<VkFramebuffer> arr_frame_buffers;
+
+		std::vector<VkSemaphore> images_available;
+		std::vector<VkSemaphore> render_finished;
+		std::vector<VkFence> frames_in_flight;
 
 		VkFormat m_format;
 		VkExtent2D m_extent;

@@ -182,7 +182,7 @@ namespace Kos
 		swapchain_Info.imageArrayLayers = 1;
 		swapchain_Info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		QueueFamilyIndices Indices = m_device->FindQueueFamilies(phy_device, surface);
+		QueueFamilyIndices Indices = m_device->GetQueueFamilyIndices();
 		uint32_t queueFamilyIndices[] = { Indices.m_graphics_family.value(), Indices.m_present_family.value() };
 
 		if (Indices.m_graphics_family != Indices.m_present_family)

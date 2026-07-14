@@ -41,11 +41,5 @@ namespace Kos
 
 		VkCommandPool m_cmd_pool;
 		VkCommandBuffer m_cmd_buffer;
-
-		VkSemaphore m_image_available;
-		VkSemaphore m_render_finished;
-		VkFence m_frames_in_flight;
-
-
 	};
 }
