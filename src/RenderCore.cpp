@@ -54,7 +54,10 @@ namespace Kos
 	{
 		std::vector<KModel::Vertex> vertices
 		{
-			{{0.0f, 0.0f,}}
+			{{0.0f, 0.5f, 0.0f}},
+			{{0.5f, 0.5f, 0.0f}},
+			{{-0.5f, 0.5f, 0.0f}}
+
 		};
 
 		m_model = std::make_unique<KModel>(m_device, vertices);
@@ -118,23 +121,23 @@ namespace Kos
 	/*
 	TODO: Turn Commandbuffer into a vector to enable muilt images being render
 	*/
-	void RenderCore::RecordCommandBuffers(VkCommandBuffer, uint32_t image_index)
+	void RenderCore::RecordCommandBuffers(VkCommandBuffer buffer, uint32_t image_index)
 	{
 		VkCommandBufferBeginInfo BeginInfo{};
 		BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-		if (vkBeginCommandBuffer(m_command_buffer, &BeginInfo) != VK_SUCCESS)
+		if (vkBeginCommandBuffer(buffer, &BeginInfo) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to write to commandbuffer");
 		}
 
 		VkRenderPassBeginInfo RenderPassBeginInfo{};
 		RenderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		RenderPassBeginInfo.renderPass = m_renderpass;
-		RenderPassBeginInfo.framebuffer = m_frame_buffers[image_index]; //The framebuffer and the attachements 
+		RenderPassBeginInfo.renderPass = m_renderpass->GetRenderpass();
+		RenderPassBeginInfo.framebuffer = m_renderpass->CreateFrameBuffers; //The framebuffer and the attachements 
 		//Affected area of the render pass
 		RenderPassBeginInfo.renderArea.offset = { 0,0 };
-		RenderPassBeginInfo.renderArea.extent =
+		RenderPassBeginInfo.renderArea.extent = m_swapchain
 
 			VkClearValue ClearValues = { {{0.0f, 0.0f, 0.0f, 1.0f}} }; //Clear color used for VK_ATTACHMENT_LOAD_OP_CLEAR
 		RenderPassBeginInfo.clearValueCount = 1;
@@ -145,18 +148,14 @@ namespace Kos
 		vkCmdBeginRenderPass(m_command_buffer, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 		//Make a function for this in the pipeline object
-		vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->GetPipline());
 
-		//Because the viewport and scissor is dynmic so they must be set in the command buffer before drawing
-		
-		//Same with these
-		vkCmdSetViewport(m_command_buffer, 0, 1, &m_pipeline->GetViewport());
-		vkCmdSetScissor(m_command_buffer, 0, 1, &m_pipeline->GetScissor());
+		m_pipeline->bind(buffer);
 
 		//Now we can draw
-		vkCmdDraw(m_command_buffer, 3, 1, 0, 0);
+		m_model->bind(buffer);
+		m_model->draw(buffer);
 
-		vkCmdEndRenderPass(m_command_buffer);
+		vkCmdEndRenderPass(buffer);
 
 		if (vkEndCommandBuffer(m_command_buffer) != VK_SUCCESS)
 		{

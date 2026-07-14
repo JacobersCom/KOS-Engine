@@ -281,4 +281,15 @@ namespace Kos
 		vkDestroyShaderModule(device, VertModule, nullptr);
 		vkDestroyShaderModule(device, PixelModule, nullptr);
 	}
+
+	/*
+	binds the pipline, viewport and scissor to the GPU pipeline
+	*/
+	void KPipeline::bind(VkCommandBuffer buffer)
+	{
+		vkCmdBindPipeline(buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+		//Because the viewport and scissor is dynmic so they must be set in the command buffer before drawing
+		vkCmdSetViewport(buffer, 0, 1, &m_viewport);
+		vkCmdSetScissor(buffer, 0, 1, &m_scissor);
+	}
 }

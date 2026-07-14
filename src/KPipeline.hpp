@@ -18,6 +18,9 @@ namespace Kos
 		void startup();
 		void shutdown();
 		
+		//helper function
+		void bind(VkCommandBuffer buffer);
+
 		VkPipeline GetPipline() const { return m_pipeline; };
 		VkPipelineLayout GetPipelineLayout() const { return m_pipeline_layout; };
 		VkRect2D GetScissor() const { return m_scissor; };
