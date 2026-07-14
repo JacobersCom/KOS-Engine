@@ -52,8 +52,8 @@ namespace Kos
 		VkSurfaceKHR GetSurface() const { return m_surface; };
 		VkPhysicalDevice GetPhysicalDevice() const { return m_physical_device; };
 		VkDevice GetDevice() const { return m_device; };
-		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
-		
+		QueueFamilyIndices GetQueueFamilyIndices();
+
 		void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags useage, VkMemoryPropertyFlags properties
 			,VkBuffer& buffer, VkDeviceMemory& buffer_memeory);
 
@@ -68,6 +68,7 @@ namespace Kos
 		
 		//Helper functions
 		bool RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
+		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface);
 
 	private:
 

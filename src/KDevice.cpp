@@ -124,11 +124,6 @@ namespace Kos
 			return indices;
 		}
 
-		Kos::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
-		{
-			QueueFamilyIndices indices = FindQueueFamilies(phy_device, surface);
-			return indices;
-		}
 
 		uint32_t FindMemoryType(VkPhysicalDevice physical_device,uint32_t type_filter, VkMemoryPropertyFlags properties)
 		{
@@ -212,6 +207,12 @@ namespace Kos
 		CreateSurface();
 		FindUsersGPU();
 		CreateLogicDevice();
+	}
+
+	QueueFamilyIndices KDevice::GetQueueFamilyIndices()
+	{
+		QueueFamilyIndices indices = FindQueueFamilies(m_physical_device, m_surface);
+		return indices;
 	}
 
 	/*

@@ -66,9 +66,9 @@ namespace Kos
 	/*
 	Creates a command pool on the CPU to record commands to be passed into the GPU queue
 	*/
-	void RenderCore::CreateCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool)
+	void RenderCore::CreateCommandPool(VkCommandPool command_pool)
 	{
-		QueueFamilyIndices Indices = GetQueueFamilyIndices(physical_device, m_surface);
+		QueueFamilyIndices Indices = m_device->GetQueueFamilyIndices();
 
 		VkCommandPoolCreateInfo CommandPoolInfo{};
 		CommandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -77,28 +77,29 @@ namespace Kos
 		CommandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 		CommandPoolInfo.queueFamilyIndex = Indices.m_graphics_family.value();
 
-		if (vkCreateCommandPool(device, &CommandPoolInfo, nullptr, &command_pool) != VK_SUCCESS)
+		if (vkCreateCommandPool(m_device->GetDevice(), &CommandPoolInfo, nullptr, &command_pool) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create command pool");
 		}
 
 	}
 
-	void RenderCore::CreatePrimaryCommandBuffer()
+	void RenderCore::CreatePrimaryCommandBuffer(VkCommandPool command_pool, VkCommandBuffer buffer)
 	{
 		VkCommandBufferAllocateInfo AllocateInfo{};
 		AllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		AllocateInfo.commandPool = m_command_pool;
+		AllocateInfo.commandPool = command_pool;
 		AllocateInfo.commandBufferCount = 1;
 
 		//Can be submitted to queue but not to another command buffer
 		AllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
-		if (vkAllocateCommandBuffers(m_device, &AllocateInfo, &m_command_buffer))
+		if (vkAllocateCommandBuffers(m_device->GetDevice(), &AllocateInfo, &buffer))
 		{
 			throw std::runtime_error("Failed to create primary command buffer");
 		}
 	}
+
 
 	void RenderCore::SyncObjects()
 	{
@@ -109,18 +110,15 @@ namespace Kos
 		FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		FenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; //fences start signed
 
-		if (vkCreateSemaphore(m_device, &SemaphoreInfo, nullptr, &m_image_available) != VK_SUCCESS
-			|| vkCreateSemaphore(m_device, &SemaphoreInfo, nullptr, &m_render_finished) != VK_SUCCESS
-			|| vkCreateFence(m_device, &FenceInfo, nullptr, &m_frames_in_flight) != VK_SUCCESS
+		if (vkCreateSemaphore(m_device->GetDevice(), &SemaphoreInfo, nullptr, &m_image_available) != VK_SUCCESS
+			|| vkCreateSemaphore(m_device->GetDevice(), &SemaphoreInfo, nullptr, &m_render_finished) != VK_SUCCESS
+			|| vkCreateFence(m_device->GetDevice(), &FenceInfo, nullptr, &m_frames_in_flight) != VK_SUCCESS
 			)
 		{
 			throw std::runtime_error("Failed to create semaphores and fence!");
 		}
 	}
 
-	/*
-	TODO: Turn Commandbuffer into a vector to enable muilt images being render
-	*/
 	void RenderCore::RecordCommandBuffers(VkCommandBuffer buffer, uint32_t image_index)
 	{
 		VkCommandBufferBeginInfo BeginInfo{};
@@ -131,23 +129,7 @@ namespace Kos
 			throw std::runtime_error("Failed to write to commandbuffer");
 		}
 
-		VkRenderPassBeginInfo RenderPassBeginInfo{};
-		RenderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		RenderPassBeginInfo.renderPass = m_renderpass->GetRenderpass();
-		RenderPassBeginInfo.framebuffer = m_renderpass->CreateFrameBuffers; //The framebuffer and the attachements 
-		//Affected area of the render pass
-		RenderPassBeginInfo.renderArea.offset = { 0,0 };
-		RenderPassBeginInfo.renderArea.extent = m_swapchain
-
-			VkClearValue ClearValues = { {{0.0f, 0.0f, 0.0f, 1.0f}} }; //Clear color used for VK_ATTACHMENT_LOAD_OP_CLEAR
-		RenderPassBeginInfo.clearValueCount = 1;
-		RenderPassBeginInfo.pClearValues = &ClearValues;
-
-		//The commands being recorded will be stored here and VK_SUBPASS_CONTENTS_INLINE means the commands
-		//will be embedded in the primary command buffer
-		vkCmdBeginRenderPass(m_command_buffer, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		//Make a function for this in the pipeline object
+		m_renderpass->BeginRenderPass(buffer);
 
 		m_pipeline->bind(buffer);
 
@@ -157,7 +139,7 @@ namespace Kos
 
 		vkCmdEndRenderPass(buffer);
 
-		if (vkEndCommandBuffer(m_command_buffer) != VK_SUCCESS)
+		if (vkEndCommandBuffer(buffer) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to record to command buffer");
 		}

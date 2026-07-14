@@ -122,4 +122,23 @@ namespace Kos
 		}
 
 	}
+
+	void KRenderpass::BeginRenderPass(VkCommandBuffer buffer)
+	{
+		VkRenderPassBeginInfo RenderPassBeginInfo{};
+		RenderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		RenderPassBeginInfo.renderPass = m_renderpass;
+		RenderPassBeginInfo.framebuffer = m_frame_buffer.data(); //The framebuffer and the attachements 
+		//Affected area of the render pass
+		RenderPassBeginInfo.renderArea.offset = { 0,0 };
+		RenderPassBeginInfo.renderArea.extent = m_swapchain->GetExtent();
+
+		VkClearValue ClearValues = { {{0.0f, 0.0f, 0.0f, 1.0f}} }; //Clear color used for VK_ATTACHMENT_LOAD_OP_CLEAR
+		RenderPassBeginInfo.clearValueCount = 1;
+		RenderPassBeginInfo.pClearValues = &ClearValues;
+
+		//The commands being recorded will be stored here and VK_SUBPASS_CONTENTS_INLINE means the commands
+		//will be embedded in the primary command buffer
+		vkCmdBeginRenderPass(m_command_buffer, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+	}
 }

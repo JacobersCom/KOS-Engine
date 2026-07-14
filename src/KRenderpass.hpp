@@ -12,14 +12,15 @@ namespace Kos
 		void startup();
 		void shutdown();
 
-
-		VkRenderPassCreateInfo CreateRenderPassInfo(VkFormat format);
-		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
-
+		void BeginRenderPass(VkCommandBuffer buffer);
 
 		VkRenderPass GetRenderpass() const { return m_renderpass; };
 
 	private:
+
+
+		VkRenderPassCreateInfo CreateRenderPassInfo(VkFormat format);
+		void CreateFrameBuffers(std::vector<VkImageView> image_views, VkExtent2D extent);
 
 		VkRenderPass m_renderpass;
 

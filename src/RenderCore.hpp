@@ -24,8 +24,8 @@ namespace Kos
 	private:
 
 		void LoadModel();
-		void CreateCommandPool(VkPhysicalDevice physical_device, VkDevice device, VkCommandPool command_pool);
-		void CreatePrimaryCommandBuffer();
+		void CreateCommandPool(VkCommandPool command_pool);
+		void CreatePrimaryCommandBuffer(VkCommandPool command_pool, VkCommandBuffer buffer);
 		void SyncObjects();
 		void RecordCommandBuffers(VkCommandBuffer, uint32_t image_index);
 		
@@ -38,6 +38,14 @@ namespace Kos
 		std::unique_ptr<class KRenderpass> m_renderpass;
 		std::unique_ptr<class KPipeline> m_pipeline;
 		std::unique_ptr<class KModel> m_model;
+
+		VkCommandPool m_cmd_pool;
+		VkCommandBuffer m_cmd_buffer;
+
+		VkSemaphore m_image_available;
+		VkSemaphore m_render_finished;
+		VkFence m_frames_in_flight;
+
 
 	};
 }
