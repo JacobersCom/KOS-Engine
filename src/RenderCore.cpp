@@ -42,8 +42,9 @@ namespace Kos
 
 			m_window->ProcessMessages();
 			DrawFrame();
+
+			vkDeviceWaitIdle(device->GetDevice());
 		}
-		vkDeviceWaitIdle(device->GetDevice());
 	}
 
 	void RenderCore::LoadModel()

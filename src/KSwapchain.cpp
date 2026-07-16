@@ -155,8 +155,13 @@ namespace Kos
 
 	VkResult KSwapchain::AcquireNextImage(uint32_t* image_index)
 	{
+		//Tell the CPU to wait till the GPU is done working
+		//Waits for all fences to be signed before returning and disables a time out.
+		//All fences start off signed so this is oki
+
 		vkWaitForFences(m_device->GetDevice(), 1, &frames_in_flight, VK_TRUE, UINT64_MAX);
 		vkResetFences(m_device->GetDevice(), 1, &frames_in_flight);
+
 
 		//imageavailablesemaphore signeds when the presentation engine is finish
 		VkResult result = vkAcquireNextImageKHR(m_device->GetDevice(), m_swapchain, UINT64_MAX,

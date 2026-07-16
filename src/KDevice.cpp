@@ -400,7 +400,7 @@ namespace Kos
 	{
 		VkBufferCreateInfo buffer_info{};
 		buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		buffer_info.flags = useage;
+		buffer_info.usage = useage;
 		buffer_info.size = size;
 		buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE; //access to any resource will be exclusvie to one queue family at a time
 
