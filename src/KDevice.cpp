@@ -13,7 +13,6 @@ namespace Kos
 		std::vector<const char*> layers =
 		{
 			"VK_LAYER_KHRONOS_validation"
-			"VK_EXT_debug_utils"
 		};
 
 		/*
@@ -65,14 +64,13 @@ namespace Kos
 			std::vector<const char* > wantedExtensions
 			{
 					VK_KHR_SWAPCHAIN_EXTENSION_NAME
-					VK_KHR_WIN32_SURFACE_EXTENSION_NAME
 			};
 
-			for (const auto& ae : availableExtensions)
+			for (const auto& we : wantedExtensions)
 			{
 				bool extensionsFound = false;
 			
-				for (const auto& we : wantedExtensions)
+				for (const auto& ae : availableExtensions)
 				{
 					if (strcmp(ae.extensionName, we) == 0)
 					{
@@ -85,7 +83,6 @@ namespace Kos
 					throw std::runtime_error("Failed to find required device extensions");
 				}
 			}
-
 			return true;
 		}
 		Kos::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
@@ -177,7 +174,6 @@ namespace Kos
 
 		//Find the graphics bit queue family
 		int i = 0;
-		VkBool32 presentSupport = false;
 		for (const auto& queueFamily : queueFamilys)
 		{
 			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
@@ -185,6 +181,7 @@ namespace Kos
 				indices.m_graphics_family = i;
 			}
 
+			VkBool32 presentSupport = false;
 			vkGetPhysicalDeviceSurfaceSupportKHR(phy_device, i,surface, &presentSupport);
 
 			if (presentSupport)
@@ -192,7 +189,10 @@ namespace Kos
 				indices.m_present_family = i;
 			}
 
-			if (indices.isComplete()) break;
+			if (indices.isComplete())
+			{
+				break;
+			}
 			i++;
 		}
 
@@ -233,14 +233,19 @@ namespace Kos
 		//The parameters for the newly created vulkan instance
 		VkInstanceCreateInfo InstanceInfo{};
 
+		std::vector<const char*> instance_extension
+		{
+			VK_KHR_SURFACE_EXTENSION_NAME,      
+			VK_KHR_WIN32_SURFACE_EXTENSION_NAME		
+		};
 
 		InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		InstanceInfo.pApplicationInfo = &AppInfo;
 		InstanceInfo.pNext = VK_NULL_HANDLE;
-		InstanceInfo.enabledExtensionCount = 0;
-		InstanceInfo.ppEnabledExtensionNames = nullptr;
+		InstanceInfo.enabledExtensionCount = instance_extension.size();
+		InstanceInfo.ppEnabledExtensionNames = instance_extension.data();
 
-	#ifndef _DEBUG
+	#ifndef NDEBUG
 		if (CheckVaildationLayersSupport(layers))
 		{
 			InstanceInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
@@ -363,7 +368,6 @@ namespace Kos
 		std::vector<const char*> device_ext =
 		{
 			VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-			VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME
 		};
 		DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(device_ext.size());
 		DeviceInfo.ppEnabledExtensionNames = device_ext.data();

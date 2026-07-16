@@ -32,7 +32,7 @@ namespace Kos
 		VkSwapchainKHR GetSwapchain() const { return m_swapchain; };
 		std::vector<VkImageView> GetImageViews() const { return image_views; };
 		VkExtent2D GetExtent() const { return m_extent; };
-		VkFormat GetFormat() const { return m_format; };
+		VkFormat GetFormat() const { return format; };
 
 
 	private:
@@ -49,16 +49,16 @@ namespace Kos
 		std::vector<VkImageView> image_views;
 		std::vector<VkFramebuffer> frame_buffers;
 
-		std::vector<VkSemaphore> image_available;
-		std::vector<VkSemaphore> render_finished;
-		std::vector<VkFence> frames_in_flight;
-		std::vector<VkFence> image_in_flight;
+		VkSemaphore image_available;
+		VkSemaphore render_finished;
+		VkFence frames_in_flight;
+		VkFence image_in_flight;
 
 
-		VkFormat m_format;
+		VkFormat format;
 		VkExtent2D m_extent;
 
-		size_t current_frame;
+		size_t current_frame = 0;
 
 	private:
 

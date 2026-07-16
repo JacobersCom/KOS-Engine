@@ -126,7 +126,7 @@ namespace Kos
 			ImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 			ImageViewInfo.image = m_images[i];
 			ImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-			ImageViewInfo.format = m_format;
+			ImageViewInfo.format = format;
 			ImageViewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
 			ImageViewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
 			ImageViewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -155,14 +155,12 @@ namespace Kos
 
 	VkResult KSwapchain::AcquireNextImage(uint32_t* image_index)
 	{
-		vkWaitForFences(m_device->GetDevice(), 1, &frames_in_flight[current_frame], VK_TRUE, UINT64_MAX);
-		vkResetFences(m_device->GetDevice(), 1, &frames_in_flight[current_frame]);
-
-		uint32_t ImageIndex;
+		vkWaitForFences(m_device->GetDevice(), 1, &frames_in_flight, VK_TRUE, UINT64_MAX);
+		vkResetFences(m_device->GetDevice(), 1, &frames_in_flight);
 
 		//imageavailablesemaphore signeds when the presentation engine is finish
 		VkResult result = vkAcquireNextImageKHR(m_device->GetDevice(), m_swapchain, UINT64_MAX,
-			image_available[current_frame], VK_NULL_HANDLE, &ImageIndex);
+			image_available, VK_NULL_HANDLE, image_index);
 
 		if (result != VK_SUCCESS)
 		{
@@ -175,12 +173,12 @@ namespace Kos
 	VkResult KSwapchain::SubmitCommandBuffers(const VkCommandBuffer buffer, uint32_t* image_index)
 	{
 		//Tell the CPU to wait till the GPU is done working
-		if (image_in_flight[*image_index] == VK_NULL_HANDLE)
+		if (image_in_flight == VK_NULL_HANDLE)
 		{
-			vkWaitForFences(m_device->GetDevice(), 1, &image_in_flight[*image_index], VK_TRUE, UINT64_MAX);
+			vkWaitForFences(m_device->GetDevice(), 1, &image_in_flight, VK_TRUE, UINT64_MAX);
 		}
 
-		image_in_flight[*image_index] = frames_in_flight[current_frame];
+		image_in_flight = frames_in_flight;
 
 		//Record info to submit it
 
@@ -188,7 +186,7 @@ namespace Kos
 		SubmittedInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
 		//The Semaphore upon which to wait on before exe the commandbuffer
-		VkSemaphore WaitSemaphore[] = { image_available[current_frame]};
+		VkSemaphore WaitSemaphore[] = { image_available};
 		SubmittedInfo.waitSemaphoreCount = 1;
 		SubmittedInfo.pWaitSemaphores = WaitSemaphore;
 
@@ -200,15 +198,15 @@ namespace Kos
 		SubmittedInfo.pCommandBuffers = &buffer;
 
 		//Which semaphore to sign once the commandbuffer is finished
-		VkSemaphore SingleSemaphore[] = { render_finished[current_frame]};
+		VkSemaphore SingleSemaphore[] = { render_finished};
 		SubmittedInfo.signalSemaphoreCount = 1;
 		SubmittedInfo.pSignalSemaphores = SingleSemaphore;
 
-		vkResetFences(m_device->GetDevice(), 1, &frames_in_flight[current_frame]);
+		vkResetFences(m_device->GetDevice(), 1, &frames_in_flight);
 
 
 		//All commands will be submitted to the queue. The fence Will singal when it is finished
-		if (vkQueueSubmit(m_device->GetGraphicsQueue(), 1, &SubmittedInfo, frames_in_flight[current_frame]) != VK_SUCCESS)
+		if (vkQueueSubmit(m_device->GetGraphicsQueue(), 1, &SubmittedInfo, frames_in_flight) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to submit commands to queue");
 		}
@@ -246,9 +244,9 @@ namespace Kos
 		FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		FenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; //fences start signed
 
-		if (vkCreateSemaphore(m_device->GetDevice(), &SemaphoreInfo, nullptr, image_available.data()) != VK_SUCCESS
-			|| vkCreateSemaphore(m_device->GetDevice(), &SemaphoreInfo, nullptr, render_finished.data()) != VK_SUCCESS
-			|| vkCreateFence(m_device->GetDevice(), &FenceInfo, nullptr, frames_in_flight.data()) != VK_SUCCESS
+		if (vkCreateSemaphore(m_device->GetDevice(), &SemaphoreInfo, nullptr, &image_available) != VK_SUCCESS
+			|| vkCreateSemaphore(m_device->GetDevice(), &SemaphoreInfo, nullptr, &render_finished) != VK_SUCCESS
+			|| vkCreateFence(m_device->GetDevice(), &FenceInfo, nullptr, &frames_in_flight) != VK_SUCCESS
 			)
 		{
 			throw std::runtime_error("Failed to create semaphores and fence!");
@@ -317,7 +315,7 @@ namespace Kos
 		m_images.resize(image_count);
 		vkGetSwapchainImagesKHR(device, m_swapchain, &image_count, m_images.data());
 
-		m_format = surface_format.format;
+		format = surface_format.format;
 		m_extent = extent;
 
 		CreateImageViews();

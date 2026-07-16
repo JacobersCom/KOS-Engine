@@ -34,8 +34,8 @@ namespace Kos
 	private:
 
 		
-		VkPipeline m_pipeline;
-		VkPipelineLayout m_pipeline_layout;
+		VkPipeline m_pipeline = nullptr;
+		VkPipelineLayout m_pipeline_layout = nullptr;
 
 		VkViewport m_viewport;
 		VkRect2D m_scissor;

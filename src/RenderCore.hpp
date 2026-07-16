@@ -33,9 +33,9 @@ namespace Kos
 	private:
 
 		void LoadModel();
-		void CreateCommandPool(VkCommandPool command_pool);
-		void CreatePrimaryCommandBuffer(VkCommandPool command_pool, VkCommandBuffer buffer);
-		void RecordCommandBuffers(VkCommandBuffer, uint32_t image_index);
+		void CreateCommandPool(VkCommandPool& command_pool);
+		void CreatePrimaryCommandBuffer(VkCommandPool command_pool, VkCommandBuffer& buffer);
+		void RecordCommandBuffers(VkCommandBuffer buffer);
 		void DrawFrame();
 		
 
@@ -48,7 +48,7 @@ namespace Kos
 		std::unique_ptr<KPipeline> m_pipeline;
 		std::unique_ptr<KModel> m_model;
 
-		VkCommandPool m_cmd_pool;
-		VkCommandBuffer m_cmd_buffer;
+		VkCommandPool cmd_pool;
+		VkCommandBuffer cmd_buffer;
 	};
 }

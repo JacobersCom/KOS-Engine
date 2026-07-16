@@ -1,6 +1,5 @@
 #include "KLog.hpp"
 #include <fstream>
-#include <print>
 #include <filesystem>
 
 namespace Kos

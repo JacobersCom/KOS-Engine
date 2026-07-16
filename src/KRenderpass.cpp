@@ -80,7 +80,7 @@ namespace Kos
 		VkResult result = vkCreateRenderPass(m_device->GetDevice(), &renderpass_info, nullptr, &m_renderpass);
 		if (result != VK_SUCCESS)
 		{
-			printf("Failed to create RenderPass");
+			throw std::runtime_error("Failed to create render pass");
 		}
 
 		return renderpass_info;

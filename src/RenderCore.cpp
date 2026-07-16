@@ -24,6 +24,10 @@ namespace Kos
 		m_swapchain->startup();
 		m_renderpass->startup();
 		m_pipeline->startup();
+		LoadModel();
+		CreateCommandPool(cmd_pool);
+		CreatePrimaryCommandBuffer(cmd_pool, cmd_buffer);
+		m_swapchain->SyncDeviceWork();
 
 		return true;
 	}
@@ -31,8 +35,11 @@ namespace Kos
 
 	void RenderCore::update()
 	{
-		while (!m_window->GetWindowHandle()->unused)
+		while (true)
 		{
+			if (!IsWindow(m_window->GetWindowHandle()))
+				break;
+
 			m_window->ProcessMessages();
 			DrawFrame();
 		}
@@ -55,7 +62,7 @@ namespace Kos
 	/*
 	Creates a command pool on the CPU to record commands to be passed into the GPU queue
 	*/
-	void RenderCore::CreateCommandPool(VkCommandPool command_pool)
+	void RenderCore::CreateCommandPool(VkCommandPool& command_pool)
 	{
 		QueueFamilyIndices Indices = device->GetQueueFamilyIndices();
 
@@ -73,7 +80,7 @@ namespace Kos
 
 	}
 
-	void RenderCore::CreatePrimaryCommandBuffer(VkCommandPool command_pool, VkCommandBuffer buffer)
+	void RenderCore::CreatePrimaryCommandBuffer(VkCommandPool command_pool, VkCommandBuffer& buffer)
 	{
 		VkCommandBufferAllocateInfo AllocateInfo{};
 		AllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -90,7 +97,7 @@ namespace Kos
 	}
 
 
-	void RenderCore::RecordCommandBuffers(VkCommandBuffer buffer, uint32_t image_index)
+	void RenderCore::RecordCommandBuffers(VkCommandBuffer buffer)
 	{
 		VkCommandBufferBeginInfo BeginInfo{};
 		BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -119,13 +126,16 @@ namespace Kos
 	void RenderCore::DrawFrame()
 	{
 		uint32_t image_index;
+
+		RecordCommandBuffers(cmd_buffer);
+
 		VkResult result = m_swapchain->AcquireNextImage(&image_index);
 		if (result != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to acquire next swapchain image");
 		}
 
-		result = m_swapchain->SubmitCommandBuffers(m_cmd_buffer, &image_index);
+		result = m_swapchain->SubmitCommandBuffers(cmd_buffer, &image_index);
 		if (result != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to submit commands to buffer");

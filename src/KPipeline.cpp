@@ -59,7 +59,7 @@ namespace Kos
 		VkPipelineVertexInputStateCreateInfo CreateVertexInputStateInfo(int vertex_attribute_count, int vertex_binding_count)
 		{
 			auto binding_descriptions = KModel::Vertex::getBindingDescriptions();
-			auto attribute_descriptions = KModel::Vertex::getAttributeDescriptions();
+			 auto attribute_descriptions = KModel::Vertex::getAttributeDescriptions();
 
 			VkPipelineVertexInputStateCreateInfo VertexStateInfo{};
 			VertexStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -80,7 +80,7 @@ namespace Kos
 			return AssemblyStateInfo;
 		}
 
-		VkViewport CreateViewportAndScissor(VkViewport viewport, VkRect2D scissor, VkExtent2D extent)
+		VkViewport CreateViewportAndScissor(VkViewport& viewport, VkRect2D& scissor, VkExtent2D extent)
 		{
 			VkViewport viewport_info{};
 			viewport_info.x = 0.0f;
@@ -218,27 +218,35 @@ namespace Kos
 		PixelStage.module = PixelModule;
 		PixelStage.pName = "main";
 
-		VkPipelineShaderStageCreateInfo ShaderStages[] = { VertexStage, PixelStage };
+		VkPipelineShaderStageCreateInfo shader_stages[] = { VertexStage, PixelStage };
 
-		VkPipelineVertexInputStateCreateInfo VertexInput = CreateVertexInputStateInfo(0,0);
+		auto binding_descriptions = KModel::Vertex::getBindingDescriptions();
+		auto attribute_descriptions = KModel::Vertex::getAttributeDescriptions();
 
-		VkPipelineInputAssemblyStateCreateInfo AssemblyInput = CreateAssemblyInputStateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+		VkPipelineVertexInputStateCreateInfo vertex_input{};
+		vertex_input.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertex_input.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size());
+		vertex_input.vertexBindingDescriptionCount = static_cast<uint32_t>(binding_descriptions.size());
+		vertex_input.pVertexAttributeDescriptions = attribute_descriptions.data();
+		vertex_input.pVertexBindingDescriptions = binding_descriptions.data();
+
+		VkPipelineInputAssemblyStateCreateInfo assembly_input = CreateAssemblyInputStateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 
 		CreateViewportAndScissor(m_viewport, m_scissor, extents);
 
-		VkPipelineViewportStateCreateInfo ViewPortInfo = CreateViewPortStateInfo(m_viewport, m_scissor, 1, 1);
+		VkPipelineViewportStateCreateInfo viewport_info = CreateViewPortStateInfo(m_viewport, m_scissor, 1, 1);
 
-		VkPipelineRasterizationStateCreateInfo RasterizationInfo = CreateRasterizationState();
+		VkPipelineRasterizationStateCreateInfo rasterization_state = CreateRasterizationState();
 
 		VkPipelineColorBlendAttachmentState ColorBlendAttachment = CreateColorBlendInfo();
 
-		VkPipelineColorBlendStateCreateInfo ColorBlendInfo = CreatePipelineColorBlendStateInfo(ColorBlendAttachment);
+		VkPipelineColorBlendStateCreateInfo color_blend_state = CreatePipelineColorBlendStateInfo(ColorBlendAttachment);
 
 		std::vector<VkDynamicState> States = { VK_DYNAMIC_STATE_SCISSOR,VK_DYNAMIC_STATE_VIEWPORT};
 
-		VkPipelineDynamicStateCreateInfo DynamicStateInfo = CreateDynaminceStateInfo(States.size(), States.data());
+		VkPipelineDynamicStateCreateInfo dynamic_state = CreateDynaminceStateInfo(States.size(), States.data());
 
-		VkPipelineMultisampleStateCreateInfo MultiSampleInfo = CreatePipelineMultisampleStateInfo();
+		VkPipelineMultisampleStateCreateInfo multisample_state = CreatePipelineMultisampleStateInfo();
 
 		VkPipelineLayoutCreateInfo pipe_line_layout_Info{};
 		pipe_line_layout_Info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -251,28 +259,29 @@ namespace Kos
 
 		if (result != VK_SUCCESS)
 		{
-			printf("Failed to create pipeline layout");
+			throw std::runtime_error("Failed to create GraphicsPipeLine");
 		}
 
 		VkGraphicsPipelineCreateInfo pipe_line_info{};
 		pipe_line_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		pipe_line_info.stageCount = 2;
-		pipe_line_info.pStages = ShaderStages;
-		pipe_line_info.pVertexInputState = &VertexInput;
-		pipe_line_info.pInputAssemblyState = &AssemblyInput;
-		pipe_line_info.pViewportState = &ViewPortInfo;
-		pipe_line_info.pRasterizationState = &RasterizationInfo;
-		pipe_line_info.pColorBlendState = &ColorBlendInfo;
-		pipe_line_info.pMultisampleState = &MultiSampleInfo;
-		pipe_line_info.pDynamicState = &DynamicStateInfo;
+		pipe_line_info.pStages = shader_stages;
+		pipe_line_info.pVertexInputState = &vertex_input;
+		pipe_line_info.pInputAssemblyState = &assembly_input;
+		pipe_line_info.pViewportState = &viewport_info;
+		pipe_line_info.pRasterizationState = &rasterization_state;
+		pipe_line_info.pColorBlendState = &color_blend_state;
+		pipe_line_info.pMultisampleState = &multisample_state;
+		pipe_line_info.pDynamicState = &dynamic_state;
 		pipe_line_info.layout = m_pipeline_layout;
 		pipe_line_info.renderPass = renderpass;
 		pipe_line_info.subpass = 0; //Index of subpass where this pipeline will be used
 		pipe_line_info.basePipelineHandle = VK_NULL_HANDLE; //Ref to another pipeline
 		pipe_line_info.basePipelineIndex = 0; //Index of pipeline
 
-		if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1,
-			&pipe_line_info, nullptr, &m_pipeline) != VK_SUCCESS) {
+		result = vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipe_line_info, nullptr, &m_pipeline);
+
+		if (result != VK_SUCCESS) {
 
 			throw std::runtime_error("Failed to create GraphicsPipeLine");
 		}
