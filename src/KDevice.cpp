@@ -53,7 +53,7 @@ namespace Kos
 		/*
 		* Ensure that the GPU has swapchain support. And returns the required extension names
 		*/
-		std::vector<const char*> CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)
+		bool CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)
 		{
 			uint32_t extensionCount;
 
@@ -65,6 +65,7 @@ namespace Kos
 			std::vector<const char* > wantedExtensions
 			{
 					VK_KHR_SWAPCHAIN_EXTENSION_NAME
+					VK_KHR_WIN32_SURFACE_EXTENSION_NAME
 			};
 
 			for (const auto& ae : availableExtensions)
@@ -85,7 +86,7 @@ namespace Kos
 				}
 			}
 
-			return wantedExtensions;
+			return true;
 		}
 		Kos::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
 		{
@@ -155,9 +156,8 @@ namespace Kos
 	bool KDevice::RateDeviceSuitable(VkPhysicalDevice phy_device, VkSurfaceKHR surface)
 	{
 		QueueFamilyIndices Indices = FindQueueFamilies(phy_device, surface);
-		
 
-		return Indices.isComplete();
+		return Indices.isComplete() && CheckDeviceExtensionSupport(phy_device);
 	}
 
 	/*
