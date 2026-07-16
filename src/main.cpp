@@ -10,6 +10,7 @@ int main()
 {
 	Kos::RenderCore m_render_core;
 	m_render_core.startup();
+	
 	m_render_core.update();
 
 

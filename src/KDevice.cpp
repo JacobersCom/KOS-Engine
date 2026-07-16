@@ -8,8 +8,7 @@ namespace Kos
 	namespace
 	{
 		/*These variables are not needed by any another class or file*/
-		VkQueue m_graphics_queue;
-		VkQueue m_present_queue;
+		
 
 		std::vector<const char*> layers =
 		{
@@ -200,7 +199,7 @@ namespace Kos
 		return indices;
 	}
 	
-	bool Kos::KDevice::startup()
+	void Kos::KDevice::startup()
 	{
 		
 		CreateInstance();
@@ -211,7 +210,7 @@ namespace Kos
 
 	QueueFamilyIndices KDevice::GetQueueFamilyIndices()
 	{
-		QueueFamilyIndices indices = FindQueueFamilies(m_physical_device, m_surface);
+		QueueFamilyIndices indices = FindQueueFamilies(physical_device, surface);
 		return indices;
 	}
 
@@ -249,7 +248,7 @@ namespace Kos
 		}
 	#endif // !NDEBUG
 
-		if (vkCreateInstance(&InstanceInfo, nullptr, &m_instance) != VK_SUCCESS)
+		if (vkCreateInstance(&InstanceInfo, nullptr, &instance) != VK_SUCCESS)
 		{
 			//Replace with a KLog
 		}
@@ -270,9 +269,12 @@ namespace Kos
 		surface_info.hwnd = m_window->GetWindowHandle(); //Handle to win32 window
 		surface_info.hinstance = m_window->GetWindowInstance();//Instance of the win32 window
 
-		if (vkCreateWin32SurfaceKHR(m_instance, &surface_info, nullptr, &m_surface) != VK_SUCCESS)
+		VkResult result = vkCreateWin32SurfaceKHR(instance, &surface_info, nullptr, &surface);
+
+		if ( result != VK_SUCCESS)
 		{
 			//Replace with a KLog
+			throw std::runtime_error("Failed to create win32 surface");
 		}
 	}
 
@@ -285,7 +287,7 @@ namespace Kos
 	{
 		//Get device count
 		uint32_t deviceCount = 0;
-		vkEnumeratePhysicalDevices(m_instance, &deviceCount, nullptr);
+		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 
 		if (deviceCount == 0)
 		{
@@ -294,19 +296,19 @@ namespace Kos
 
 		//Get device information
 		std::vector<VkPhysicalDevice> physical_devices(deviceCount);
-		vkEnumeratePhysicalDevices(m_instance, &deviceCount, physical_devices.data());
+		vkEnumeratePhysicalDevices(instance, &deviceCount, physical_devices.data());
 
 		//Find a suitable device with vulkan support
-		for (const auto physical_device : physical_devices)
+		for (const auto m_physical_device : physical_devices)
 		{
-			if (RateDeviceSuitable(physical_device, m_surface))
+			if (RateDeviceSuitable(m_physical_device, surface))
 			{
-				m_physical_device = physical_device;
+				physical_device = m_physical_device;
 				break;
 			}
 		}
 
-		if (m_physical_device == VK_NULL_HANDLE)
+		if (physical_device == VK_NULL_HANDLE)
 		{
 			throw std::runtime_error("Failed to find Suitable GPU");
 		}
@@ -326,7 +328,7 @@ namespace Kos
 		instance_ext.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif // _DEBUG
 
-		QueueFamilyIndices indices = GetQueueFamilyIndices(m_physical_device, m_surface);
+		QueueFamilyIndices indices = GetQueueFamilyIndices();
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 		std::set<uint32_t> uniqueQueueFamilies = { indices.m_graphics_family.value(), indices.m_present_family.value() };
@@ -372,13 +374,13 @@ namespace Kos
 	DeviceInfo.enabledLayerCount = 0;
 #endif // _DEBUG
 
-		if (vkCreateDevice(m_physical_device, &DeviceInfo, nullptr, &m_device) != VK_SUCCESS)
+		if (vkCreateDevice(physical_device, &DeviceInfo, nullptr, &device) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create logical device!");
 		}
 
-		vkGetDeviceQueue(m_device, indices.m_graphics_family.value(), 0, &m_graphics_queue);
-		vkGetDeviceQueue(m_device, indices.m_present_family.value(), 0, &m_present_queue);
+		vkGetDeviceQueue(device, indices.m_graphics_family.value(), 0, &graphics_queue);
+		vkGetDeviceQueue(device, indices.m_present_family.value(), 0, &present_queue);
 	}
 
 	
@@ -398,25 +400,25 @@ namespace Kos
 		buffer_info.size = size;
 		buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE; //access to any resource will be exclusvie to one queue family at a time
 
-		if (vkCreateBuffer(m_device, &buffer_info, nullptr, &buffer) != VK_SUCCESS)
+		if (vkCreateBuffer(device, &buffer_info, nullptr, &buffer) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create vertexbuffer");
 		}
 
 		VkMemoryRequirements mem_requirememnts{};
-		vkGetBufferMemoryRequirements(m_device, buffer, &mem_requirememnts);
+		vkGetBufferMemoryRequirements(device, buffer, &mem_requirememnts);
 
 		VkMemoryAllocateInfo alloc_info{};
 		alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		alloc_info.allocationSize = mem_requirememnts.size;
-		alloc_info.memoryTypeIndex = FindMemoryType(m_physical_device, 
+		alloc_info.memoryTypeIndex = FindMemoryType(physical_device, 
 			mem_requirememnts.memoryTypeBits, properties);
 
-		if (vkAllocateMemory(m_device, &alloc_info, nullptr, &buffer_memeory) != VK_SUCCESS)
+		if (vkAllocateMemory(device, &alloc_info, nullptr, &buffer_memeory) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to allocate vertex buffer memory");
 		}
 
-		vkBindBufferMemory(m_device, buffer, buffer_memeory, 0);
+		vkBindBufferMemory(device, buffer, buffer_memeory, 0);
 	}
 }

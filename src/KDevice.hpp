@@ -1,3 +1,4 @@
+#pragma once
 
 //defines
 #ifdef _WIN32
@@ -41,17 +42,18 @@ namespace Kos
 	public:
 		
 		KDevice(class KWindow* window) : m_window(window){}
-		~KDevice();
 
-		bool startup();
+		void startup();
 		bool shutdown();
-		void DrawFrame();
 
 		//Accessors
-		VkInstance GetInstance() const { return m_instance; };
-		VkSurfaceKHR GetSurface() const { return m_surface; };
-		VkPhysicalDevice GetPhysicalDevice() const { return m_physical_device; };
-		VkDevice GetDevice() const { return m_device; };
+		VkInstance GetInstance() const { return instance; };
+		VkSurfaceKHR GetSurface() const { return surface; };
+		VkPhysicalDevice GetPhysicalDevice() const { return physical_device; };
+		VkDevice GetDevice() const { return device; };
+		VkQueue GetGraphicsQueue() const { return graphics_queue; };
+		VkQueue GetPresentQueue() const { return present_queue; };
+
 		QueueFamilyIndices GetQueueFamilyIndices();
 
 		void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags useage, VkMemoryPropertyFlags properties
@@ -74,9 +76,12 @@ namespace Kos
 
 		KWindow* m_window;
 
-		VkInstance m_instance = 0;
-		VkSurfaceKHR m_surface = 0;
-		VkPhysicalDevice m_physical_device = 0;
-		VkDevice m_device = 0;
+		VkInstance instance = 0;
+		VkSurfaceKHR surface = 0;
+		VkPhysicalDevice physical_device = 0;
+		VkDevice device = 0;
+
+		VkQueue graphics_queue;
+		VkQueue present_queue;
 	};
 }

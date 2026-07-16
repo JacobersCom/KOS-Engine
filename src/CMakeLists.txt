@@ -9,6 +9,8 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/KDevice.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KLog.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/KRenderpass.cpp
+
     ${CMAKE_CURRENT_SOURCE_DIR}/KPipeline.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KModel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RenderCore.cpp
@@ -24,6 +26,7 @@ PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/KDevice.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/pch.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/KRenderpass.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KPipeline.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/KModel.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/RenderCore.hpp

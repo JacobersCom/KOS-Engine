@@ -19,13 +19,15 @@ namespace Kos
 	{
 	public:
 
-		KSwapchain(class KDevice* device, class KWindow* window) : m_device(device), m_window(window){};
+		KSwapchain(class KDevice* device, class KWindow* window) : m_device(device), m_window(window) {};
 		
 		bool startup();
 		bool shutdown();
 		
 		VkResult AcquireNextImage(uint32_t* image_index);
 		VkResult SubmitCommandBuffers(const VkCommandBuffer buffer, uint32_t* image_index);
+
+		void SyncDeviceWork();
 
 		VkSwapchainKHR GetSwapchain() const { return m_swapchain; };
 		std::vector<VkImageView> GetImageViews() const { return image_views; };
@@ -41,24 +43,22 @@ namespace Kos
 
 	private:
 		
-		/*
-		* Stores all the needed details of the swapchain
-		*
-		* Mainly used in ChooseUserGPU to ensure that the end users has the needed swapchain cabailities
-		*/
+		VkSwapchainKHR m_swapchain;
 
-		VkSwapchainKHR& m_swapchain;
-
-		std::vector<VkImage> arr_images;
+		std::vector<VkImage> m_images;
 		std::vector<VkImageView> image_views;
-		std::vector<VkFramebuffer> arr_frame_buffers;
+		std::vector<VkFramebuffer> frame_buffers;
 
-		std::vector<VkSemaphore> images_available;
+		std::vector<VkSemaphore> image_available;
 		std::vector<VkSemaphore> render_finished;
 		std::vector<VkFence> frames_in_flight;
+		std::vector<VkFence> image_in_flight;
+
 
 		VkFormat m_format;
 		VkExtent2D m_extent;
+
+		size_t current_frame;
 
 	private:
 

@@ -7,7 +7,6 @@ namespace Kos
 	public:
 
 		KRenderpass(class KDevice* device, class KSwapchain* swapchain) : m_device(device), m_swapchain(swapchain) {};
-		~KRenderpass();
 
 		void startup();
 		void shutdown();
