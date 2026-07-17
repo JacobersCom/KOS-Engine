@@ -11,7 +11,6 @@ namespace KE
 		{
 			//Creates the window
 			CreateWin32Window(_WindowDesc);
-			//CreateWin32Button();
 		}
 
 		void KWindow::SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle, 
@@ -158,18 +157,7 @@ namespace KE
 				NULL);      // Pointer not needed.
 		}
 
-		void KWindow::EventDispatcher()
-		{
-			MSG msg = {};
-
-			while (GetMessage(&msg, NULL, 0, 0) > 0)
-			{
-				TranslateMessage(&msg);
-				DispatchMessageW(&msg);
-			}
-
-			printf("Program shutdown\n");
-		}
+		
 
 		LRESULT CALLBACK KWindow::WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam)
 		{

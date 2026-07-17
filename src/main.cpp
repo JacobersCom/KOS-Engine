@@ -19,7 +19,6 @@ int main()
 	while (IsRunning)
 	{
 		_render.UpdateLoop();
-		_win.EventDispatcher();
 		
 		if (!IsWindow(_win.GetWindowHandle()))
 		{
@@ -27,6 +26,7 @@ int main()
 		}
 	}
 
+	_render.CleanUp();
 	_render.CleanUp();
 
 

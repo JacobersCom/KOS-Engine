@@ -31,7 +31,6 @@ namespace KE
 				const int WindowWidth, const int WindowHeight);
 			void GetFrameBufferSize(HWND WindowHandle, int& Width, int& Height);
 			void OpenDialogBox();
-			void EventDispatcher();
 
 			const HWND GetWindowHandle() { return WindowHandle; }
 			const HINSTANCE GetWindowInstance() { return PtrLoader; }
