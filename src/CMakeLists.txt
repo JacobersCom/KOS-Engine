@@ -1,12 +1,13 @@
 find_package(Vulkan QUIET)
 
-add_subdirectory(platform)
-add_subdirectory(render)
+add_subdirectory(Platform)
+add_subdirectory(RHI)
+
 
 add_executable(KOS-Engine main.cpp)
 
-target_link_libraries(KOS-Engine 
+target_include_directories(KOS-Engine 
 PUBLIC 
-    render
-    platform
+    RHI
+    Platform
 )
