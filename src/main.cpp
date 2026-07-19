@@ -1,5 +1,6 @@
 
-
+#include "KRender.h"
+#include "KWindow.h"
 #include <iostream>
 
 int main()

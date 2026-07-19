@@ -1,4 +1,4 @@
-#include <platform/win32/KWindow.h>
+#include "KWindow.h"
 #include <string>
 #include <assert.h>
 #include <windows.h>

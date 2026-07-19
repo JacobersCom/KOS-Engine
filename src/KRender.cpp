@@ -1,5 +1,5 @@
-#include <render/vulkan/KRender.h>
-#include <platform/win32/KWindow.h>
+#include "KRender.h"
+#include "KWindow.h"
 
 namespace KE
 {
