@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 4.0)
 project(KOS-Engine VERSION 1.0 LANGUAGES CXX)
 
 #Set the standard language version
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 #Make it required
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 

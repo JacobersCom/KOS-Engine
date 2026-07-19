@@ -3,6 +3,7 @@
 #include "KWindow.h"
 #include <iostream>
 
+
 int main()
 {
 	KE::SYSTEM::KWindow _win;
@@ -11,8 +12,8 @@ int main()
 	_win.SetWindowDesc(L"KOS", L"KOS Engine", 500, 500);
 	_win.Create();
 	
-	bool IsRunning = _render.InitVulkan();
 
+	bool IsRunning = _render.InitVulkan();
 	while (IsRunning)
 	{
 		_render.UpdateLoop();
