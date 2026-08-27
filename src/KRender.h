@@ -69,6 +69,12 @@ namespace KE
 				std::vector<VkPresentModeKHR> PresentMode;
 			};
 
+			struct Vertex
+			{
+				float pos[4];
+				float color[3];
+			};
+
 		private:
 
 		
@@ -80,6 +86,7 @@ namespace KE
 			void CreateSwapChain();
 			void CreateImageViews();
 			void CreatePipeline();
+			void CreateVertexBuffer();
 
 			QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 			QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
@@ -130,7 +137,7 @@ namespace KE
 
 			//All Shader helpers
 			//Takes in the a spv compiled shader
-			std::vector<char> LoadShader(std::filesystem::path& _FileName);
+			std::vector<char> LoadShader(const std::filesystem::path& _FileName);
 			//Takes in the return from LoadShaders
 			VkShaderModule CreateShaderModule(const std::vector<char>& code);
 

@@ -1032,6 +1032,15 @@ namespace KE
 			vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
 			vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
 		}
+
+		void KRender::CreateVertexBuffer()
+		{
+			VkBufferCreateInfo buffer_info{};
+
+			buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+			buffer_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+			buffer_info.size = sizeof(float) * 3;
+		}
 		
 
 		/*
@@ -1096,7 +1105,7 @@ namespace KE
 
 		/*
 		*/
-		std::vector<char> KRender::LoadShader(std::filesystem::path& _FileName)
+		std::vector<char> KRender::LoadShader(const std::filesystem::path& _FileName)
 		{
 			//Starts reading at the end of the file
 			std::ifstream file(_FileName, std::ios::ate | std::ios::binary);
