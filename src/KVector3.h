@@ -9,9 +9,12 @@ namespace Kos::math
 	struct KVector3
 	{
 
-		//Constructers
-		//inline KVector3() = delete;
+		inline float* Data() { return &x; };
 
+		float x, y, z;
+
+		static const KVector3 unit_vector;
+		static const KVector3 zero_vector;
 
 		inline KVector3(float x, float y, float z) 
 		{
@@ -69,12 +72,6 @@ namespace Kos::math
 		}
 
 		//Allows vector data to be treated like an array of floats
-		inline float* Data() { return &x; };
-
-		float x, y, z;
-
-		static const KVector3 unit_vector;
-		static const KVector3 zero_vector;
 	};
 	
 	inline std::ostream& operator<<(std::ostream& os, const KVector3& a)

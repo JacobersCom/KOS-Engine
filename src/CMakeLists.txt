@@ -1,27 +1,18 @@
 find_package(Vulkan QUIET)
 
-include(FetchContent)
-FetchContent_Declare(
-    fetch_vk_bootstrap
-    GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
-    GIT_TAG main #suggest using a tag so the library doesn't update whenever new commits are pushed to a branch
-)
-FetchContent_MakeAvailable(fetch_vk_bootstrap)
-
-add_executable(KOS-Engine main.cpp)
-target_link_libraries(KOS-Engine PRIVATE 
-    Vulkan::Vulkan
-    vk-bootstrap::vk-bootstrap
-)
-
 target_sources(KOS-Engine
 PRIVATE
 	KWindow.cpp
 	KRender.cpp
+	KLog.cpp
+	KVector3.cpp
 	
 PUBLIC
 	KWindow.h
 	KRender.h
+	KLog.h
+	KVector.h
+	KMat.h
 )
 
 #Find the shader compiler 
