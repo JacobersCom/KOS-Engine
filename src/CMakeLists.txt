@@ -1,49 +1,30 @@
 find_package(Vulkan QUIET)
 
-
-add_executable(KOS main.cpp)
-
-target_sources(KOS
-PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/KWindow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KDevice.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KLog.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KRenderpass.cpp
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/KPipeline.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KModel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/RenderCore.cpp
-
-
-	
-	
-    ${CMAKE_CURRENT_SOURCE_DIR}/KMat4.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KVector3.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KWindow.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KObject.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KLog.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KDevice.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/pch.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KSwapchain.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KRenderpass.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KPipeline.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/KModel.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/RenderCore.hpp
-
-
-
-
-	
-	
-
+include(FetchContent)
+FetchContent_Declare(
+    fetch_vk_bootstrap
+    GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
+    GIT_TAG main #suggest using a tag so the library doesn't update whenever new commits are pushed to a branch
 )
+FetchContent_MakeAvailable(fetch_vk_bootstrap)
 
-target_link_libraries(KOS
-PRIVATE
+add_executable(KOS-Engine main.cpp)
+target_link_libraries(KOS-Engine PRIVATE 
     Vulkan::Vulkan
+    vk-bootstrap::vk-bootstrap
 )
 
+target_sources(KOS-Engine
+PRIVATE
+	KWindow.cpp
+	KRender.cpp
+	
+PUBLIC
+	KWindow.h
+	KRender.h
+)
+
+#Find the shader compiler 
 find_program(GLSLC
 	name glslc
 	HINTS ENV VULKAN_SDK
@@ -89,21 +70,22 @@ add_custom_command(
     VERBATIM
 )
 
+target_sources(KOS-Engine PRIVATE
+    "${HLSL_VERT}"
+    "${HLSL_FRAG}"
+    "${SPV_VERT}"
+    "${SPV_FRAG}"
+)
 
 source_group("Shaders" FILES
     "${HLSL_VERT}"
     "${HLSL_FRAG}"
+)
+
+source_group("Generated Shaders" FILES
     "${SPV_VERT}"
     "${SPV_FRAG}"
 )
-
-target_sources(KOS PRIVATE
-    "${HLSL_VERT}"
-    "${HLSL_FRAG}"
-    "${SPV_VERT}"
-    "${SPV_FRAG}"
-)
-
 
 set_source_files_properties(
     "${HLSL_VERT}"
@@ -111,6 +93,6 @@ set_source_files_properties(
     PROPERTIES HEADER_FILE_ONLY ON
 )
 
-target_compile_definitions(KOS
+target_compile_definitions(KOS-Engine
     PRIVATE KENGINE_SHADER_DIR="${SHADER_OUT_DIR}"
 )

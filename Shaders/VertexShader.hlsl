@@ -1,21 +1,23 @@
 
+
+
 struct VSInput
 {
-    float2 inPosition;
-    float3 inColor;
+    [[vk::location(0)]] float4 pos : SV_POSITION;
+    [[vk::location(1)]] float3 color : COLOR0;
 };
 
 struct VSOutput
 {
-    float4 outPosition : SV_Position;
-    float3 outColor;
+    [[vk::location(0)]] float4 pos : SV_POSITION;
+    [[vk::location(1)]] float3 color : COLOR0
 };
 
-VSOutput main(VSInput input)
+VSOutput main(VSInput vert_in )
 {
     
-    VSOutput output;
-    output.outPosition = float4(input.inPosition, 0.0f, 1.0f);
-    output.outColor = input.inColor;
-    return output;
+    VSOutput vert_out;
+    vert_out.pos = vert_in.pos;
+    vert_out.color = vert_in.color;
+    return vert_out;
 }
