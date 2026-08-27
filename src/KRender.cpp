@@ -264,12 +264,15 @@ namespace KE
 		*/
 		VkPipelineVertexInputStateCreateInfo KRender::CreateVertexInputStateInfo()
 		{
+			auto attri_desc = Vertex::GetAttributeDesc();
+			auto binding_desc = Vertex::GetBindingDesc();
+
 			VkPipelineVertexInputStateCreateInfo VertexStateInfo{};
 			VertexStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-			VertexStateInfo.pVertexAttributeDescriptions = nullptr;
-			VertexStateInfo.pVertexBindingDescriptions = nullptr;
-			VertexStateInfo.vertexAttributeDescriptionCount = 0;
-			VertexStateInfo.vertexBindingDescriptionCount = 0;
+			VertexStateInfo.pVertexAttributeDescriptions = attri_desc.data();
+			VertexStateInfo.pVertexBindingDescriptions = &binding_desc;
+			VertexStateInfo.vertexAttributeDescriptionCount = (uint32_t)attri_desc.size();
+			VertexStateInfo.vertexBindingDescriptionCount = 1;
 			return VertexStateInfo;
 		}
 

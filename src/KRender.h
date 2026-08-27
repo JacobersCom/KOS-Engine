@@ -73,6 +73,41 @@ namespace KE
 			{
 				float pos[4];
 				float color[3];
+
+				static VkVertexInputBindingDescription GetBindingDesc()
+				{
+					VkVertexInputBindingDescription binding_desc{};
+
+					binding_desc.binding = 0;
+					binding_desc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+					binding_desc.stride = sizeof(Vertex); 
+
+					return binding_desc;
+				}
+
+				static std::vector<VkVertexInputAttributeDescription> GetAttributeDesc()
+				{
+					std::vector<VkVertexInputAttributeDescription> attri_desc;
+
+					attri_desc[0].binding = 0;
+					attri_desc[0].location = 0;
+					attri_desc[0].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+					attri_desc[0].offset = offsetof(Vertex, pos);
+
+					attri_desc[1].binding = 0;
+					attri_desc[1].location = 0;
+					attri_desc[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+					attri_desc[1].offset = offsetof(Vertex, color);
+
+
+					return attri_desc;
+				}
+			};
+
+			const std::vector<Vertex> vertices = {
+				{{0.0f, -0.5f, 0.0, 0.0}, {1.0f, 0.0, 0.0}},
+				{{0.5, 0.5f, 0.0, 0.0}, {0.0f, 1.0, 0.0}},
+				{{-0.5, 0.0f, 0.0, 0.0}, {0.0f, 0.0, 1.0}},
 			};
 
 		private:
