@@ -11,8 +11,8 @@ PUBLIC
 	KWindow.h
 	KRender.h
 	KLog.h
-	KVector.h
-	KMat.h
+	KVector3.h
+	KMat4.h
 )
 
 #Find the shader compiler 
@@ -81,8 +81,16 @@ source_group("Generated Shaders" FILES
 set_source_files_properties(
     "${HLSL_VERT}"
     "${HLSL_FRAG}"
-    PROPERTIES HEADER_FILE_ONLY ON
+    PROPERTIES
+ VS_TOOL_OVERRIDE "None"
+ HEADER_FILE_ONLY ON
 )
+
+target_link_libraries(KOS-Engine
+    Vulkan::Vulkan
+)
+
+target_compile_features(KOS-Engine PRIVATE cxx_std_23)
 
 target_compile_definitions(KOS-Engine
     PRIVATE KENGINE_SHADER_DIR="${SHADER_OUT_DIR}"
