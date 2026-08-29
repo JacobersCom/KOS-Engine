@@ -1,5 +1,6 @@
 #include "KRender.h"
 #include "KWindow.h"
+#include "KLog.h"
 
 namespace KE
 {
@@ -84,6 +85,7 @@ namespace KE
 				vkDestroyFramebuffer(_VkDevice, Framebuffer, nullptr);
 			}
 			
+			vkDestroyBuffer(_VkDevice, vertex_buffer, nullptr);
 			vkDestroyRenderPass(_VkDevice, _VkRenderPass, nullptr);
 			vkDestroyPipelineLayout(_VkDevice, _VkPipelineLayout, nullptr);
 			vkDestroyCommandPool(_VkDevice, _VkCommandPool, nullptr);
@@ -587,16 +589,18 @@ namespace KE
 			//The commands being recorded will be stored here and VK_SUBPASS_CONTENTS_INLINE means the commands
 			//will be embedded in the primary command buffer
 			vkCmdBeginRenderPass(_VkCommandBuffer, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-			vkCmdBindPipeline(_VkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _VkPipeline);
-
+			
 			//Because the viewport and scissor is dynmic so they must be set in the command buffer before drawing
-
 			vkCmdSetViewport(_VkCommandBuffer, 0, 1, &_VkViewport);
 			vkCmdSetScissor(_VkCommandBuffer, 0, 1, &_VkScissor);
 
+			vkCmdBindPipeline(_VkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _VkPipeline);
+
+			vkCmdBindVertexBuffers(_VkCommandBuffer, 0, 1, &vertex_buffer, 0);
+
+
 			//Now we can draw
-			vkCmdDraw(_VkCommandBuffer, 3, 1, 0, 0);
+			vkCmdDraw(_VkCommandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 
 			vkCmdEndRenderPass(_VkCommandBuffer);
 
@@ -1042,7 +1046,52 @@ namespace KE
 
 			buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 			buffer_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-			buffer_info.size = sizeof(float) * 3;
+			buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+			buffer_info.size = sizeof(vertices[0]) * vertices.size();
+
+			if (vkCreateBuffer(_VkDevice, &buffer_info, nullptr, &vertex_buffer) != VK_SUCCESS)
+			{
+				Kos::KLog::WriteLog(Kos::LogType::Error, "Failed to create vertex_buffer");
+				return;
+			}
+
+			VkMemoryRequirements mem_requr{};
+			vkGetBufferMemoryRequirements(_VkDevice, vertex_buffer, &mem_requr);
+			
+			VkMemoryAllocateInfo mem_alloc_info{};
+			mem_alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+			mem_alloc_info.pNext = nullptr;
+			mem_alloc_info.allocationSize = mem_requr.size;
+			mem_alloc_info.memoryTypeIndex = FindMemoryType(mem_requr.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+			if (vkAllocateMemory(_VkDevice, &mem_alloc_info, nullptr, &vertex_memory) != VK_SUCCESS)
+			{
+				Kos::KLog::WriteLog(Kos::LogType::Error, "Failed to allocate vertex memory");
+				return;
+			}
+
+			vkBindBufferMemory(_VkDevice, vertex_buffer, vertex_memory, 0);
+
+			void* data;
+			vkMapMemory(_VkDevice, vertex_memory, 0, buffer_info.size, 0, &data);
+			memcpy(data, vertices.data(), (size_t)buffer_info.size);
+			vkUnmapMemory(_VkDevice, vertex_memory);
+
+		}
+
+		uint32_t KRender::FindMemoryType(uint32_t mem_filter, VkMemoryPropertyFlags properties)
+		{
+			VkPhysicalDeviceMemoryProperties mem_props{};
+			vkGetPhysicalDeviceMemoryProperties(_VkPhysicalDevice, &mem_props);
+
+			for (uint32_t i = 0; i < mem_props.memoryTypeCount; i++)
+			{
+				//Checks if the bit is set to one
+				if (mem_filter & (1 << i) && (mem_props.memoryTypes[i].propertyFlags & properties) == properties)
+				{
+					return i;
+				}
+			}
 		}
 		
 

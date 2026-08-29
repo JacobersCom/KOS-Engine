@@ -1,4 +1,4 @@
-find_package(Vulkan QUIET)
+find_package(Vulkan REQUIRED)
 
 target_sources(KOS-Engine
 PRIVATE
@@ -15,6 +15,19 @@ PUBLIC
 	KMat4.h
 )
 
+# Link Vulkan include/library to the engine target
+if (Vulkan_FOUND)
+    # Prefer imported target when available
+    if (TARGET Vulkan::Vulkan)
+        target_link_libraries(KOS-Engine PRIVATE Vulkan::Vulkan)
+    else()
+        target_include_directories(KOS-Engine PRIVATE ${Vulkan_INCLUDE_DIR})
+        target_link_libraries(KOS-Engine PRIVATE ${Vulkan_LIBRARY})
+    endif()
+else()
+    message(FATAL_ERROR "Vulkan SDK not found. Please install the Vulkan SDK and set VULKAN_SDK environment variable.")
+endif()
+
 #Find the shader compiler 
 find_program(GLSLC
 	name glslc
@@ -25,7 +38,7 @@ find_program(GLSLC
 
 #Set source and output folders
 set(SHADER_SRC_DIR "${PROJECT_SOURCE_DIR}/Shaders")
-set(SHADER_OUT_DIR "${CMAKE_BINARY_DIR}//shaders")
+set(SHADER_OUT_DIR "${CMAKE_BINARY_DIR}/shaders")
 
 #Set HLSL source files
 set(HLSL_VERT "${SHADER_SRC_DIR}/VertexShader.hlsl")
@@ -82,15 +95,9 @@ set_source_files_properties(
     "${HLSL_VERT}"
     "${HLSL_FRAG}"
     PROPERTIES
- VS_TOOL_OVERRIDE "None"
- HEADER_FILE_ONLY ON
 )
 
-target_link_libraries(KOS-Engine
-    Vulkan::Vulkan
-)
 
-target_compile_features(KOS-Engine PRIVATE cxx_std_23)
 
 target_compile_definitions(KOS-Engine
     PRIVATE KENGINE_SHADER_DIR="${SHADER_OUT_DIR}"
