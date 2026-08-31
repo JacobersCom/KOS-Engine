@@ -122,6 +122,7 @@ namespace KE
 			void CreateImageViews();
 			void CreatePipeline();
 			void CreateVertexBuffer();
+
 			uint32_t FindMemoryType(uint32_t mem_filter, VkMemoryPropertyFlags properties);
 
 			QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);

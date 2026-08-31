@@ -1,8 +1,8 @@
 
 struct PSOutput
 {
-	float4 position : SV_POSITION;
-	float3 color : COLOR0;
+    [[vk::location(0)]]float4 position : POSITION0;
+    [[vk::location(1)]]float3 color : COLOR1;
 };
 
 float4 main(PSOutput pix_out) : SV_Target

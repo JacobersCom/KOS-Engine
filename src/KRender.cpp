@@ -266,9 +266,10 @@ namespace KE
 		*/
 		VkPipelineVertexInputStateCreateInfo KRender::CreateVertexInputStateInfo()
 		{
+			//TODO: Remove static and make function paramater based
 			// Keep attribute and binding descriptions in static storage so their pointers remain valid
-			auto attri_desc = Vertex::GetAttributeDesc();
-			auto binding_desc = Vertex::GetBindingDesc();
+			static auto attri_desc = Vertex::GetAttributeDesc();
+			static auto binding_desc = Vertex::GetBindingDesc();
 
 			VkPipelineVertexInputStateCreateInfo VertexStateInfo{};
 			VertexStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
