@@ -22,12 +22,12 @@ namespace KE
 			KE::RENDERER::KRender::CreateSwapChain();
 			KE::RENDERER::KRender::CreateImageViews();
 			KE::RENDERER::KRender::CreateRenderPassInfo();
+			KE::RENDERER::KRender::CreateVertexBuffer();
 			KE::RENDERER::KRender::CreatePipeline();
 			KE::RENDERER::KRender::CreateFramebuffers();
 			KE::RENDERER::KRender::CreateCommandPool();
 			KE::RENDERER::KRender::CreateCommandBuffer();
 			KE::RENDERER::KRender::CreateSyncObjects();
-
 			return true;
 		}
 
@@ -266,15 +266,17 @@ namespace KE
 		*/
 		VkPipelineVertexInputStateCreateInfo KRender::CreateVertexInputStateInfo()
 		{
+			// Keep attribute and binding descriptions in static storage so their pointers remain valid
 			auto attri_desc = Vertex::GetAttributeDesc();
 			auto binding_desc = Vertex::GetBindingDesc();
 
 			VkPipelineVertexInputStateCreateInfo VertexStateInfo{};
 			VertexStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+			VertexStateInfo.vertexBindingDescriptionCount = 1;
+			VertexStateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attri_desc.size());
 			VertexStateInfo.pVertexAttributeDescriptions = attri_desc.data();
 			VertexStateInfo.pVertexBindingDescriptions = &binding_desc;
-			VertexStateInfo.vertexAttributeDescriptionCount = (uint32_t)attri_desc.size();
-			VertexStateInfo.vertexBindingDescriptionCount = 1;
+
 			return VertexStateInfo;
 		}
 
@@ -596,7 +598,8 @@ namespace KE
 
 			vkCmdBindPipeline(_VkCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _VkPipeline);
 
-			vkCmdBindVertexBuffers(_VkCommandBuffer, 0, 1, &vertex_buffer, 0);
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers(_VkCommandBuffer, 0, 1, &vertex_buffer, offsets);
 
 
 			//Now we can draw
@@ -958,8 +961,8 @@ namespace KE
 		*/
 		void KRender::CreatePipeline()
 		{
-			auto VertShaderCode = LoadShader(std::filesystem::path(KENGINE_SHADER_DIR) / "VertShader.spv");
-			auto PixelShaderCode = LoadShader(std::filesystem::path(KENGINE_SHADER_DIR) / "FragShader.spv");
+			auto VertShaderCode = LoadShader("../Shaders/vert.spv");
+			auto PixelShaderCode = LoadShader("../Shaders/pixel.spv");
 		
 			VkShaderModule VertModule = CreateShaderModule(VertShaderCode);
 			VkShaderModule PixelModule = CreateShaderModule(PixelShaderCode);
@@ -1157,10 +1160,10 @@ namespace KE
 
 		/*
 		*/
-		std::vector<char> KRender::LoadShader(const std::filesystem::path& _FileName)
+		std::vector<char> KRender::LoadShader(std::string file_name)
 		{
 			//Starts reading at the end of the file
-			std::ifstream file(_FileName, std::ios::ate | std::ios::binary);
+			std::ifstream file(file_name, std::ios::ate | std::ios::binary);
 			
 			if (!file.is_open())
 			{
@@ -1177,7 +1180,10 @@ namespace KE
 			//Read shader data into vector
 			file.read(buffer.data(), fileSize);
 
+
+
 			file.close();
+			
 			return buffer;
 		}
 

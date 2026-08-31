@@ -22,6 +22,7 @@
 #include <filesystem>
 
 #include <vulkan/vulkan.h>
+#include <array>
 #pragma endregion
 
 #pragma region Forward Declares
@@ -85,9 +86,9 @@ namespace KE
 					return binding_desc;
 				}
 
-				static std::vector<VkVertexInputAttributeDescription> GetAttributeDesc()
+				static std::array<VkVertexInputAttributeDescription, 2> GetAttributeDesc()
 				{
-					std::vector<VkVertexInputAttributeDescription> attri_desc;
+					std::array<VkVertexInputAttributeDescription, 2> attri_desc{};
 
 					attri_desc[0].binding = 0;
 					attri_desc[0].location = 0;
@@ -95,10 +96,9 @@ namespace KE
 					attri_desc[0].offset = offsetof(Vertex, pos);
 
 					attri_desc[1].binding = 0;
-					attri_desc[1].location = 0;
+					attri_desc[1].location = 1;
 					attri_desc[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 					attri_desc[1].offset = offsetof(Vertex, color);
-
 
 					return attri_desc;
 				}
@@ -173,7 +173,7 @@ namespace KE
 
 			//All Shader helpers
 			//Takes in the a spv compiled shader
-			std::vector<char> LoadShader(const std::filesystem::path& _FileName);
+			std::vector<char> LoadShader(std::string file_name);
 			//Takes in the return from LoadShaders
 			VkShaderModule CreateShaderModule(const std::vector<char>& code);
 

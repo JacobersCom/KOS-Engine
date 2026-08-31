@@ -1,0 +1,3 @@
+C:\VulkanSDK\1.4.335.0\Bin\glslc.exe -fshader-stage=vertex VertexShader.hlsl -o vert.spv
+C:\VulkanSDK\1.4.335.0\Bin\glslc.exe -fshader-stage=vertex PixelShader.hlsl -o pixel.spv
+pause
