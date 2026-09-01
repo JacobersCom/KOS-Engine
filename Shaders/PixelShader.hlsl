@@ -1,11 +1,10 @@
-
-struct PSOutput
+struct PSInput
 {
-    [[vk::location(0)]]float4 position : POSITION0;
-    [[vk::location(1)]]float3 color : COLOR1;
+    float4 pos : SV_POSITION;
+    float3 fragColor : COLOR1;
 };
 
-float4 main(PSOutput pix_out) : SV_Target
+float4 main(PSInput input) : SV_TARGET
 {
-	return float4(pix_out.color, 1.0);
+    return float4(input.fragColor, 1.0);
 }
