@@ -4,10 +4,10 @@
 
 namespace Kos
 {
-	
+
 	static
 	std::string log_file_name = "KLog.txt";
-	
+
 	static
 	bool log_to_file = false;
 
@@ -37,14 +37,14 @@ namespace Kos
 	}
 
 	//Change this to use a typename for writing a log
-	static
+	statics
 	void WriteToOutput(const LogType type, std::string msg, ...)
 	{
 		const std::string preFix = (type == LogType::Info) ? "Info:" : (type == LogType::Warning) ? "Warning:" : "Error:";
 		msg = preFix + " " + __FUNCTION__ + " " + msg + " " + "{}";
 		//std::print(msg);
 	}
-	
+
 
 	void KLog::WriteLog(const LogType type, std::string msg, ...)
 	{
