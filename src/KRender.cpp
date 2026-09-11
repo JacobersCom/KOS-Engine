@@ -73,28 +73,28 @@ namespace KE
 		{
 
 			vkDestroySurfaceKHR(_VkInstance, _VkSurface, nullptr);
-			vkDestroySwapchainKHR(_VkDevice, _VkSwapchain, nullptr);
+			vkDestroySwapchainKHR(device, _VkSwapchain, nullptr);
 			
 			for (auto& ImageView : _VkSwapchainImageViews)
 			{
-				vkDestroyImageView(_VkDevice, ImageView, nullptr);
+				vkDestroyImageView(device, ImageView, nullptr);
 			}
 			
 			for (auto& Framebuffer : _VkFramebuffers)
 			{
-				vkDestroyFramebuffer(_VkDevice, Framebuffer, nullptr);
+				vkDestroyFramebuffer(device, Framebuffer, nullptr);
 			}
 			
-			vkDestroyBuffer(_VkDevice, vertex_buffer, nullptr);
-			vkDestroyRenderPass(_VkDevice, _VkRenderPass, nullptr);
-			vkDestroyPipelineLayout(_VkDevice, _VkPipelineLayout, nullptr);
-			vkDestroyCommandPool(_VkDevice, _VkCommandPool, nullptr);
+			vkDestroyBuffer(device, vertex_buffer, nullptr);
+			vkDestroyRenderPass(device, _VkRenderPass, nullptr);
+			vkDestroyPipelineLayout(device, _VkPipelineLayout, nullptr);
+			vkDestroyCommandPool(device, _VkCommandPool, nullptr);
 
-			vkDestroySemaphore(_VkDevice, imageAvailableSemaphore, nullptr);
-			vkDestroySemaphore(_VkDevice, renderFinishedSemaphore, nullptr);
-			vkDestroyFence(_VkDevice, inFlightFence, nullptr);
+			vkDestroySemaphore(device, imageAvailableSemaphore, nullptr);
+			vkDestroySemaphore(device, renderFinishedSemaphore, nullptr);
+			vkDestroyFence(device, inFlightFence, nullptr);
 			
-			vkDestroyDevice(_VkDevice, nullptr);
+			vkDestroyDevice(device, nullptr);
 
 			printf("Program cleaned up");
 		}
@@ -448,7 +448,7 @@ namespace KE
 				FramebufferInfo.width = _VkSwapchainExtent.width;
 				FramebufferInfo.layers = 1; //the total sides of an image
 
-				if (vkCreateFramebuffer(_VkDevice, &FramebufferInfo, nullptr, &_VkFramebuffers[i]) != VK_SUCCESS)
+				if (vkCreateFramebuffer(device, &FramebufferInfo, nullptr, &_VkFramebuffers[i]) != VK_SUCCESS)
 				{
 					throw std::runtime_error("Failed to create Framebuffer for Swapchain Image view");
 				}
@@ -516,7 +516,7 @@ namespace KE
 			RenderPassInfo.dependencyCount = 1;
 			RenderPassInfo.pDependencies = &SubpassDependency;
 
-			VkResult result = vkCreateRenderPass(_VkDevice, &RenderPassInfo, nullptr, &_VkRenderPass);
+			VkResult result = vkCreateRenderPass(device, &RenderPassInfo, nullptr, &_VkRenderPass);
 			if (result != VK_SUCCESS)
 			{
 				printf("Failed to create RenderPass");
@@ -539,7 +539,7 @@ namespace KE
 			CommandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; 
 			CommandPoolInfo.queueFamilyIndex = Indices.GraphicsFamily.value();
 
-			if (vkCreateCommandPool(_VkDevice, &CommandPoolInfo, nullptr, &_VkCommandPool) != VK_SUCCESS)
+			if (vkCreateCommandPool(device, &CommandPoolInfo, nullptr, &_VkCommandPool) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to create command pool");
 			}
@@ -560,7 +560,7 @@ namespace KE
 			//Can be submitted to queue but not to another command buffer
 			AllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
-			if (vkAllocateCommandBuffers(_VkDevice, &AllocateInfo, &_VkCommandBuffer))
+			if (vkAllocateCommandBuffers(device, &AllocateInfo, &_VkCommandBuffer))
 			{
 				throw std::runtime_error("Failed to create primary command buffer");
 			}
@@ -623,9 +623,9 @@ namespace KE
 			FenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 			FenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; //fences start signed
 
-			if (vkCreateSemaphore(_VkDevice, &SemaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS
-				|| vkCreateSemaphore(_VkDevice, &SemaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS
-				|| vkCreateFence(_VkDevice, &FenceInfo, nullptr, &inFlightFence) != VK_SUCCESS
+			if (vkCreateSemaphore(device, &SemaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS
+				|| vkCreateSemaphore(device, &SemaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS
+				|| vkCreateFence(device, &FenceInfo, nullptr, &inFlightFence) != VK_SUCCESS
 				)
 			{
 				throw std::runtime_error("Failed to create semaphores and fence!");
@@ -639,13 +639,13 @@ namespace KE
 		{
 			//Waits for all fences to be signed before returning and disables a time out.
 			//All fences start off signed so this is oki
-			vkWaitForFences(_VkDevice, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
-			vkResetFences(_VkDevice, 1, &inFlightFence);
+			vkWaitForFences(device, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
+			vkResetFences(device, 1, &inFlightFence);
 
 			uint32_t ImageIndex;
 
 			//imageavailablesemaphore signeds when the presentation engine is finish
-			vkAcquireNextImageKHR(_VkDevice, _VkSwapchain, UINT64_MAX,
+			vkAcquireNextImageKHR(device, _VkSwapchain, UINT64_MAX,
 				imageAvailableSemaphore, VK_NULL_HANDLE, &ImageIndex);
 			
 
@@ -695,7 +695,7 @@ namespace KE
 
 			vkQueuePresentKHR(_VkPresentationQueue, &PresentInfo);
 			
-			vkDeviceWaitIdle(_VkDevice);
+			vkDeviceWaitIdle(device);
 
 		};
 
@@ -850,13 +850,13 @@ namespace KE
 			}
 
 
-			if (vkCreateDevice(_VkPhysicalDevice, &DeviceInfo, nullptr, &_VkDevice) != VK_SUCCESS)
+			if (vkCreateDevice(_VkPhysicalDevice, &DeviceInfo, nullptr, &device) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to create logical device!");
 			}
 
-			vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &_VkGraphicsQueue);
-			vkGetDeviceQueue(_VkDevice, indices.PresentFamily.value(), 0, &_VkPresentationQueue);
+			vkGetDeviceQueue(device, indices.GraphicsFamily.value(), 0, &_VkGraphicsQueue);
+			vkGetDeviceQueue(device, indices.PresentFamily.value(), 0, &_VkPresentationQueue);
 		}
 
 		/*
@@ -909,16 +909,16 @@ namespace KE
 			SwapChainInfo.clipped = VK_TRUE; // Dont care about covered pixels
 			SwapChainInfo.oldSwapchain = VK_NULL_HANDLE;
 		
-			VkResult result = vkCreateSwapchainKHR(_VkDevice, &SwapChainInfo, nullptr, &_VkSwapchain);
+			VkResult result = vkCreateSwapchainKHR(device, &SwapChainInfo, nullptr, &_VkSwapchain);
 
 			if (result != VK_SUCCESS)
 			{
 				printf("Failed to create SwapChain");
 			}
 
-			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapchain, &ImageCount, nullptr);
+			vkGetSwapchainImagesKHR(device, _VkSwapchain, &ImageCount, nullptr);
 			_VkSwapchainImages.resize(ImageCount);
-			vkGetSwapchainImagesKHR(_VkDevice, _VkSwapchain, &ImageCount, _VkSwapchainImages.data());
+			vkGetSwapchainImagesKHR(device, _VkSwapchain, &ImageCount, _VkSwapchainImages.data());
 
 			_VkSwapchainFormat = SurfaceFormat.format;
 			_VkSwapchainExtent = Extent;
@@ -949,7 +949,7 @@ namespace KE
 				ImageViewInfo.subresourceRange.baseArrayLayer = 0;
 				ImageViewInfo.subresourceRange.layerCount = 1;
 
-				VkResult result = vkCreateImageView(_VkDevice, &ImageViewInfo, nullptr, &_VkSwapchainImageViews[i]);
+				VkResult result = vkCreateImageView(device, &ImageViewInfo, nullptr, &_VkSwapchainImageViews[i]);
 
 				if (result != VK_SUCCESS)
 				{
@@ -1009,7 +1009,7 @@ namespace KE
 			PipelinelayoutInfo.pushConstantRangeCount = 0;
 			PipelinelayoutInfo.pPushConstantRanges = nullptr;
 
-			VkResult result = vkCreatePipelineLayout(_VkDevice, &PipelinelayoutInfo, nullptr, &_VkPipelineLayout);
+			VkResult result = vkCreatePipelineLayout(device, &PipelinelayoutInfo, nullptr, &_VkPipelineLayout);
 
 			if (result != VK_SUCCESS)
 			{
@@ -1033,34 +1033,46 @@ namespace KE
 			PipelineInfo.basePipelineHandle = VK_NULL_HANDLE; //Ref to another pipeline
 			PipelineInfo.basePipelineIndex = 0; //Index of pipeline
 
-			if (vkCreateGraphicsPipelines(_VkDevice, VK_NULL_HANDLE, 1, 
+			if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, 
 				&PipelineInfo, nullptr, &_VkPipeline) != VK_SUCCESS) {
 				
 				throw std::runtime_error("Failed to create GraphicsPipeLine");
 			}
 
 			//Clean up
-			vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
-			vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
+			vkDestroyShaderModule(device, VertModule, nullptr);
+			vkDestroyShaderModule(device, PixelModule, nullptr);
 		}
 
 		void KRender::CreateVertexBuffer()
 		{
+			VkDeviceSize size = sizeof(vertices[0]) * vertices.size();
+
+			CreateBuffer(size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertex_buffer, vertex_memory, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+			
+			void* data;
+			vkMapMemory(device, vertex_memory, 0, size, 0, &data);
+			memcpy(data, vertices.data(), (size_t)size);
+			vkUnmapMemory(device, vertex_memory);
+		}
+
+		void KRender::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags flags, VkBuffer& buffer, VkDeviceMemory& buffer_mem, VkMemoryPropertyFlags properties)
+		{
 			VkBufferCreateInfo buffer_info{};
 
 			buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-			buffer_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+			buffer_info.usage = flags;
 			buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-			buffer_info.size = sizeof(vertices[0]) * vertices.size();
+			buffer_info.size = size;
 
-			if (vkCreateBuffer(_VkDevice, &buffer_info, nullptr, &vertex_buffer) != VK_SUCCESS)
+			if (vkCreateBuffer(device, &buffer_info, nullptr, &buffer) != VK_SUCCESS)
 			{
 				Kos::KLog::WriteLog(Kos::LogType::Error, "Failed to create vertex_buffer");
 				return;
 			}
 
 			VkMemoryRequirements mem_requr{};
-			vkGetBufferMemoryRequirements(_VkDevice, vertex_buffer, &mem_requr);
+			vkGetBufferMemoryRequirements(device, buffer, &mem_requr);
 			
 			VkMemoryAllocateInfo mem_alloc_info{};
 			mem_alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -1068,19 +1080,13 @@ namespace KE
 			mem_alloc_info.allocationSize = mem_requr.size;
 			mem_alloc_info.memoryTypeIndex = FindMemoryType(mem_requr.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-			if (vkAllocateMemory(_VkDevice, &mem_alloc_info, nullptr, &vertex_memory) != VK_SUCCESS)
+			if (vkAllocateMemory(device, &mem_alloc_info, nullptr, &buffer_mem) != VK_SUCCESS)
 			{
 				Kos::KLog::WriteLog(Kos::LogType::Error, "Failed to allocate vertex memory");
 				return;
 			}
 
-			vkBindBufferMemory(_VkDevice, vertex_buffer, vertex_memory, 0);
-
-			void* data;
-			vkMapMemory(_VkDevice, vertex_memory, 0, buffer_info.size, 0, &data);
-			memcpy(data, vertices.data(), (size_t)buffer_info.size);
-			vkUnmapMemory(_VkDevice, vertex_memory);
-
+			vkBindBufferMemory(device, buffer, buffer_mem, 0);
 		}
 
 		uint32_t KRender::FindMemoryType(uint32_t mem_filter, VkMemoryPropertyFlags properties)
@@ -1248,7 +1254,7 @@ namespace KE
 
 			VkShaderModule _VkShaderModule;
 
-			VkResult result = vkCreateShaderModule(_VkDevice, &ShaderModuleCreateInfo, nullptr, &_VkShaderModule);
+			VkResult result = vkCreateShaderModule(device, &ShaderModuleCreateInfo, nullptr, &_VkShaderModule);
 			if (result != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to create Shader Module");

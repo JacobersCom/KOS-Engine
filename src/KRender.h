@@ -122,6 +122,7 @@ namespace KE
 			void CreateImageViews();
 			void CreatePipeline();
 			void CreateVertexBuffer();
+			void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags flags, VkBuffer& buffer, VkDeviceMemory& buffer_mem, VkMemoryPropertyFlags properties);
 
 			uint32_t FindMemoryType(uint32_t mem_filter, VkMemoryPropertyFlags properties);
 
@@ -192,7 +193,7 @@ namespace KE
 
 			KE::SYSTEM::KWindow* _win;
 			VkInstance _VkInstance;
-			VkDevice _VkDevice;
+			VkDevice device;
 			VkQueue _VkGraphicsQueue;
 			VkQueue _VkPresentationQueue;
 			VkSurfaceKHR _VkSurface;
