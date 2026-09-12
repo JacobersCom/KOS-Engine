@@ -3,6 +3,7 @@
 #include "KWindow.h"
 #include <iostream>
 
+#include "KLog.h"
 
 int main()
 {
@@ -12,6 +13,7 @@ int main()
 	_win.SetWindowDesc(L"KOS", L"KOS Engine", 500, 500);
 	_win.Create();
 	
+	KLog::WriteLog(LogType::Error, "Working");
 
 	bool IsRunning = _render.InitVulkan();
 	while (IsRunning)

@@ -22,10 +22,10 @@ namespace KE
 			KE::RENDERER::KRender::CreateSwapChain();
 			KE::RENDERER::KRender::CreateImageViews();
 			KE::RENDERER::KRender::CreateRenderPassInfo();
-			KE::RENDERER::KRender::CreateVertexBuffer();
 			KE::RENDERER::KRender::CreatePipeline();
 			KE::RENDERER::KRender::CreateFramebuffers();
 			KE::RENDERER::KRender::CreateCommandPool();
+			KE::RENDERER::KRender::CreateVertexBuffer();
 			KE::RENDERER::KRender::CreateCommandBuffer();
 			KE::RENDERER::KRender::CreateSyncObjects();
 			return true;
@@ -1085,6 +1085,7 @@ namespace KE
 				KLog::WriteLog(LogType::Error, "Failed to create vertex_buffer");
 				return;
 			}
+			KLog::WriteLog(LogType::Info, "Created staging buffer");
 
 			VkMemoryRequirements mem_requr{};
 			vkGetBufferMemoryRequirements(device, buffer, &mem_requr);

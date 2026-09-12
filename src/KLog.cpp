@@ -1,14 +1,19 @@
 #include "KLog.h"
+
+
+#include "iostream"
 #include <fstream>
 #include <filesystem>
 
 
 
-
+static
 std::string log_file_name = "KLog.txt";
 
+static
 bool log_to_file = false;
 
+static
 void WriteToFile(const LogType type, std::string msg)
 {
 	const std::string pre_fix = (type == LogType::Info) ? "Info:" : (type == LogType::Warning) ? "Warning:" : "Error:";
@@ -33,13 +38,13 @@ void WriteToFile(const LogType type, std::string msg)
 
 }
 
+static
 void WriteToOutput(const LogType type, std::string msg, ...)
 {
-const std::string preFix = (type == LogType::Info) ? "Info:" : (type == LogType::Warning) ? "Warning:" : "Error:";
-msg = preFix + " " + __FUNCTION__ + " " + msg + " " + "{}";
-	//std::print(msg);
+	const std::string pre_fix = (type == LogType::Info) ? "[INFO]:" : (type == LogType::Warning) ? "[WARNING]:" : "[ERROR]:";
+	msg = pre_fix + " " + msg;
+	std::cout << msg;
 }
-//Change this to use a typename for writing a log
 
 
 void KLog::WriteLog(const LogType type, std::string msg, ...)

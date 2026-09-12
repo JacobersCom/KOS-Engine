@@ -20,9 +20,6 @@ class KLog
 {
 public:
 
-	KLog() {};
-
-	//void Initialize();
 	static void SetLogToFile(const bool log);
 	static void WriteLog(LogType type, std::string msg, ...);
 };
