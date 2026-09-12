@@ -124,7 +124,9 @@ namespace KE
 			void CreateVertexBuffer();
 			void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags flags, VkBuffer& buffer, VkDeviceMemory& buffer_mem, VkMemoryPropertyFlags properties);
 
+
 			uint32_t FindMemoryType(uint32_t mem_filter, VkMemoryPropertyFlags properties);
+			void VulkanCopyMem(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size);
 
 			QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 			QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
@@ -194,7 +196,7 @@ namespace KE
 			KE::SYSTEM::KWindow* _win;
 			VkInstance _VkInstance;
 			VkDevice device;
-			VkQueue _VkGraphicsQueue;
+			VkQueue graphics_queue;
 			VkQueue _VkPresentationQueue;
 			VkSurfaceKHR _VkSurface;
 			VkPhysicalDevice _VkPhysicalDevice;
@@ -208,7 +210,7 @@ namespace KE
 			VkBuffer vertex_buffer;
 			VkDeviceMemory vertex_memory;
 
-			VkCommandPool _VkCommandPool;
+			VkCommandPool command_pool;
 			VkCommandBuffer _VkCommandBuffer;
 			
 			VkPipelineLayout _VkPipelineLayout;

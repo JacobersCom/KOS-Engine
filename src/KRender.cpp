@@ -88,7 +88,7 @@ namespace KE
 			vkDestroyBuffer(device, vertex_buffer, nullptr);
 			vkDestroyRenderPass(device, _VkRenderPass, nullptr);
 			vkDestroyPipelineLayout(device, _VkPipelineLayout, nullptr);
-			vkDestroyCommandPool(device, _VkCommandPool, nullptr);
+			vkDestroyCommandPool(device, command_pool, nullptr);
 
 			vkDestroySemaphore(device, imageAvailableSemaphore, nullptr);
 			vkDestroySemaphore(device, renderFinishedSemaphore, nullptr);
@@ -539,7 +539,7 @@ namespace KE
 			CommandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; 
 			CommandPoolInfo.queueFamilyIndex = Indices.GraphicsFamily.value();
 
-			if (vkCreateCommandPool(device, &CommandPoolInfo, nullptr, &_VkCommandPool) != VK_SUCCESS)
+			if (vkCreateCommandPool(device, &CommandPoolInfo, nullptr, &command_pool) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to create command pool");
 			}
@@ -554,7 +554,7 @@ namespace KE
 		{
 			VkCommandBufferAllocateInfo AllocateInfo{};
 			AllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-			AllocateInfo.commandPool = _VkCommandPool;
+			AllocateInfo.commandPool = command_pool;
 			AllocateInfo.commandBufferCount = 1;
 
 			//Can be submitted to queue but not to another command buffer
@@ -676,7 +676,7 @@ namespace KE
 			SubmittedInfo.pSignalSemaphores = SingleSemaphore;
 
 			//All commands will be submitted to the queue. The fence Will singal when it is finished
-			if (vkQueueSubmit(_VkGraphicsQueue, 1, &SubmittedInfo, inFlightFence) != VK_SUCCESS)
+			if (vkQueueSubmit(graphics_queue, 1, &SubmittedInfo, inFlightFence) != VK_SUCCESS)
 			{
 				throw std::runtime_error("Failed to submit commands to queue");
 			}
@@ -855,7 +855,7 @@ namespace KE
 				throw std::runtime_error("Failed to create logical device!");
 			}
 
-			vkGetDeviceQueue(device, indices.GraphicsFamily.value(), 0, &_VkGraphicsQueue);
+			vkGetDeviceQueue(device, indices.GraphicsFamily.value(), 0, &graphics_queue);
 			vkGetDeviceQueue(device, indices.PresentFamily.value(), 0, &_VkPresentationQueue);
 		}
 
@@ -1048,12 +1048,27 @@ namespace KE
 		{
 			VkDeviceSize size = sizeof(vertices[0]) * vertices.size();
 
-			CreateBuffer(size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertex_buffer, vertex_memory, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+			VkBuffer staging_buffer;
+			VkDeviceMemory staging_memory;
+			// This buffer is used as src in memory transfer
+			CreateBuffer(size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT| VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, staging_buffer, staging_memory, 
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 			
 			void* data;
-			vkMapMemory(device, vertex_memory, 0, size, 0, &data);
+			
+			vkMapMemory(device, staging_memory, 0, size, 0, &data);
 			memcpy(data, vertices.data(), (size_t)size);
-			vkUnmapMemory(device, vertex_memory);
+			vkUnmapMemory(device, staging_memory);
+
+			// This buffer is used as dst in memory transfer
+			CreateBuffer(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertex_buffer, vertex_memory,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT // This Buffer is most effcient for the device to access and cant be mapped but copied
+			);
+
+			VulkanCopyMem(staging_buffer, vertex_buffer, size);
+
+			vkDestroyBuffer(device, staging_buffer, nullptr);
+			vkFreeMemory(device, staging_memory, nullptr);
 		}
 
 		void KRender::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags flags, VkBuffer& buffer, VkDeviceMemory& buffer_mem, VkMemoryPropertyFlags properties)
@@ -1067,7 +1082,7 @@ namespace KE
 
 			if (vkCreateBuffer(device, &buffer_info, nullptr, &buffer) != VK_SUCCESS)
 			{
-				Kos::KLog::WriteLog(Kos::LogType::Error, "Failed to create vertex_buffer");
+				KLog::WriteLog(LogType::Error, "Failed to create vertex_buffer");
 				return;
 			}
 
@@ -1082,7 +1097,7 @@ namespace KE
 
 			if (vkAllocateMemory(device, &mem_alloc_info, nullptr, &buffer_mem) != VK_SUCCESS)
 			{
-				Kos::KLog::WriteLog(Kos::LogType::Error, "Failed to allocate vertex memory");
+				KLog::WriteLog(LogType::Error, "Failed to allocate vertex memory");
 				return;
 			}
 
@@ -1102,6 +1117,44 @@ namespace KE
 					return i;
 				}
 			}
+		}
+
+		void KRender::VulkanCopyMem(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size)
+		{
+			VkCommandBufferAllocateInfo cmd_alloc_info = {};
+			cmd_alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+			cmd_alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+			cmd_alloc_info.commandPool = command_pool;
+			cmd_alloc_info.commandBufferCount = 1;
+
+			VkCommandBuffer copy_buffer;
+			vkAllocateCommandBuffers(device, &cmd_alloc_info, &copy_buffer);
+
+			VkCommandBufferBeginInfo cmd_begin_info = {};
+			cmd_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+			cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; // the buffer is used for one operation
+
+			vkBeginCommandBuffer(copy_buffer, &cmd_begin_info);
+
+			VkBufferCopy buffer_copy = {};
+			buffer_copy.dstOffset = 0;
+			buffer_copy.srcOffset = 0;
+			buffer_copy.size = size;
+
+			vkCmdCopyBuffer(copy_buffer, src_buffer, dst_buffer, 1, &buffer_copy);
+
+			vkEndCommandBuffer(copy_buffer);
+
+			VkSubmitInfo submit_info = {};
+			submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+			submit_info.commandBufferCount = 1;
+			submit_info.pCommandBuffers = &copy_buffer;
+
+			vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+			//Waits till the queue becomes idle
+			vkQueueWaitIdle(graphics_queue);
+
+			vkFreeCommandBuffers(device, command_pool, 1, &copy_buffer);
 		}
 		
 

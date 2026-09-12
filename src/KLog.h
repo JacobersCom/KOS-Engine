@@ -2,29 +2,28 @@
 
 #include <string>
 
-namespace Kos
+
+enum class LogType
 {
-	enum class LogType
-	{
-		Info,
-		Warning,
-		Error
-	};
+	Info,
+	Warning,
+	Error
+};
 
 
-	/*
-	* The standard logging class for KOS
-	* 
-	* By default logs will be send to the output window and if logToFile is true, logs will also in KLog.txt
-	*/
-	class KLog
-	{
-	public:
+/*
+* The standard logging class for KOS
+* 
+* By default logs will be send to the output window and if logToFile is true, logs will also in KLog.txt
+*/
+class KLog
+{
+public:
 
-		KLog() {};
+	KLog() {};
 
-		//void Initialize();
-		static void SetLogToFile(const bool log);
-		static void WriteLog(LogType type, std::string msg, ...);
-	};
-}
+	//void Initialize();
+	static void SetLogToFile(const bool log);
+	static void WriteLog(LogType type, std::string msg, ...);
+};
+
