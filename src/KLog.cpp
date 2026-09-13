@@ -41,8 +41,8 @@ void WriteToFile(const LogType type, std::string msg)
 static
 void WriteToOutput(const LogType type, std::string msg, ...)
 {
-	const std::string pre_fix = (type == LogType::Info) ? "[INFO]:" : (type == LogType::Warning) ? "[WARNING]:" : "[ERROR]:";
-	msg = pre_fix + " " + msg;
+	const std::string pre_fix = (type == LogType::Info) ? "[INFO]:" : (type == LogType::Warning) ? "[WARNING]:" : (type == LogType::Error) ? "[ERROR]:" : "[VULKAN ERROR]:";
+	msg = pre_fix + " " + msg + "\n";
 	std::cout << msg;
 }
 
@@ -54,6 +54,13 @@ void KLog::WriteLog(const LogType type, std::string msg, ...)
 		WriteToFile(type, msg);
 	}
 	WriteToOutput(type, msg);
+}
+
+//NOTE: Add vulka error file logging
+void KLog::VulkanLog(VkResult x)
+{
+	WriteToOutput(LogType::VError, string_VkResult(x));
+	abort();
 }
 
 void KLog::SetLogToFile(const bool log)

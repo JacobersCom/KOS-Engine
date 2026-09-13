@@ -26,6 +26,7 @@ namespace KE
 			KE::RENDERER::KRender::CreateFramebuffers();
 			KE::RENDERER::KRender::CreateCommandPool();
 			KE::RENDERER::KRender::CreateVertexBuffer();
+			KE::RENDERER::KRender::CreateIndexBuffer();
 			KE::RENDERER::KRender::CreateCommandBuffer();
 			KE::RENDERER::KRender::CreateSyncObjects();
 			return true;
@@ -539,10 +540,7 @@ namespace KE
 			CommandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; 
 			CommandPoolInfo.queueFamilyIndex = Indices.GraphicsFamily.value();
 
-			if (vkCreateCommandPool(device, &CommandPoolInfo, nullptr, &command_pool) != VK_SUCCESS)
-			{
-				throw std::runtime_error("Failed to create command pool");
-			}
+			KLog::VulkanLog(vkCreateCommandPool(device, &CommandPoolInfo, nullptr, &command_pool));
 
 		}
 
@@ -602,9 +600,10 @@ namespace KE
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(_VkCommandBuffer, 0, 1, &vertex_buffer, offsets);
 
+			vkCmdBindIndexBuffer(_VkCommandBuffer, index_buffer, 0, VK_INDEX_TYPE_UINT16);
 
 			//Now we can draw
-			vkCmdDraw(_VkCommandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+			vkCmdDrawIndexed(_VkCommandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
 			vkCmdEndRenderPass(_VkCommandBuffer);
 
@@ -1066,6 +1065,33 @@ namespace KE
 			);
 
 			VulkanCopyMem(staging_buffer, vertex_buffer, size);
+
+			vkDestroyBuffer(device, staging_buffer, nullptr);
+			vkFreeMemory(device, staging_memory, nullptr);
+		}
+
+		void KRender::CreateIndexBuffer()
+		{
+			VkDeviceSize size = sizeof(indices[0]) * indices.size();
+
+			VkBuffer staging_buffer;
+			VkDeviceMemory staging_memory;
+			// This buffer is used as src in memory transfer
+			CreateBuffer(size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, staging_buffer, staging_memory,
+				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+			void* data;
+
+			vkMapMemory(device, staging_memory, 0, size, 0, &data);
+			memcpy(data, indices.data(), (size_t)size);
+			vkUnmapMemory(device, staging_memory);
+
+			// This buffer is used as dst in memory transfer
+			CreateBuffer(size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, index_buffer, index_memory,
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT // This Buffer is most effcient for the device to access and cant be mapped but copied
+			);
+
+			VulkanCopyMem(staging_buffer, index_buffer, size);
 
 			vkDestroyBuffer(device, staging_buffer, nullptr);
 			vkFreeMemory(device, staging_memory, nullptr);
