@@ -1,10 +1,9 @@
 #pragma once
 
 #include "NonCopyable.h"
-#include "Common.h"
+#include "VkCommon.h"
 
 
-#include <vulkan/vulkan.h>
 
 class KRenderer : public NonCopyable
 {
@@ -13,13 +12,13 @@ public:
 	KRenderer() = default;
 	
 	~KRenderer();
-
-	bool InitRenderer();
+	
+	bool CreateInstance(const char* app_name, U32 verison);
 
 private:
 
 
-	bool is_initialized;
+	bool			 is_initialized;
 
 	VkInstance		 k_instance;
 	VkPhysicalDevice k_physical;

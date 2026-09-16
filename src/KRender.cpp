@@ -540,7 +540,7 @@ namespace KE
 			CommandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; 
 			CommandPoolInfo.queueFamilyIndex = Indices.GraphicsFamily.value();
 
-			KLog::VulkanLog(vkCreateCommandPool(device, &CommandPoolInfo, nullptr, &command_pool));
+			KLog::VulkanCheck(vkCreateCommandPool(device, &CommandPoolInfo, nullptr, &command_pool));
 
 		}
 

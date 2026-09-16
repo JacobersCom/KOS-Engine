@@ -24,6 +24,6 @@ public:
 
 	static void SetLogToFile(const bool log);
 	static void WriteLog(LogType type, std::string msg, ...);
-	static void VulkanLog(VkResult x);
+	static void VulkanCheck(VkResult x);
 };
 
