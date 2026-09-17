@@ -1,55 +1,83 @@
 #pragma once
 
 #include "VkCommon.h"
+#include "VkTypes.h"
+
 
 #ifdef NDEBUG
-static const bool enableValidationLayers = false;
+global const bool enable_validation_layers = false;
 #else 
-static const bool enableValidationLayers = true;
+global const bool enable_validation_layers = true;
 #endif
 
 class VkUtils
 {
 public:
 
-	static inline 
+	internal inline
+	bool IsDeviceSuitable(VkPhysicalDevice physical_device)
+	{
+		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
+
+		bool extensionsSupported = CheckDeviceExtensionSupport(_VkPhyscialDevice);
+
+		//Is the SwapChain supported
+		bool SwapChainAdequate = false;
+		if (extensionsSupported)
+		{
+			SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails(physical_device);
+			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && !SwapChainSupportDetails.PresentMode.empty();
+		}
+
+		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
+	}
+
+	internal inline 
 	std::vector<const char*> GetRequiredInstanceExtensions()
 	{
 		std::vector<const char*> extensions;
 
-		if (enableValidationLayers)
+		if (enable_validation_layers)
 		{
 			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		}
 
 		extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 
+		if (windows)
+		{
+			extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+		}
+
 		return extensions;
 	}
 
-	static inline
+	internal inline
 	bool CheckVaildationLayerSupport(std::vector<const char*> validation_layers)
 	{
-		uint32_t LayerCount;
-		vkEnumerateInstanceLayerProperties(&LayerCount, nullptr);
+		if (!enable_validation_layers)
+			return false;
 
-		std::vector<VkLayerProperties> available_layers(LayerCount);
-		vkEnumerateInstanceLayerProperties(&LayerCount, available_layers.data());
+		uint32_t layer_count;
+		vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
+
+		std::vector<VkLayerProperties> available_layers(layer_count);
+		vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
 
 		for (const auto* layer_name : validation_layers)
 		{
-			bool Layer_found = false;
+			bool layer_found = false;
 
 			for (const auto& layer_properties : available_layers)
 			{
 				if (strcmp(layer_name, layer_properties.layerName) == 0)
 				{
-					Layer_found = true;
+					layer_found = true;
 					break;
 				}
 			}
 
-			if (!Layer_found)
+			if (!layer_found)
 				return false;
 		}
 		return true;
