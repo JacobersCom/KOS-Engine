@@ -4,7 +4,6 @@
 #include "VkUtils.h"
 #include "KLog.h"
 
-
 void KRenderer::CreateInstance(const char* app_name, U32 verison)
 {
 	//Applcation information
@@ -46,12 +45,11 @@ void KRenderer::CreateSurface(void* window_handle)
 
 #if defined(_WIN32) || defined(_WIN64)
 	
-
 	surface_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 	surface_info.hwnd = window_handle;
 	surface_info.hinstance = nullptr;
 
-	KLog::VulkanCheck(vkCreateWin32Surface(k_instance, &surface_info, nullptr, &k_surface));
+	KLog::VulkanCheck(vkCreateWin32SurfaceKHR(k_instance, &surface_info, nullptr, &k_surface));
 #elif 
 	//Linux window support
 

@@ -1,6 +1,7 @@
 #pragma once
 //NOTE: Should not be included difectly to a vulkan file! Use VkCommon for vulkan files
 
+#include <stdio.h>
 
 #define internal	  static
 #define global		  static
