@@ -1,8 +1,18 @@
 #pragma once
-//NOTE: Should not be included difectly to a vulkan file! Use VkCommon for vulkan files
+
+#define GATEWARE_ENABLE_CORE
+#define GATEWARE_ENABLE_SYSTEM
+#define GATEWARE_ENABLE_GRAPHICS
+
+#define GATEWARE_DISABLE_GDIRECTX11SURFACE
+#define GATEWARE_DISABLE_GDIRECTX12SURFACE
+#define GATEWARE_DISABLE_GRASTERSURFACE
+#define GATEWARE_DISABLE_GOPENGLSURFACE
 
 #include <stdio.h>
 #include <cstdint>
+#include "../Core/Logger/KLog.h"
+#include "../../third_party/Gateware.h"
 
 #define _internal	  static
 #define _global		  static

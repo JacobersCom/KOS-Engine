@@ -1,8 +1,6 @@
 #pragma once
 
 #include <Common.h>
-#include <Gateware.h>
-#include <vulkan/vulkan.h>
 
 class KRenderer
 {

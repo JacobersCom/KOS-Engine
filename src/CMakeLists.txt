@@ -61,9 +61,8 @@ target_include_directories(Core PUBLIC
 )
 
 #end of Core module
-
-target_link_libraries(KOS-Engine PRIVATE RHI Core)
-target_compile_features(KOS-Engine PUBLIC cxx_std_23)
+target_link_libraries(KOS-Engine PUBLIC Core)
+target_compile_features(KOS-Engine PUBLIC cxx_std_17)
 
 #Set source and output folders
 #set(SHADER_SRC_DIR "${PROJECT_SOURCE_DIR}/Shaders")
