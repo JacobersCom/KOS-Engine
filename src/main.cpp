@@ -1,7 +1,8 @@
 
 #include "RHI/Vulkan/KRender.h"
-#include "Platform/Windows/KWindow.h"
+#include "Core/Window/KWindow.h"
 #include <iostream>
+#include <Gateware.h>
 
 
 int main()
