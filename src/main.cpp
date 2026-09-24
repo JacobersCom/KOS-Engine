@@ -3,7 +3,6 @@
 #include "Platform/Windows/KWindow.h"
 #include <iostream>
 
-#include "KLog.h"
 
 int main()
 {

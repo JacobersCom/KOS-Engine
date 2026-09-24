@@ -1,11 +1,9 @@
 #pragma once
 
-#include "NonCopyable.h"
 #include "VkCommon.h"
 
 
-
-class KRenderer : public NonCopyable
+class KRenderer
 {
 public:
 	
