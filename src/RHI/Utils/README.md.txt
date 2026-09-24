@@ -1,1 +1,0 @@
-This folder holds only vulkan Utils within it

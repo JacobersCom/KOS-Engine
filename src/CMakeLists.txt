@@ -12,23 +12,19 @@ file(GLOB_RECURSE Vulkan
     "${RHI_PATH}/Vulkan/*.h"
 )
 
-file(GLOB_RECURSE Utils
-    "${RHI_PATH}/Utils/*.cpp"
-    "${RHI_PATH}/Utils/*.h"
-)
 
 file(GLOB_RECURSE SRC_RHI
     ${Vulkan}
-    ${Utils}
 )
 
 add_library(RHI ${SRC_RHI})
 
 source_group("Vulkan" FILES ${Vulkan})
-source_group("Utils" FILES ${Utils})
 
-
-target_include_directories(RHI PUBLIC "../third_party/Gateware.h")
+target_include_directories(RHI PUBLIC 
+"${CMAKE_SOURCE_DIR}/third_party/"
+"${CMAKE_CURRENT_SOURCE_DIR}/Utils/"
+)
 target_link_libraries(RHI PRIVATE Vulkan::Vulkan Vulkan::shaderc_combined)
 #end of RHI module
 
@@ -48,24 +44,21 @@ file(GLOB_RECURSE Window
     "${CORE_PATH}/Window/*.h"    
 )
 
-file(GLOB_RECURSE Utils
-    "${CORE_PATH}/Utils/*.cpp"
-    "${CORE_PATH}/Utils/*.h"    
-)
-
 file(GLOB_RECURSE SRC_CORE
     ${Logger}
     ${Math}
     ${Window}
-    ${Utils}
-
 )
 add_library(Core ${SRC_CORE})
 
 source_group("Math" FILES ${Math})
-source_group("Utils" FILES ${Utils})
 source_group("Logger" FILES ${Logger})
 source_group("Window" FILES ${Window})
+
+target_include_directories(Core PUBLIC 
+"${CMAKE_SOURCE_DIR}/third_party/"
+"${CMAKE_CURRENT_SOURCE_DIR}/Utils/"
+)
 
 #end of Core module
 

@@ -1,8 +1,9 @@
 #pragma once
 
-#include <vulkan/vk_enum_string_helper.h>
-
 //Add loging for Vulkan errors
+
+#include <iostream>
+#include <string>
 
 enum class LogType
 {
@@ -24,6 +25,5 @@ public:
 
 	static void SetLogToFile(const bool log);
 	static void WriteLog(LogType type, std::string msg, ...);
-	static void VulkanCheck(VkResult x);
 };
 
