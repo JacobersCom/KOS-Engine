@@ -1,5 +1,5 @@
 #Cmake make minium required 
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.20)
 
 #Project name version and language used
 project(KOS-Engine VERSION 1.0 LANGUAGES CXX)

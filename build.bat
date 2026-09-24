@@ -3,7 +3,7 @@ set "build_folder=build"
 
 if exist "%build_folder%" (
 	echo found build folder. compiling project...
-	cmake --build build
+	cmake --build build --target clean
 ) else (
 
 	 set /p version="Enter Visual Studio verison (22 or 26): "
