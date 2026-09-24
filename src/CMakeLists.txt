@@ -4,34 +4,75 @@ set(CORE_PATH           "${CMAKE_CURRENT_SOURCE_DIR}/Core")
 set(PLATFORM_PATH    "${CMAKE_CURRENT_SOURCE_DIR}/Platform")
 set(RHI_PATH             "${CMAKE_CURRENT_SOURCE_DIR}/RHI")
 
-set(WINDOWS_PATH "${PLATFORM_PATH}/Windows")
-set(VULKAN_PATH        "${RHI_PATH}/Vulkan")
 
-#Sources for windows platform and VK
-#Note: Will need to change the GLOB_RECURSE to target the platform and RHI folder instead
-file(GLOB_RECURSE SRC_WIN
-    "${WINDOWS_PATH}/*.cpp"
-    "${WINDOWS_PATH}/*.h"
-)
 
-file(GLOB_RECURSE SRC_VK
-    "${VULKAN_PATH}/*.cpp"
-    "${VULKAN_PATH}/*.h"
-)
-
+#RHI module 
 find_package(Vulkan REQUIRED COMPONENTS shaderc_combined)
 
-add_library(Platform ${SRC_WIN})
-add_library(RHI ${SRC_VK})
+file(GLOB_RECURSE Vulkan
+    "${RHI_PATH}/Vulkan/*.cpp"
+    "${RHI_PATH}/Vulkan/*.h"
+)
+
+file(GLOB_RECURSE Utils
+    "${RHI_PATH}/Utils/*.cpp"
+    "${RHI_PATH}/Utils/*.h"
+)
+
+file(GLOB_RECURSE SRC_RHI
+    ${Vulkan}
+    ${Utils}
+)
+
+add_library(RHI ${SRC_RHI})
+
+source_group("Vulkan" FILES ${Vulkan})
+source_group("Utils" FILES ${Utils})
 
 target_link_libraries(RHI PRIVATE Vulkan::Vulkan Vulkan::shaderc_combined)
+#end of RHI module
 
-source_group("Windows" FILES ${SRC_WIN})
-source_group("Vulkan" FILES ${SRC_VK})
+#Core module
+file(GLOB_RECURSE Logger
+    "${CORE_PATH}/Logger/*.cpp"
+    "${CORE_PATH}/Logger/*.h"
+)
+
+file(GLOB_RECURSE Math
+    "${CORE_PATH}/Math/*.cpp"
+    "${CORE_PATH}/Math/*.h"    
+)
+
+file(GLOB_RECURSE Window
+    "${CORE_PATH}/Window/*.cpp"
+    "${CORE_PATH}/Window/*.h"    
+)
+
+file(GLOB_RECURSE Utils
+    "${CORE_PATH}/Utils/*.cpp"
+    "${CORE_PATH}/Utils/*.h"    
+)
+
+file(GLOB_RECURSE SRC_CORE
+    ${Logger}
+    ${Math}
+    ${Window}
+    ${Utils}
+
+)
+add_library(Core ${SRC_CORE})
+
+source_group("Math" FILES ${Math})
+source_group("Utils" FILES ${Utils})
+source_group("Logger" FILES ${Logger})
+source_group("Window" FILES ${Window})
+#end of Core module
 
 
 
-target_link_libraries(KOS-Engine PRIVATE RHI Platform)
+
+
+target_link_libraries(KOS-Engine PRIVATE RHI Core)
 
 #Set source and output folders
 #set(SHADER_SRC_DIR "${PROJECT_SOURCE_DIR}/Shaders")
