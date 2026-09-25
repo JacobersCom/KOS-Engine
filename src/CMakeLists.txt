@@ -38,31 +38,25 @@ file(GLOB_RECURSE Window
     "${CORE_PATH}/Window/*.h"    
 )
 
+file(GLOB_RECURSE Utils
+    "${CORE_PATH}/Utils/*.cpp"
+    "${CORE_PATH}/Utils/*.h"    
+)
+
 file(GLOB_RECURSE SRC_CORE
     ${Logger}
     ${Math}
     ${Window}
+    ${Utils}
 )
 add_library(Core ${SRC_CORE})
 
-source_group("Math" FILES ${Math})
-source_group("Logger" FILES ${Logger})
-source_group("Window" FILES ${Window})
+source_group("Math"     FILES ${Math})
+source_group("Logger"   FILES ${Logger})
+source_group("Window"   FILES ${Window})
+source_group("Utils"    FILES ${Utils})
 
 #end of Core module
-
-#Utils module
-file(GLOB_RECURSE SRC_UTILS
-    "${UTILS_PATH}/*.h"
-    "${UTILS_PATH}/*.cpp"
-)
-add_library(Utils ${SRC_UTILS})
-
-source_group("Utils" FILES ${SRC_UTILS})
-set_target_properties(Utils PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(Utils PUBLIC "../third_party/")
-
-#end of Utils module
 
 target_include_directories(Core PUBLIC "../third_party/")
 
