@@ -8,7 +8,7 @@ constexpr U16 window_w = 600;
 
 void KWindow::InitalizeWindow()
 {
-	if (k_window.Create(0, 0, window_w, window_h, GW::SYSTEM::GWindowStyle::WINDOWEDBORDERED) == GW::GReturn::SUCCESS)
+	if (+k_window.Create(0, 0, window_w, window_h, GW::SYSTEM::GWindowStyle::WINDOWEDBORDERED))
 	{
 		KLog::WriteLog(LogType::Info, "Window create successfully");
 		k_window.SetWindowName("KOS Engine");

@@ -1,7 +1,6 @@
 
 # Sets up paths to folders
 set(CORE_PATH           "${CMAKE_CURRENT_SOURCE_DIR}/Core")
-set(PLATFORM_PATH    "${CMAKE_CURRENT_SOURCE_DIR}/Platform")
 set(RHI_PATH             "${CMAKE_CURRENT_SOURCE_DIR}/RHI")
 
 #RHI module 
@@ -21,10 +20,6 @@ add_library(RHI ${SRC_RHI})
 
 source_group("Vulkan" FILES ${Vulkan})
 
-target_include_directories(RHI PUBLIC 
-"${CMAKE_SOURCE_DIR}/third_party/"
-"${CMAKE_CURRENT_SOURCE_DIR}/Utils/"
-)
 target_link_libraries(RHI PRIVATE Vulkan::Vulkan Vulkan::shaderc_combined)
 #end of RHI module
 
@@ -55,12 +50,11 @@ source_group("Math" FILES ${Math})
 source_group("Logger" FILES ${Logger})
 source_group("Window" FILES ${Window})
 
-target_include_directories(Core PUBLIC 
-"${CMAKE_SOURCE_DIR}/third_party/"
-"${CMAKE_CURRENT_SOURCE_DIR}/Utils/"
-)
+target_include_directories(Core PUBLIC "../third_party/" "${CMAKE_CURRENT_SOURCE_DIR}/Utils")
 
 #end of Core module
+
+
 target_link_libraries(KOS-Engine PUBLIC Core)
 target_compile_features(KOS-Engine PUBLIC cxx_std_17)
 
