@@ -1,9 +1,5 @@
 #pragma once
 
-#define GATEWARE_ENABLE_CORE
-#define GATEWARE_ENABLE_SYSTEM 
-
-#include <Gateware/Gateware.h>
 #include <Common.h>
 
 class KWindow

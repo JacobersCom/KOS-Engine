@@ -28,8 +28,8 @@ void KWindow::Update()
 {
 	KLog::WriteLog(LogType::Info, "Update loop as began");
 
-	while (true)
+	while (+k_window.ProcessWindowEvents())
 	{
-
+		
 	}
 }

@@ -11,4 +11,3 @@ int main()
 
 }
 
-GW::SYSTEM::GApp app(main);
