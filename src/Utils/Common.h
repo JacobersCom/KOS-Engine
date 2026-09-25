@@ -3,6 +3,7 @@
 #define GATEWARE_ENABLE_SYSTEM 
 
 #include <Gateware/Gateware.h>
+#include <entt/entt.hpp>
 #include "../Core/Logger/KLog.h"
 
 #include <stdio.h>

@@ -4,10 +4,14 @@
 
 int main()
 {
-	KWindow _win;
+	KWindow win;
 
+	win.InitalizeWindow("KOS-Engine", 800, 800);
 
-	_win.InitalizeWindow();
+	while (win.IsWindowOpen())
+	{
+		win.Update();
+	}
 
 }
 

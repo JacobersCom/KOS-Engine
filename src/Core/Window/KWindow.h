@@ -1,17 +1,19 @@
 #pragma once
 
-#include <Common.h>
+#include "../Utils/Common.h"
 
 class KWindow
 {
 public:
 
-	void InitalizeWindow();
+	void InitalizeWindow(const char* window_name, int width, int height);
+	
+	bool IsWindowOpen() const { return is_open; }
+
 	void Update();
 
 private:
 
-
-	GW::SYSTEM::GWindow		    k_window;
-	GW::SYSTEM::GWindow::Events k_window_event;
+	bool						 is_open;
+	GW::SYSTEM::GWindow		     k_window;
 };
