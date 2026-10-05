@@ -1,4 +1,4 @@
-#include <Common.h>
+#include "../Utils/Common.h"
 
 #include "KLog.h"
 
@@ -7,13 +7,13 @@
 
 
 
-_global
+global
 std::string log_file_name = "KLog.txt";
 
-_global
+global
 bool log_to_file = false;
 
-_internal
+internal
 void WriteToFile(const LogType type, std::string msg)
 {
 	const std::string pre_fix = (type == LogType::Info) ? "Info:" : (type == LogType::Warning) ? "Warning:" : "Error:";
@@ -38,7 +38,7 @@ void WriteToFile(const LogType type, std::string msg)
 
 }
 
-_internal
+internal
 void WriteToOutput(const LogType type, std::string msg, ...)
 {
 	const std::string pre_fix = (type == LogType::Info) ? "[INFO]:" : (type == LogType::Warning) ? "[WARNING]:" : (type == LogType::Error) ? "[ERROR]:" : "[VULKAN ERROR]:";
@@ -56,7 +56,6 @@ void KLog::WriteLog(const LogType type, std::string msg, ...)
 	WriteToOutput(type, msg);
 }
 
-//NOTE: Add vulkan error file logging
 
 void KLog::SetLogToFile(const bool log)
 {

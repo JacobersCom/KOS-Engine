@@ -1,5 +1,7 @@
 #include "KWindow.h"
 
+#include "../Logger/KLog.h"
+
 
 void KWindow::InitalizeWindow(const char* window_name, int width, int height)
 {

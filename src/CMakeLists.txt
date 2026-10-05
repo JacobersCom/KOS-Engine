@@ -60,8 +60,6 @@ source_group("Utils"    FILES ${Utils})
 
 target_include_directories(Core PUBLIC "../third_party/")
 
-target_link_libraries(Core PRIVATE Utils)
-
 
 target_link_libraries(KOS-Engine PUBLIC Core)
 target_compile_features(KOS-Engine PUBLIC cxx_std_17)
