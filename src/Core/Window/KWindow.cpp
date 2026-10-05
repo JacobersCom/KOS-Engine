@@ -3,7 +3,7 @@
 #include "../Logger/KLog.h"
 
 
-void KWindow::InitalizeWindow(const char* window_name, int width, int height)
+void KWindow::InitalizeWindow()
 {
 	if (-k_window.Create(0, 0, width, height, GW::SYSTEM::GWindowStyle::WINDOWEDBORDERED))
 	{
