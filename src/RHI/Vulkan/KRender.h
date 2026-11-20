@@ -25,7 +25,6 @@
 #include <array>
 #pragma endregion
 
-
 #pragma region Forward Declares
 namespace KE::SYSTEM
 {
@@ -106,16 +105,9 @@ namespace KE
 			};
 
 			const std::vector<Vertex> vertices = {
-				{{-0.5f, -0.5f,0.0,1.0}, {1.0f, 0.0f, 0.0f}},
-				{{0.5f, -0.5f,0.0,1.0}, {0.0f, 1.0f, 0.0f}},
-				{{0.5f, 0.5f,0.0,1.0}, {0.0f, 0.0f, 1.0f}},
-				{{-0.5f, 0.5f, 0.0, 1.0}, {1.0f, 1.0f, 1.0f}}
-
-			};
-
-			const std::vector<uint16_t> indices =
-			{
-				0,1,2,2,3,0
+				{{0.0f, -0.5f, 0.0, 1.0}, {1.0f, 0.0, 0.0}},
+				{{0.5, 0.5f, 0.0, 1.0}, {0.0f, 1.0, 0.0}},
+				{{-0.5, 0.0f, 0.0, 1.0}, {0.0f, 0.0, 1.0}},
 			};
 
 		private:
@@ -130,7 +122,6 @@ namespace KE
 			void CreateImageViews();
 			void CreatePipeline();
 			void CreateVertexBuffer();
-			void CreateIndexBuffer();
 			void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags flags, VkBuffer& buffer, VkDeviceMemory& buffer_mem, VkMemoryPropertyFlags properties);
 
 
@@ -218,8 +209,6 @@ namespace KE
 
 			VkBuffer vertex_buffer;
 			VkDeviceMemory vertex_memory;
-			VkBuffer index_buffer;
-			VkDeviceMemory index_memory;
 
 			VkCommandPool command_pool;
 			VkCommandBuffer _VkCommandBuffer;

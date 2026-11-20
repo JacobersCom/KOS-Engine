@@ -41,8 +41,8 @@ void WriteToFile(const LogType type, std::string msg)
 internal
 void WriteToOutput(const LogType type, std::string msg, ...)
 {
-	const std::string pre_fix = (type == LogType::Info) ? "[INFO]:" : (type == LogType::Warning) ? "[WARNING]:" : (type == LogType::Error) ? "[ERROR]:" : "[VULKAN ERROR]:";
-	msg = pre_fix + " " + msg + "\n";
+	const std::string pre_fix = (type == LogType::Info) ? "[INFO]:" : (type == LogType::Warning) ? "[WARNING]:" : "[ERROR]:";
+	msg = pre_fix + " " + msg;
 	std::cout << msg;
 }
 
@@ -56,7 +56,10 @@ void KLog::WriteLog(const LogType type, std::string msg, ...)
 	WriteToOutput(type, msg);
 }
 
+<<<<<<< HEAD:src/Core/Logger/KLog.cpp
 
+=======
+>>>>>>> parent of 028c38d (Added Vulkan logging, and created a helper class for NonCopyable objects):src/KLog.cpp
 void KLog::SetLogToFile(const bool log)
 {
 	log_to_file = log;

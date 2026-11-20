@@ -10,7 +10,11 @@ int main()
 {
 	entt::registry registry;
 	
+<<<<<<< HEAD
 	WindowSystem(registry);
+=======
+	KLog::WriteLog(LogType::Error, "Working");
+>>>>>>> parent of 028c38d (Added Vulkan logging, and created a helper class for NonCopyable objects)
 
 	//Use on construct and on update with entt!!!
 }
